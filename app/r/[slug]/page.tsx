@@ -551,28 +551,29 @@ export default function RestaurantPage({ params }: { params: Promise<{ slug: str
       </section>
 
       {/* Footer */}
-      <footer className="bg-black text-white py-16">
+      <footer className="bg-black text-white py-12 md:py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-12">
-              <h3 className="text-4xl font-bold mb-6">{restaurant.name}</h3>
-              <p className="text-slate-400 text-xl max-w-2xl mx-auto leading-relaxed">
+            {/* Restaurant Info */}
+            <div className="text-center mb-8 md:mb-12">
+              <h3 className="text-2xl md:text-4xl font-bold mb-4 md:mb-6">{restaurant.name}</h3>
+              <p className="text-slate-400 text-base md:text-xl max-w-2xl mx-auto leading-relaxed px-4">
                 {restaurant.description || "Delicious food, great service, unforgettable experiences"}
               </p>
             </div>
 
             {/* Social Media */}
             {restaurant.social_media && (
-              <div className="flex justify-center space-x-6 mb-12">
+              <div className="flex flex-wrap justify-center gap-4 md:gap-6 mb-8 md:mb-12 px-4">
                 {Object.entries(restaurant.social_media)
                   .filter(([platform, url]) => url && url !== '')
                   .map(([platform, url]) => {
                     const getIcon = (platform: string) => {
                       switch (platform.toLowerCase()) {
-                        case 'instagram': return <Instagram className="h-6 w-6" />
-                        case 'facebook': return <Facebook className="h-6 w-6" />
-                        case 'twitter': return <Twitter className="h-6 w-6" />
-                        case 'tiktok': return <Youtube className="h-6 w-6" />
+                        case 'instagram': return <Instagram className="h-5 w-5 md:h-6 md:w-6" />
+                        case 'facebook': return <Facebook className="h-5 w-5 md:h-6 md:w-6" />
+                        case 'twitter': return <Twitter className="h-5 w-5 md:h-6 md:w-6" />
+                        case 'tiktok': return <Youtube className="h-5 w-5 md:h-6 md:w-6" />
                         default: return null
                       }
                     }
@@ -588,7 +589,7 @@ export default function RestaurantPage({ params }: { params: Promise<{ slug: str
                         href={socialUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-slate-400 hover:text-white transition-colors p-3 rounded-full bg-white/10 hover:bg-white/20"
+                        className="text-slate-400 hover:text-white transition-colors p-2 md:p-3 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center"
                         title={`Follow us on ${platform}`}
                       >
                         {getIcon(platform)}
@@ -598,8 +599,9 @@ export default function RestaurantPage({ params }: { params: Promise<{ slug: str
               </div>
             )}
 
-            <div className="border-t border-slate-800 pt-8 text-center">
-              <p className="text-slate-500">
+            {/* Bottom Section */}
+            <div className="border-t border-slate-800 pt-6 md:pt-8 text-center">
+              <p className="text-slate-500 text-sm md:text-base px-4">
                 Powered by <span className="text-blue-400 font-semibold">Tably</span> Restaurant Management Platform
               </p>
             </div>

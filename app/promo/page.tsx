@@ -444,12 +444,12 @@ export default function PromoPage() {
       ))}
 
       {/* Footer */}
-      <footer className="relative z-10 px-6 py-12 bg-slate-900 text-white">
+      <footer className="relative z-10 px-4 md:px-6 py-8 md:py-12 bg-slate-900 text-white">
         <div className="max-w-7xl mx-auto text-center">
-          <div className="flex justify-center mb-6">
-            <img src="/tably_logo.png" alt="Tably" className="h-8 w-auto brightness-0 invert" />
+          <div className="flex justify-center mb-4 md:mb-6">
+            <img src="/tably_logo.png" alt="Tably" className="h-6 md:h-8 w-auto brightness-0 invert" />
           </div>
-          <p className="text-slate-400">
+          <p className="text-slate-400 text-sm md:text-base">
             © 2024 Tably. Todos los derechos reservados.
           </p>
         </div>

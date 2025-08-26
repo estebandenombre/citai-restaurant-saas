@@ -817,46 +817,65 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-16">
+      <footer className="bg-gray-900 text-white py-12 md:py-16">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
+          {/* Main Footer Content */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
+            {/* Company Info - Full width on mobile */}
+            <div className="col-span-1 sm:col-span-2 lg:col-span-1">
               <Logo size="lg" />
-              <p className="text-gray-400 mt-4">
+              <p className="text-gray-400 mt-4 text-sm md:text-base leading-relaxed">
                 The restaurant management platform that actually works. Streamline your operations, boost your revenue, and delight your customers.
               </p>
             </div>
-            <div>
-              <h3 className="font-semibold mb-4">Product</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link href="#" className="hover:text-white transition-colors">Features</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">Pricing</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">Demo</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">API</Link></li>
+            
+            {/* Product Links */}
+            <div className="text-center sm:text-left">
+              <h3 className="font-semibold mb-4 text-white">Product</h3>
+              <ul className="space-y-3 text-gray-400">
+                <li><Link href="#" className="hover:text-white transition-colors text-sm md:text-base block py-1">Features</Link></li>
+                <li><Link href="#" className="hover:text-white transition-colors text-sm md:text-base block py-1">Pricing</Link></li>
+                <li><Link href="#" className="hover:text-white transition-colors text-sm md:text-base block py-1">Demo</Link></li>
+                <li><Link href="#" className="hover:text-white transition-colors text-sm md:text-base block py-1">API</Link></li>
               </ul>
             </div>
-            <div>
-              <h3 className="font-semibold mb-4">Support</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link href="#" className="hover:text-white transition-colors">Help Center</Link></li>
-                <li><a href="mailto:info@tably.digital" className="hover:text-white transition-colors">Contact Us</a></li>
-                <li><Link href="#" className="hover:text-white transition-colors">Status</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">Training</Link></li>
+            
+            {/* Support Links */}
+            <div className="text-center sm:text-left">
+              <h3 className="font-semibold mb-4 text-white">Support</h3>
+              <ul className="space-y-3 text-gray-400">
+                <li><Link href="#" className="hover:text-white transition-colors text-sm md:text-base block py-1">Help Center</Link></li>
+                <li><a href="mailto:info@tably.digital" className="hover:text-white transition-colors text-sm md:text-base block py-1">Contact Us</a></li>
+                <li><Link href="#" className="hover:text-white transition-colors text-sm md:text-base block py-1">Status</Link></li>
+                <li><Link href="#" className="hover:text-white transition-colors text-sm md:text-base block py-1">Training</Link></li>
               </ul>
             </div>
-            <div>
-              <h3 className="font-semibold mb-4">Company</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link href="#" className="hover:text-white transition-colors">About</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">Blog</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">Careers</Link></li>
-                <li><Link href="/legal/privacy" className="hover:text-white transition-colors">Privacy</Link></li>
-                <li><Link href="/legal/terms" className="hover:text-white transition-colors">Terms</Link></li>
+            
+            {/* Company Links */}
+            <div className="text-center sm:text-left">
+              <h3 className="font-semibold mb-4 text-white">Company</h3>
+              <ul className="space-y-3 text-gray-400">
+                <li><Link href="#" className="hover:text-white transition-colors text-sm md:text-base block py-1">About</Link></li>
+                <li><Link href="#" className="hover:text-white transition-colors text-sm md:text-base block py-1">Blog</Link></li>
+                <li><Link href="#" className="hover:text-white transition-colors text-sm md:text-base block py-1">Careers</Link></li>
+                <li><Link href="/legal/privacy" className="hover:text-white transition-colors text-sm md:text-base block py-1">Privacy</Link></li>
+                <li><Link href="/legal/terms" className="hover:text-white transition-colors text-sm md:text-base block py-1">Terms</Link></li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 Tably. All rights reserved. Made with ❤️ for restaurant owners.</p>
+          
+          {/* Bottom Section */}
+          <div className="border-t border-gray-800 mt-8 md:mt-12 pt-6 md:pt-8">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <p className="text-gray-400 text-sm md:text-base text-center md:text-left">
+                &copy; 2024 Tably. All rights reserved. Made with ❤️ for restaurant owners.
+              </p>
+              <div className="flex items-center space-x-4 text-gray-400">
+                <a href="mailto:info@tably.digital" className="hover:text-white transition-colors text-sm">
+                  info@tably.digital
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </footer>
