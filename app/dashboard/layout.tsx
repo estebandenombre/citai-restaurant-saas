@@ -6,6 +6,7 @@ import { Sidebar } from "@/components/sidebar"
 import { AIChat } from "@/components/ai-chat/ai-chat"
 import { TrialExpiredBanner, TrialExpiredCard } from "@/components/subscription/trial-expired-banner"
 import { useSubscription } from "@/hooks/use-subscription"
+import { AuthGuard } from "@/components/auth/auth-guard"
 import { supabase } from "@/lib/supabase"
 
 export default function DashboardLayout({
@@ -19,23 +20,25 @@ export default function DashboardLayout({
 
 
   return (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="light"
-      enableSystem
-      disableTransitionOnChange
-    >
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
-        {/* Show trial expired banner if trial has expired */}
-        {!loading && isTrialExpired && (
-          <TrialExpiredBanner />
-        )}
-        
-        <Sidebar sidebarCollapsed={sidebarCollapsed} setSidebarCollapsed={setSidebarCollapsed} />
-        <MainContent sidebarCollapsed={sidebarCollapsed}>{children}</MainContent>
-        <AIChat isOpen={aiChatOpen} onToggle={() => setAiChatOpen(!aiChatOpen)} />
-      </div>
-    </ThemeProvider>
+    <AuthGuard>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="light"
+        enableSystem
+        disableTransitionOnChange
+      >
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
+          {/* Show trial expired banner if trial has expired */}
+          {!loading && isTrialExpired && (
+            <TrialExpiredBanner />
+          )}
+          
+          <Sidebar sidebarCollapsed={sidebarCollapsed} setSidebarCollapsed={setSidebarCollapsed} />
+          <MainContent sidebarCollapsed={sidebarCollapsed}>{children}</MainContent>
+          <AIChat isOpen={aiChatOpen} onToggle={() => setAiChatOpen(!aiChatOpen)} />
+        </div>
+      </ThemeProvider>
+    </AuthGuard>
   )
 }
 
