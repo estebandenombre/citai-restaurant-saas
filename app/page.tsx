@@ -8,7 +8,7 @@ import {
   Play, 
   Check, 
   Star, 
-  Users, 
+  Users,  
   Zap, 
   Shield, 
   Clock, 
