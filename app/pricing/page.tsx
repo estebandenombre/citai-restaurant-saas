@@ -382,53 +382,75 @@ export default function PricingPage() {
         {/* FAQ Section */}
         <div className="mt-16 max-w-4xl mx-auto">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold mb-2">Frequently Asked Questions</h2>
+            <h2 className="text-2xl font-bold mb-2">Frequently Asked Questions About Restaurant Management Software</h2>
             <p className="text-muted-foreground">
-              Everything you need to know about our subscription plans
+              Everything you need to know about Tably's restaurant SaaS platform and subscription plans
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Can I change my plan anytime?</CardTitle>
+                <CardTitle className="text-lg">What is restaurant management software?</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Yes! You can upgrade or downgrade your plan at any time. Please contact our support team at support@tably.com to make changes to your plan.
+                  Restaurant management software like Tably is an all-in-one SaaS platform that helps restaurants manage online ordering, reservations, inventory, staff, and analytics. It streamlines operations and boosts revenue.
                 </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">What happens after my trial ends?</CardTitle>
+                <CardTitle className="text-lg">How does online ordering work with Tably?</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  After your 14-day trial, you'll need to contact us to upgrade to a paid plan. Your account will remain active but with limited features.
+                  Tably's online ordering system allows customers to place orders directly through your restaurant's website. Orders are automatically sent to your kitchen display system, and you can track everything in real-time.
                 </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">How do I upgrade my plan?</CardTitle>
+                <CardTitle className="text-lg">Can I change my restaurant management plan anytime?</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Simply click "Contact to Upgrade" on any plan and send us a message. We'll process your request and contact you within 24 hours.
+                  Yes! You can upgrade or downgrade your restaurant SaaS plan at any time. Please contact our support team at info@tably.digital to make changes to your plan.
                 </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Can I cancel anytime?</CardTitle>
+                <CardTitle className="text-lg">What happens after my free trial ends?</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Absolutely! You can cancel your subscription at any time by contacting our support team at support@tably.com.
+                  After your 14-day free trial, you'll need to upgrade to a paid restaurant management software plan. Your account remains active with limited features until you upgrade.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">How do I upgrade my restaurant software plan?</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Simply click "Contact to Upgrade" on any plan and send us a message. We'll process your restaurant management software upgrade request within 24 hours.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Can I cancel my restaurant SaaS subscription anytime?</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Absolutely! You can cancel your restaurant management software subscription at any time by contacting our support team at info@tably.digital.
                 </p>
               </CardContent>
             </Card>

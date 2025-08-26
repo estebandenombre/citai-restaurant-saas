@@ -60,7 +60,7 @@ export default function PrivacyPage() {
 
             <section>
               <h2 className="text-xl font-semibold text-gray-900 mb-3">7. Contact Us</h2>
-              <p>For privacy questions, contact us at privacy@tably.com</p>
+              <p>For privacy questions, contact us at info@tably.digital</p>
             </section>
           </div>
 

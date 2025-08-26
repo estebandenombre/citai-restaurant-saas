@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Logo } from "@/components/ui/logo"
+import { VideoModal } from "@/components/video-modal"
 import { 
   ArrowRight, 
   Play, 
@@ -92,7 +93,7 @@ export default function HomePage() {
 
             {/* Main Headline */}
             <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
-              The Restaurant Management Platform
+              AI-Powered Restaurant Management Software
               <span className="block bg-gradient-to-r from-[#7C3AED] to-[#D64DD2] bg-clip-text text-transparent">
                 That Actually Works
               </span>
@@ -100,7 +101,7 @@ export default function HomePage() {
 
             {/* Subheadline */}
             <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Stop juggling spreadsheets and sticky notes. Tably gives you everything you need to run your restaurant efficiently - orders, reservations, inventory, and analytics in one beautiful dashboard.
+              Transform your restaurant with Tably's comprehensive SaaS platform. Accept online orders, manage reservations, track kitchen tickets, and get AI-powered insights to boost revenue and streamline operations.
             </p>
 
             {/* CTA Buttons */}
@@ -111,10 +112,12 @@ export default function HomePage() {
                   Start Free Trial
                 </Button>
               </Link>
-              <Button variant="outline" size="lg" className="border-2 border-gray-300 text-gray-900 hover:bg-gray-50 hover:text-gray-900 text-lg px-8 py-4 font-medium">
-                <Play className="w-5 h-5 mr-2" />
-                Watch Demo
-              </Button>
+              <VideoModal videoId="623Cw28jD8o" title="Tably Restaurant Management Demo">
+                <Button variant="outline" size="lg" className="border-2 border-gray-300 text-gray-900 hover:bg-gray-50 hover:text-gray-900 text-lg px-8 py-4 font-medium">
+                  <Play className="w-5 h-5 mr-2" />
+                  Watch Demo
+                </Button>
+              </VideoModal>
             </div>
 
             {/* Trust Indicators */}
@@ -171,11 +174,11 @@ export default function HomePage() {
           <div className="text-center mb-16">
             <Badge className="bg-blue-100 text-blue-700 border-blue-200 mb-4">
               <Sparkles className="w-4 h-4 mr-2" />
-              Everything You Need
+              All-in-One Restaurant SaaS
             </Badge>
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Complete Restaurant Management</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Complete Restaurant Management Software</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              From taking orders to analyzing performance, Tably provides all the tools you need to run your restaurant efficiently.
+              From online ordering and reservations to kitchen management and AI analytics, Tably provides everything you need to run your restaurant efficiently and profitably.
             </p>
           </div>
 
@@ -185,9 +188,9 @@ export default function HomePage() {
                 <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mb-4">
                   <ShoppingCart className="w-6 h-6 text-white" />
                 </div>
-                <CardTitle className="text-xl">Order Management</CardTitle>
+                <CardTitle className="text-xl">Online Ordering System</CardTitle>
                 <CardDescription>
-                  Take orders, track status, and manage your kitchen workflow seamlessly.
+                  Accept online orders, track status in real-time, and manage your kitchen workflow seamlessly with our restaurant POS system.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -213,9 +216,9 @@ export default function HomePage() {
                 <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mb-4">
                   <Calendar className="w-6 h-6 text-white" />
                 </div>
-                <CardTitle className="text-xl">Reservations</CardTitle>
+                <CardTitle className="text-xl">Restaurant Reservation System</CardTitle>
                 <CardDescription>
-                  Manage your table bookings and optimize your seating capacity.
+                  Manage your table bookings, optimize seating capacity, and streamline your restaurant reservation system.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -241,9 +244,9 @@ export default function HomePage() {
                 <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl flex items-center justify-center mb-4">
                   <ChefHat className="w-6 h-6 text-white" />
                 </div>
-                <CardTitle className="text-xl">Menu Management</CardTitle>
+                <CardTitle className="text-xl">Digital Menu Management</CardTitle>
                 <CardDescription>
-                  Create and manage your menu with categories, pricing, and availability.
+                  Create and manage your digital menu with categories, pricing, and real-time availability updates.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -269,9 +272,9 @@ export default function HomePage() {
                 <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-600 rounded-xl flex items-center justify-center mb-4">
                   <Package className="w-6 h-6 text-white" />
                 </div>
-                <CardTitle className="text-xl">Inventory Control</CardTitle>
+                <CardTitle className="text-xl">Inventory Management Software</CardTitle>
                 <CardDescription>
-                  Track your stock levels and manage your inventory efficiently.
+                  Track your stock levels, manage inventory efficiently, and get automated alerts for low stock with our restaurant inventory management software.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -297,9 +300,9 @@ export default function HomePage() {
                 <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-blue-600 rounded-xl flex items-center justify-center mb-4">
                   <BarChart3 className="w-6 h-6 text-white" />
                 </div>
-                <CardTitle className="text-xl">Analytics & Reports</CardTitle>
+                <CardTitle className="text-xl">AI Restaurant Analytics</CardTitle>
                 <CardDescription>
-                  Get insights into your restaurant's performance and trends.
+                  Get AI-powered insights into your restaurant's performance, trends, and actionable recommendations to boost revenue.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -325,9 +328,9 @@ export default function HomePage() {
                 <div className="w-12 h-12 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-xl flex items-center justify-center mb-4">
                   <Settings className="w-6 h-6 text-white" />
                 </div>
-                <CardTitle className="text-xl">Staff Management</CardTitle>
+                <CardTitle className="text-xl">Restaurant Staff Management</CardTitle>
                 <CardDescription>
-                  Manage your team schedules, roles, and permissions effectively.
+                  Manage your team schedules, roles, and permissions effectively with our comprehensive restaurant management software.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -361,10 +364,10 @@ export default function HomePage() {
                 See It In Action
               </Badge>
               <h2 className="text-4xl font-bold text-gray-900 mb-6">
-                Beautiful Dashboard That Actually Works
+                Restaurant Management Dashboard That Actually Works
               </h2>
               <p className="text-xl text-gray-600 mb-8">
-                Tably's intuitive interface makes restaurant management feel effortless. Everything you need is just one click away.
+                Tably's intuitive restaurant management software interface makes running your restaurant effortless. Everything you need is just one click away.
               </p>
               <div className="space-y-4">
                 <div className="flex items-center space-x-3">
@@ -777,10 +780,10 @@ export default function HomePage() {
       <section className="py-20 bg-gradient-to-r from-[#7C3AED] to-[#D64DD2]">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Ready to Transform Your Restaurant?
+            Ready to Transform Your Restaurant with AI-Powered Software?
           </h2>
           <p className="text-xl text-white/90 mb-8 max-w-3xl mx-auto">
-            Join 500+ restaurants that have already streamlined their operations with Tably. Start your free trial today and see the difference.
+            Join 500+ restaurants that have already streamlined their operations with Tably's restaurant management software. Start your free trial today and see the difference.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
             <Link href="/auth/register">
@@ -789,10 +792,12 @@ export default function HomePage() {
                 Start Free Trial
               </Button>
             </Link>
-                         <Button size="lg" className="bg-white/10 backdrop-blur-sm border-2 border-white/20 text-white hover:bg-white hover:text-[#7C3AED] text-lg px-8 py-4 font-medium transition-all duration-300">
-               <Play className="w-5 h-5 mr-2" />
-               Watch Demo
-             </Button>
+                         <VideoModal videoId="623Cw28jD8o" title="Tably Restaurant Management Demo">
+                           <Button size="lg" className="bg-white/10 backdrop-blur-sm border-2 border-white/20 text-white hover:bg-white hover:text-[#7C3AED] text-lg px-8 py-4 font-medium transition-all duration-300">
+                             <Play className="w-5 h-5 mr-2" />
+                             Watch Demo
+                           </Button>
+                         </VideoModal>
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 text-white/80 text-sm">
             <div className="flex items-center space-x-2">
@@ -834,7 +839,7 @@ export default function HomePage() {
               <h3 className="font-semibold mb-4">Support</h3>
               <ul className="space-y-2 text-gray-400">
                 <li><Link href="#" className="hover:text-white transition-colors">Help Center</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">Contact Us</Link></li>
+                <li><a href="mailto:info@tably.digital" className="hover:text-white transition-colors">Contact Us</a></li>
                 <li><Link href="#" className="hover:text-white transition-colors">Status</Link></li>
                 <li><Link href="#" className="hover:text-white transition-colors">Training</Link></li>
               </ul>

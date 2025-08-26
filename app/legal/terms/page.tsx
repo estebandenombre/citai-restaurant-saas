@@ -60,7 +60,7 @@ export default function TermsPage() {
 
             <section>
               <h2 className="text-xl font-semibold text-gray-900 mb-3">7. Contact</h2>
-              <p>Questions? Contact us at legal@tably.com</p>
+              <p>Questions? Contact us at info@tably.digital</p>
             </section>
           </div>
 

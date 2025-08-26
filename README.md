@@ -61,6 +61,10 @@ pnpm dev
 - `SUPABASE_SERVICE_ROLE_KEY`: Clave de servicio de Supabase
 - `NEXT_PUBLIC_APP_URL`: URL de tu aplicación
 
+## 📧 Contacto
+
+Para soporte técnico, preguntas comerciales o cualquier consulta, contáctanos en: **info@tably.digital**
+
 ## 🔧 Scripts Disponibles
 
 - `npm run dev`: Servidor de desarrollo

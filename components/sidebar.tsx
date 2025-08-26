@@ -73,13 +73,13 @@ export function Sidebar({ sidebarCollapsed, setSidebarCollapsed }: SidebarProps)
           if (userData) {
             setUserInfo({
               name: `${userData.first_name} ${userData.last_name}`.trim() || user.email?.split('@')[0] || 'Usuario',
-              email: userData.email || user.email || 'usuario@tably.com'
+              email: userData.email || user.email || 'info@tably.digital'
             })
           } else {
             // Fallback to auth user data
             setUserInfo({
               name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Usuario',
-              email: user.email || 'usuario@tably.com'
+              email: user.email || 'info@tably.digital'
             })
           }
         }
@@ -87,7 +87,7 @@ export function Sidebar({ sidebarCollapsed, setSidebarCollapsed }: SidebarProps)
         console.error('Error fetching user info:', error)
         setUserInfo({
           name: 'Usuario',
-          email: 'usuario@tably.com'
+          email: 'info@tably.digital'
         })
       }
     }
@@ -218,7 +218,7 @@ export function Sidebar({ sidebarCollapsed, setSidebarCollapsed }: SidebarProps)
               {!sidebarCollapsed && (
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-900 truncate">{userInfo?.name || 'Usuario'}</p>
-                  <p className="text-xs text-gray-500 truncate mb-2">{userInfo?.email || 'usuario@tably.com'}</p>
+                  <p className="text-xs text-gray-500 truncate mb-2">{userInfo?.email || 'info@tably.digital'}</p>
                   
                   {/* Trial Status Badge */}
                   <div className="mb-3">

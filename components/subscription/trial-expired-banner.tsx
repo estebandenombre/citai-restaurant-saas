@@ -107,7 +107,7 @@ export function TrialExpiredCard() {
             View Subscription Plans
           </Button>
           <p className="text-xs text-red-600">
-            Contact support at support@tably.com for assistance
+            Contact support at info@tably.digital for assistance
           </p>
         </div>
       </CardContent>
