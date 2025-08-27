@@ -97,3 +97,4 @@ SELECT
     (SELECT COUNT(*) FROM users) as total_users;
 
 
+

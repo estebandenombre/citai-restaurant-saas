@@ -106,3 +106,4 @@ LEFT JOIN subscription_plans sp ON u.plan_id = sp.id
 WHERE sp.features->>'ai_chat' = 'true';
 
 
+

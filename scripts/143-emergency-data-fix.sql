@@ -273,3 +273,4 @@ SELECT '✅ Data should now be accessible' as status;
 SELECT 'IMPORTANT: Test login now to verify data access' as instruction;
 
 
+

@@ -129,3 +129,4 @@ SELECT
   '✓ Para cambiar de plan, contactar al administrador' as caracteristica;
 
 
+

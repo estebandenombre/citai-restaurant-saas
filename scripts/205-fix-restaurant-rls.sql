@@ -68,3 +68,4 @@ SELECT
     (SELECT COUNT(*) FROM restaurants WHERE id = (SELECT restaurant_id FROM users WHERE id = auth.uid())) as can_access_restaurant;
 
 
+

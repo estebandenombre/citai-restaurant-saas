@@ -208,3 +208,4 @@ SELECT 'Check the restaurant_id in the users table for the current user' as sugg
 SELECT 'Verify that the restaurant exists and has the correct data' as suggestion;
 
 
+

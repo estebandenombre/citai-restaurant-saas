@@ -88,3 +88,4 @@ WHERE tablename = 'restaurants'
 AND indexname LIKE '%currency%';
 
 
+

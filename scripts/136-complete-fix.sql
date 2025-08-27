@@ -200,3 +200,4 @@ SELECT '✅ RLS policies are safe' as status;
 SELECT 'Try creating a new account and accessing existing data' as instruction;
 
 
+

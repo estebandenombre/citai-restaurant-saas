@@ -188,3 +188,4 @@ WHERE event_object_table = 'users'
 ORDER BY trigger_name;
 
 
+

@@ -104,3 +104,4 @@ SELECT '✅ No more syntax errors with spaces in policy names' as status;
 SELECT '✅ Registration should now work correctly' as status;
 
 
+

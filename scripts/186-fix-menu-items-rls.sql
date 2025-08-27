@@ -162,3 +162,4 @@ DELETE FROM menu_items
 WHERE name = 'Test Menu Item RLS';
 
 
+

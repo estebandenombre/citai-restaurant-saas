@@ -266,3 +266,4 @@ SELECT '✅ Registration should now work correctly' as status;
 SELECT 'Try creating a new account and accessing existing data' as instruction;
 
 
+

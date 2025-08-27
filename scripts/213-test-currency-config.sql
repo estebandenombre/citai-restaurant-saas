@@ -93,3 +93,4 @@ WHERE currency_config IS NOT NULL
 ORDER BY updated_at DESC;
 
 
+

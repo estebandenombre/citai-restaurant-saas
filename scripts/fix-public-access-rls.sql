@@ -196,3 +196,4 @@ SELECT '✅ Acceso público habilitado para menús' as item;
 SELECT '✅ Propietarios pueden gestionar sus restaurantes' as item;
 SELECT '✅ Comensales pueden ver menús sin autenticación' as item;
 SELECT '🎉 Los menús ahora son visibles públicamente!' as final_message;
+

@@ -110,3 +110,4 @@ SELECT
     format_currency(1234, 'JPY', 'before') as jpy_before;
 
 
+

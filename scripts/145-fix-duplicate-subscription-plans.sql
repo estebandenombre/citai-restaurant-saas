@@ -137,3 +137,4 @@ SELECT '✅ Trigger function updated to use correct plan ID' as status;
 SELECT '✅ No more duplicate free trial plans' as status;
 
 
+

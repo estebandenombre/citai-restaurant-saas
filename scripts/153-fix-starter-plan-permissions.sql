@@ -69,3 +69,4 @@ SELECT '✅ Starter plan has basic features only' as status;
 SELECT '✅ Clear upgrade path to Pro for advanced features' as status;
 
 
+

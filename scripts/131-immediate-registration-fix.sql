@@ -122,3 +122,4 @@ SELECT 'Try creating a new account to test the registration' as instruction;
 SELECT 'The error should now be resolved' as note;
 
 
+

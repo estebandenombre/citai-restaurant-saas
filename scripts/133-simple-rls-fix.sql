@@ -61,3 +61,4 @@ SELECT 'ALTER TABLE users ENABLE ROW LEVEL SECURITY;' as command;
 SELECT 'Then create simple policies without recursion' as note;
 
 
+

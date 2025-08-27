@@ -164,3 +164,4 @@ SELECT '✅ RLS habilitado correctamente' as item;
 SELECT '✅ Acceso anónimo funcionando' as item;
 SELECT '✅ Menús visibles públicamente' as item;
 SELECT '🎉 Los comensales pueden ver los menús sin autenticación!' as final_message;
+

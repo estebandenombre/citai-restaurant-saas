@@ -105,3 +105,4 @@ SELECT '✅ User synchronization issues resolved' as status;
 SELECT '✅ SubscriptionService will now work correctly' as status;
 
 
+

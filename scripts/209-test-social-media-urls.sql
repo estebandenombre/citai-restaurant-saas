@@ -77,3 +77,4 @@ AND (social_media->>'facebook' != '' OR
 ORDER BY updated_at DESC;
 
 
+
