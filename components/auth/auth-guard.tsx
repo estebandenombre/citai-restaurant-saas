@@ -68,9 +68,9 @@ export function AuthGuard({ children }: AuthGuardProps) {
             <div className="mx-auto mb-4">
               <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
             </div>
-            <CardTitle>Verificando autenticación...</CardTitle>
+            <CardTitle>Verifying authentication...</CardTitle>
             <CardDescription>
-              Por favor espera mientras verificamos tu sesión
+              Please wait while we verify your session
             </CardDescription>
           </CardHeader>
         </Card>
@@ -86,15 +86,15 @@ export function AuthGuard({ children }: AuthGuardProps) {
             <div className="mx-auto mb-4">
               <Shield className="h-12 w-12 text-red-500" />
             </div>
-            <CardTitle>Acceso Restringido</CardTitle>
+            <CardTitle>Access Restricted</CardTitle>
             <CardDescription>
-              Necesitas iniciar sesión para acceder al dashboard
+              You need to sign in to access the dashboard
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center">
             <Button onClick={handleLogin} className="w-full">
               <LogIn className="mr-2 h-4 w-4" />
-              Iniciar Sesión
+              Sign In
             </Button>
           </CardContent>
         </Card>

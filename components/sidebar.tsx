@@ -42,6 +42,7 @@ const navigation = [
   { name: "Reservations", href: "/dashboard/reservations", icon: Calendar, color: "from-indigo-500 to-purple-600" },
   { name: "Staff", href: "/dashboard/staff", icon: Users, color: "from-teal-500 to-cyan-600" },
   { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3, color: "from-yellow-500 to-orange-600" },
+  { name: "Website Preview", href: "/dashboard/website-preview", icon: Globe, color: "from-cyan-500 to-blue-600" },
 ]
 
 interface SidebarProps {
@@ -55,6 +56,7 @@ export function Sidebar({ sidebarCollapsed, setSidebarCollapsed }: SidebarProps)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [userInfo, setUserInfo] = useState<{name: string, email: string} | null>(null)
   const [restaurantSlug, setRestaurantSlug] = useState<string | null>(null)
+  const [restaurantName, setRestaurantName] = useState<string>("")
   const { trialStatus, loading: trialLoading } = useTrialStatus()
 
 
@@ -108,12 +110,13 @@ export function Sidebar({ sidebarCollapsed, setSidebarCollapsed }: SidebarProps)
           if (userData?.restaurant_id) {
             const { data: restaurant } = await supabase
               .from('restaurants')
-              .select('slug')
+              .select('slug, name')
               .eq('id', userData.restaurant_id)
               .single()
 
             if (restaurant?.slug) {
               setRestaurantSlug(restaurant.slug)
+              setRestaurantName(restaurant.name || "")
             }
           }
         }
@@ -289,19 +292,7 @@ export function Sidebar({ sidebarCollapsed, setSidebarCollapsed }: SidebarProps)
                 {!sidebarCollapsed && <span className="ml-3">Printer</span>}
               </Link>
 
-              {restaurantSlug && (
-                <a
-                  href={`/r/${restaurantSlug}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full justify-center lg:justify-start text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-lg px-3 py-3 flex items-center"
-                >
-                  <div className="flex items-center justify-center w-6 h-6">
-                    <Globe className="h-5 w-5" />
-                  </div>
-                  {!sidebarCollapsed && <span className="ml-3">View Website</span>}
-                </a>
-              )}
+
 
             </div>
         </div>

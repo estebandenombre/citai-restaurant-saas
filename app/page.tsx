@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Logo } from "@/components/ui/logo"
 import { VideoModal } from "@/components/video-modal"
+import TawkToScript from "@/components/tawk-to-script"
 import { 
   ArrowRight, 
   Play, 
@@ -879,6 +880,7 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+      <TawkToScript />
     </div>
   )
 }

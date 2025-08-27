@@ -44,8 +44,7 @@ import {
   Zap as ZapIcon,
   ArrowUp,
   ArrowDown,
-  LayoutDashboard,
-  Download
+  LayoutDashboard
 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { getCurrentUserRestaurant } from "@/lib/auth-utils"
@@ -288,12 +287,6 @@ export default function DashboardPage() {
                 year: 'numeric' 
               })}
             </div>
-            <Button 
-              className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg shadow-sm"
-            >
-              <Download className="h-4 w-4 mr-2" />
-              Export
-            </Button>
           </div>
         </div>
       </div>
@@ -664,12 +657,7 @@ export default function DashboardPage() {
                   Check Inventory
                 </Button>
               </Link>
-              <Link href={`/r/${restaurant?.slug || restaurant?.id}`}>
-                <Button variant="outline" className="w-full justify-start hover:bg-teal-50 hover:border-teal-200 transition-colors">
-                  <Eye className="h-4 w-4 mr-2 text-teal-600" />
-                  View Landing Page
-                </Button>
-              </Link>
+
             </div>
           </CardContent>
         </Card>
