@@ -8,6 +8,16 @@ import { TrialExpiredBanner, TrialExpiredCard } from "@/components/subscription/
 import { useSubscription } from "@/hooks/use-subscription"
 import { AuthGuard } from "@/components/auth/auth-guard"
 import { supabase } from "@/lib/supabase"
+import Script from "next/script"
+
+// Declare Tawk_API types
+declare global {
+  interface Window {
+    Tawk_API?: {
+      hideWidget: () => void
+    }
+  }
+}
 
 export default function DashboardLayout({
   children,
@@ -18,6 +28,22 @@ export default function DashboardLayout({
   const [aiChatOpen, setAiChatOpen] = useState(false)
   const { isTrialExpired, loading } = useSubscription()
 
+  useEffect(() => {
+    // Hide Tawk.to widget if it exists
+    const hideTawkWidget = () => {
+      if (typeof window !== 'undefined' && window.Tawk_API) {
+        window.Tawk_API.hideWidget()
+      }
+    }
+
+    // Try to hide immediately
+    hideTawkWidget()
+    
+    // Also try after a short delay to ensure Tawk is loaded
+    const timer = setTimeout(hideTawkWidget, 1000)
+    
+    return () => clearTimeout(timer)
+  }, [])
 
   return (
     <AuthGuard>
@@ -28,6 +54,26 @@ export default function DashboardLayout({
         disableTransitionOnChange
       >
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
+          {/* Hide Tawk.to widget script */}
+          <Script
+            id="hide-tawk-widget"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+                if (typeof Tawk_API !== 'undefined') {
+                  Tawk_API.hideWidget();
+                }
+                // Also hide any existing Tawk elements
+                const tawkElements = document.querySelectorAll('[id*="tawk"], [class*="tawk"]');
+                tawkElements.forEach(el => {
+                  if (el.style) {
+                    el.style.display = 'none';
+                  }
+                });
+              `,
+            }}
+          />
+          
           {/* Show trial expired banner if trial has expired */}
           {!loading && isTrialExpired && (
             <TrialExpiredBanner />

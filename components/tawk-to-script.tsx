@@ -1,18 +1,6 @@
-"use client"
-
 import Script from "next/script"
-import { usePathname } from "next/navigation"
 
 export default function TawkToScript() {
-  const pathname = usePathname()
-  
-  // Don't show chat on dashboard pages
-  const isDashboardPage = pathname?.startsWith('/dashboard')
-  
-  if (isDashboardPage) {
-    return null
-  }
-
   return (
     <Script
       id="tawk-to-script"
