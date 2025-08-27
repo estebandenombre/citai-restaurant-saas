@@ -29,6 +29,7 @@ import { useEffect, useState, use } from "react"
 import SimpleCart from "@/components/restaurant/simple-cart"
 import MenuItem from "@/components/restaurant/menu-item"
 import ReservationForm from "@/components/restaurant/reservation-form"
+import { Footer } from "@/components/ui/footer"
 
 async function getRestaurant(slug: string) {
   const { data: restaurant, error } = await supabase
@@ -417,197 +418,149 @@ export default function RestaurantPage({ params }: { params: Promise<{ slug: str
       <section id="contact-section" className="py-24 bg-gradient-to-br from-slate-900 to-slate-800 text-white">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">Visit Us Today</h2>
-              <p className="text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
+            <div className="text-center mb-12 md:mb-16 px-4">
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6">Visit Us Today</h2>
+              <p className="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
                 We'd love to see you! Come experience our delicious food and warm hospitality in a welcoming atmosphere.
               </p>
             </div>
 
-            <div className="grid lg:grid-cols-2 gap-16">
-          {/* Contact Info */}
-              <div className="space-y-8">
-                <h3 className="text-3xl font-bold mb-8">Get in Touch</h3>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-16 px-4">
+              {/* Contact Info */}
+              <div className="space-y-6 md:space-y-8">
+                <h3 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">Get in Touch</h3>
                 
-                <div className="space-y-6">
-              {restaurant.address && (
-                    <div className="flex items-start space-x-4 p-6 bg-white/10 rounded-2xl backdrop-blur-sm">
-                      <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <MapPin className="h-6 w-6 text-white" />
+                <div className="space-y-4 md:space-y-6">
+                  {restaurant.address && (
+                    <div className="flex items-start space-x-3 md:space-x-4 p-4 md:p-6 bg-white/10 rounded-xl md:rounded-2xl backdrop-blur-sm">
+                      <div className="w-10 h-10 md:w-12 md:h-12 bg-white/20 rounded-lg md:rounded-xl flex items-center justify-center flex-shrink-0">
+                        <MapPin className="h-5 w-5 md:h-6 md:w-6 text-white" />
                       </div>
-                  <div>
-                        <p className="font-semibold text-lg mb-1">Address</p>
-                        <p className="text-slate-300 leading-relaxed">{restaurant.address}</p>
-                  </div>
-                </div>
-              )}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-base md:text-lg mb-1">Address</p>
+                        <p className="text-slate-300 leading-relaxed text-sm md:text-base break-words">{restaurant.address}</p>
+                      </div>
+                    </div>
+                  )}
 
-              {restaurant.phone && (
-                    <div className="flex items-start space-x-4 p-6 bg-white/10 rounded-2xl backdrop-blur-sm">
-                      <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <Phone className="h-6 w-6 text-white" />
+                  {restaurant.phone && (
+                    <div className="flex items-start space-x-3 md:space-x-4 p-4 md:p-6 bg-white/10 rounded-xl md:rounded-2xl backdrop-blur-sm">
+                      <div className="w-10 h-10 md:w-12 md:h-12 bg-white/20 rounded-lg md:rounded-xl flex items-center justify-center flex-shrink-0">
+                        <Phone className="h-5 w-5 md:h-6 md:w-6 text-white" />
                       </div>
-                  <div>
-                        <p className="font-semibold text-lg mb-1">Phone</p>
-                        <p className="text-slate-300">{restaurant.phone}</p>
-                  </div>
-                </div>
-              )}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-base md:text-lg mb-1">Phone</p>
+                        <p className="text-slate-300 text-sm md:text-base break-words">{restaurant.phone}</p>
+                      </div>
+                    </div>
+                  )}
 
-              {restaurant.email && (
-                    <div className="flex items-start space-x-4 p-6 bg-white/10 rounded-2xl backdrop-blur-sm">
-                      <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <Mail className="h-6 w-6 text-white" />
+                  {restaurant.email && (
+                    <div className="flex items-start space-x-3 md:space-x-4 p-4 md:p-6 bg-white/10 rounded-xl md:rounded-2xl backdrop-blur-sm">
+                      <div className="w-10 h-10 md:w-12 md:h-12 bg-white/20 rounded-lg md:rounded-xl flex items-center justify-center flex-shrink-0">
+                        <Mail className="h-5 w-5 md:h-6 md:w-6 text-white" />
                       </div>
-                  <div>
-                        <p className="font-semibold text-lg mb-1">Email</p>
-                        <p className="text-slate-300">{restaurant.email}</p>
-                  </div>
-                </div>
-              )}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-base md:text-lg mb-1">Email</p>
+                        <p className="text-slate-300 text-sm md:text-base break-words">{restaurant.email}</p>
+                      </div>
+                    </div>
+                  )}
 
-              {restaurant.website && (
-                    <div className="flex items-start space-x-4 p-6 bg-white/10 rounded-2xl backdrop-blur-sm">
-                      <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <Globe className="h-6 w-6 text-white" />
+                  {restaurant.website && (
+                    <div className="flex items-start space-x-3 md:space-x-4 p-4 md:p-6 bg-white/10 rounded-xl md:rounded-2xl backdrop-blur-sm">
+                      <div className="w-10 h-10 md:w-12 md:h-12 bg-white/20 rounded-lg md:rounded-xl flex items-center justify-center flex-shrink-0">
+                        <Globe className="h-5 w-5 md:h-6 md:w-6 text-white" />
                       </div>
-                  <div>
-                        <p className="font-semibold text-lg mb-1">Website</p>
-                    <a
-                      href={restaurant.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                          className="text-blue-400 hover:text-blue-300 transition-colors font-medium"
-                    >
-                      Visit Website
-                    </a>
-                  </div>
-                </div>
-              )}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-base md:text-lg mb-1">Website</p>
+                        <a
+                          href={restaurant.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-400 hover:text-blue-300 transition-colors font-medium text-sm md:text-base break-all"
+                        >
+                          Visit Website
+                        </a>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
-              {/* Social Media */}
-              {restaurant.social_media && Object.entries(restaurant.social_media).some(([platform, url]) => url && url !== '') && (
-                <div className="mt-8">
-                  <h3 className="text-2xl font-bold mb-6">Follow Us</h3>
-                  <div className="flex space-x-4">
-                    {Object.entries(restaurant.social_media)
-                      .filter(([platform, url]) => url && url !== '')
-                      .map(([platform, url]) => {
-                        const getIcon = (platform: string) => {
-                          switch (platform.toLowerCase()) {
-                            case 'instagram': return <Instagram className="h-6 w-6" />
-                            case 'facebook': return <Facebook className="h-6 w-6" />
-                            case 'twitter': return <Twitter className="h-6 w-6" />
-                            case 'tiktok': return <Youtube className="h-6 w-6" />
-                            default: return null
+              {/* Social Media & Opening Hours */}
+              <div className="space-y-6 md:space-y-8">
+                {/* Social Media */}
+                {restaurant.social_media && Object.entries(restaurant.social_media).some(([platform, url]) => url && url !== '') && (
+                  <div>
+                    <h3 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">Follow Us</h3>
+                    <div className="flex flex-wrap gap-3 md:gap-4">
+                      {Object.entries(restaurant.social_media)
+                        .filter(([platform, url]) => url && url !== '')
+                        .map(([platform, url]) => {
+                          const getIcon = (platform: string) => {
+                            switch (platform.toLowerCase()) {
+                              case 'instagram': return <Instagram className="h-5 w-5 md:h-6 md:w-6" />
+                              case 'facebook': return <Facebook className="h-5 w-5 md:h-6 md:w-6" />
+                              case 'twitter': return <Twitter className="h-5 w-5 md:h-6 md:w-6" />
+                              case 'tiktok': return <Youtube className="h-5 w-5 md:h-6 md:w-6" />
+                              default: return null
+                            }
                           }
-                        }
-                        
-                        const socialUrl = buildSocialMediaUrl(platform, url as string)
-                        
-                        // Only render if we have a valid URL
-                        if (!socialUrl) return null
-                        
-                        return (
-                          <a
-                            key={platform}
-                            href={socialUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center space-x-2 p-4 bg-white/10 rounded-xl backdrop-blur-sm hover:bg-white/20 transition-all duration-300"
-                            title={`Follow us on ${platform}`}
-                          >
-                            {getIcon(platform)}
-                            <span className="capitalize font-medium">{platform}</span>
-                          </a>
-                        )
-                      })}
+                          
+                          const socialUrl = buildSocialMediaUrl(platform, url as string)
+                          
+                          // Only render if we have a valid URL
+                          if (!socialUrl) return null
+                          
+                          return (
+                            <a
+                              key={platform}
+                              href={socialUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center space-x-2 p-3 md:p-4 bg-white/10 rounded-lg md:rounded-xl backdrop-blur-sm hover:bg-white/20 transition-all duration-300"
+                              title={`Follow us on ${platform}`}
+                            >
+                              {getIcon(platform)}
+                              <span className="capitalize font-medium text-sm md:text-base">{platform}</span>
+                            </a>
+                          )
+                        })}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {/* Opening Hours */}
-              {restaurant.opening_hours && (
-                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8">
-                  <h3 className="text-3xl font-bold mb-8">Opening Hours</h3>
-                  <div className="space-y-4">
+                {/* Opening Hours */}
+                {restaurant.opening_hours && (
+                  <div className="bg-white/10 backdrop-blur-sm rounded-xl md:rounded-2xl p-6 md:p-8">
+                    <h3 className="text-xl md:text-2xl lg:text-3xl font-bold mb-6 md:mb-8">Opening Hours</h3>
+                    <div className="space-y-3 md:space-y-4">
                       {Object.entries(restaurant.opening_hours).map(([day, hours]) => {
                         const hoursObj = hours as { open: string; close: string }
                         return (
-                          <div key={day} className="flex justify-between items-center py-4 border-b border-white/20 last:border-b-0">
-                            <span className="capitalize font-semibold text-lg">{day}</span>
-                            <span className="text-slate-300 text-lg">{hoursObj.open} - {hoursObj.close}</span>
+                          <div key={day} className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-3 md:py-4 border-b border-white/20 last:border-b-0 gap-1 sm:gap-0">
+                            <span className="capitalize font-semibold text-base md:text-lg">{day}</span>
+                            <span className="text-slate-300 text-sm md:text-base sm:text-lg">{hoursObj.open} - {hoursObj.close}</span>
                           </div>
                         )
                       })}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-black text-white py-12 md:py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            {/* Restaurant Info */}
-            <div className="text-center mb-8 md:mb-12">
-              <h3 className="text-2xl md:text-4xl font-bold mb-4 md:mb-6">{restaurant.name}</h3>
-              <p className="text-slate-400 text-base md:text-xl max-w-2xl mx-auto leading-relaxed px-4">
-                {restaurant.description || "Delicious food, great service, unforgettable experiences"}
-              </p>
-            </div>
-
-            {/* Social Media */}
-            {restaurant.social_media && (
-              <div className="flex flex-wrap justify-center gap-4 md:gap-6 mb-8 md:mb-12 px-4">
-                {Object.entries(restaurant.social_media)
-                  .filter(([platform, url]) => url && url !== '')
-                  .map(([platform, url]) => {
-                    const getIcon = (platform: string) => {
-                      switch (platform.toLowerCase()) {
-                        case 'instagram': return <Instagram className="h-5 w-5 md:h-6 md:w-6" />
-                        case 'facebook': return <Facebook className="h-5 w-5 md:h-6 md:w-6" />
-                        case 'twitter': return <Twitter className="h-5 w-5 md:h-6 md:w-6" />
-                        case 'tiktok': return <Youtube className="h-5 w-5 md:h-6 md:w-6" />
-                        default: return null
-                      }
-                    }
-                    
-                    const socialUrl = buildSocialMediaUrl(platform, url as string)
-                    
-                    // Only render if we have a valid URL
-                    if (!socialUrl) return null
-                    
-                    return (
-                      <a
-                        key={platform}
-                        href={socialUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-slate-400 hover:text-white transition-colors p-2 md:p-3 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center"
-                        title={`Follow us on ${platform}`}
-                      >
-                        {getIcon(platform)}
-                      </a>
-                    )
-                  })}
-              </div>
-            )}
-
-            {/* Bottom Section */}
-            <div className="border-t border-slate-800 pt-6 md:pt-8 text-center">
-              <p className="text-slate-500 text-sm md:text-base px-4">
-                Powered by <span className="text-blue-400 font-semibold">Tably</span> Restaurant Management Platform
-              </p>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer 
+        variant="restaurant"
+        restaurantName={restaurant.name}
+        restaurantDescription={restaurant.description}
+        socialMedia={restaurant.social_media}
+      />
 
       {/* Shopping Cart */}
       <SimpleCart restaurantId={restaurant.id} />

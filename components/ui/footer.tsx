@@ -32,6 +32,38 @@ export function Footer({
   }
 
   if (variant === "restaurant") {
+    // Helper function to build social media URLs
+    const buildSocialMediaUrl = (platform: string, handle: string) => {
+      if (!handle || handle === '') return ''
+      
+      // If it's already a full URL, return it as is
+      if (handle.startsWith('http://') || handle.startsWith('https://')) {
+        return handle
+      }
+      
+      // Remove @ symbol if present and clean the handle
+      const cleanHandle = handle.startsWith('@') ? handle.substring(1) : handle
+      
+      // Remove any leading/trailing whitespace
+      const trimmedHandle = cleanHandle.trim()
+      
+      // If handle is empty after cleaning, return empty string
+      if (!trimmedHandle) return ''
+      
+      switch (platform.toLowerCase()) {
+        case 'facebook':
+          return `https://www.facebook.com/${trimmedHandle}`
+        case 'instagram':
+          return `https://www.instagram.com/${trimmedHandle}`
+        case 'twitter':
+          return `https://x.com/${trimmedHandle}`
+        case 'tiktok':
+          return `https://www.tiktok.com/@${trimmedHandle}`
+        default:
+          return handle
+      }
+    }
+
     return (
       <footer className="bg-black text-white py-12 md:py-16">
         <div className="container mx-auto px-4">
@@ -49,18 +81,25 @@ export function Footer({
               <div className="flex flex-wrap justify-center gap-4 md:gap-6 mb-8 md:mb-12 px-4">
                 {Object.entries(socialMedia)
                   .filter(([platform, url]) => url && url !== '')
-                  .map(([platform, url]) => (
-                    <a
-                      key={platform}
-                      href={url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-slate-400 hover:text-white transition-colors p-2 md:p-3 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center"
-                      title={`Follow us on ${platform}`}
-                    >
-                      <span className="text-sm md:text-base capitalize">{platform}</span>
-                    </a>
-                  ))}
+                  .map(([platform, url]) => {
+                    const socialUrl = buildSocialMediaUrl(platform, url as string)
+                    
+                    // Only render if we have a valid URL
+                    if (!socialUrl) return null
+                    
+                    return (
+                      <a
+                        key={platform}
+                        href={socialUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-slate-400 hover:text-white transition-colors p-2 md:p-3 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center"
+                        title={`Follow us on ${platform}`}
+                      >
+                        <span className="text-sm md:text-base capitalize">{platform}</span>
+                      </a>
+                    )
+                  })}
               </div>
             )}
 

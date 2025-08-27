@@ -27,19 +27,9 @@ export function AuthGuard({ children }: AuthGuardProps) {
         } else if (!session) {
           setIsAuthenticated(false)
         } else {
-          // Verify the user exists in our database
-          const { data: userData, error: userError } = await supabase
-            .from('users')
-            .select('id, email, role')
-            .eq('id', session.user.id)
-            .single()
-
-          if (userError || !userData) {
-            console.error('User not found in database:', userError)
-            setIsAuthenticated(false)
-          } else {
-            setIsAuthenticated(true)
-          }
+          // For now, just verify the session exists
+          // TODO: Add user synchronization if needed
+          setIsAuthenticated(true)
         }
       } catch (error) {
         console.error('Auth guard error:', error)

@@ -129,13 +129,26 @@ export default function SimpleCart({ restaurantId }: SimpleCartProps) {
     // Try to load from database if available
     const loadDatabaseSettings = async () => {
       try {
-        // Get current user's restaurant
-        const { restaurant } = await getCurrentUserRestaurant()
-        if (restaurant && typeof restaurant === 'object' && 'id' in restaurant) {
+        // Use restaurantId prop if available, otherwise try to get from authenticated user
+        let targetRestaurantId = restaurantId
+        
+        if (!targetRestaurantId) {
+          try {
+            const { restaurant } = await getCurrentUserRestaurant()
+            if (restaurant && typeof restaurant === 'object' && 'id' in restaurant) {
+              targetRestaurantId = restaurant.id
+            }
+          } catch (error) {
+            console.log("No authenticated user, using localStorage settings")
+            return
+          }
+        }
+
+        if (targetRestaurantId) {
           const { data: dbSettings, error } = await supabase
             .from("order_settings")
             .select("*")
-            .eq("restaurant_id", restaurant.id)
+            .eq("restaurant_id", targetRestaurantId)
             .single()
 
           if (dbSettings && !error) {
