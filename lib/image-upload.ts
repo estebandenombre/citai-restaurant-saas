@@ -33,7 +33,7 @@ export const validateImage = (file: File): ImageValidationResult => {
   return { isValid: true }
 }
 
-export const optimizeImage = async (file: File, maxWidth: number = 1200, quality: number = 0.8): Promise<File> => {
+export const optimizeImage = async (file: File, maxWidth: number = 1200, quality: number = 0.8, folder: string = 'menu-items'): Promise<File> => {
   return new Promise((resolve) => {
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')
@@ -43,29 +43,46 @@ export const optimizeImage = async (file: File, maxWidth: number = 1200, quality
       // Calcular nuevas dimensiones manteniendo aspect ratio
       let { width, height } = img
       
+      // Configuraciones específicas por tipo de imagen
+      let targetWidth = maxWidth
+      let targetQuality = quality
+      
+      if (folder === 'hero-images') {
+        // Para imágenes del hero, usar dimensiones más grandes y mejor calidad
+        targetWidth = Math.max(1920, maxWidth)
+        targetQuality = 0.95 // Alta calidad para hero
+        // Asegurar proporción 16:9 o similar para hero
+        const aspectRatio = 16 / 9
+        if (width / height > aspectRatio) {
+          height = Math.round(width / aspectRatio)
+        } else {
+          width = Math.round(height * aspectRatio)
+        }
+      } else if (folder === 'logos') {
+        // Para logos, mantener proporción cuadrada y alta calidad
+        targetWidth = Math.min(512, Math.max(width, height))
+        targetQuality = 0.95
+        // Asegurar que sea cuadrado
+        const maxDimension = Math.max(width, height)
+        width = maxDimension
+        height = maxDimension
+      }
+      
       // Redimensionar solo si es necesario
-      if (width > maxWidth) {
-        height = Math.round((height * maxWidth) / width)
-        width = maxWidth
+      if (width > targetWidth) {
+        height = Math.round((height * targetWidth) / width)
+        width = targetWidth
       }
 
-      // Optimizar para diferentes tamaños de pantalla
-      const sizes = [
-        { width: Math.min(width, 400), quality: 0.7 },   // Mobile
-        { width: Math.min(width, 800), quality: 0.75 },  // Tablet
-        { width: Math.min(width, 1200), quality: 0.8 }   // Desktop
-      ]
-
-      // Usar el tamaño más apropiado
-      const targetSize = sizes.find(size => size.width <= width) || sizes[sizes.length - 1]
-      
-      canvas.width = targetSize.width
-      canvas.height = Math.round((height * targetSize.width) / width)
+      // Configurar canvas con dimensiones optimizadas
+      canvas.width = width
+      canvas.height = height
 
       // Configurar contexto para mejor calidad
       if (ctx) {
         ctx.imageSmoothingEnabled = true
         ctx.imageSmoothingQuality = 'high'
+        ctx.filter = 'none' // Evitar filtros que puedan degradar la imagen
       }
 
       // Dibujar imagen redimensionada
@@ -82,7 +99,7 @@ export const optimizeImage = async (file: File, maxWidth: number = 1200, quality
         } else {
           resolve(file) // Fallback al archivo original
         }
-      }, file.type, targetSize.quality)
+      }, file.type, targetQuality)
     }
 
     img.src = URL.createObjectURL(file)
@@ -105,7 +122,7 @@ export const uploadImage = async (
     }
 
     // Optimizar imagen si es necesario
-    const optimizedFile = await optimizeImage(file)
+    const optimizedFile = await optimizeImage(file, 1200, 0.8, folder)
 
     // Generar nombre único para el archivo
     const fileExt = file.name.split('.').pop()

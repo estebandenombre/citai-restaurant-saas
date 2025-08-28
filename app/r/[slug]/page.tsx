@@ -24,8 +24,10 @@ import {
   Sparkles,
   Calendar
 } from "lucide-react"
-import Image from "next/image"
+import { OptimizedRestaurantHeroImage, OptimizedRestaurantLogo } from "@/components/ui/optimized-hero-image"
+import { HeroLogo } from "@/components/ui/hero-logo"
 import { useEffect, useState, use } from "react"
+import Image from "next/image"
 import SimpleCart from "@/components/restaurant/simple-cart"
 import MenuItem from "@/components/restaurant/menu-item"
 import ReservationForm from "@/components/restaurant/reservation-form"
@@ -63,7 +65,9 @@ async function getMenuItems(restaurantId: string) {
 }
 
 export default function RestaurantPage({ params }: { params: Promise<{ slug: string }> }) {
-  const resolvedParams = use(params)
+  // Use React.use() at the top level to unwrap the params Promise
+  const { slug } = use(params)
+  
   const [restaurant, setRestaurant] = useState<any>(null)
   const [categories, setCategories] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -71,7 +75,7 @@ export default function RestaurantPage({ params }: { params: Promise<{ slug: str
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const restaurantData = await getRestaurant(resolvedParams.slug)
+        const restaurantData = await getRestaurant(slug)
         if (!restaurantData) {
           notFound()
         }
@@ -87,7 +91,7 @@ export default function RestaurantPage({ params }: { params: Promise<{ slug: str
     }
 
     fetchData()
-  }, [resolvedParams.slug])
+  }, [slug])
 
   if (loading) {
     return (
@@ -192,11 +196,10 @@ export default function RestaurantPage({ params }: { params: Promise<{ slug: str
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               {restaurant.logo_url && (
-                <Image
+                <OptimizedRestaurantLogo
                   src={restaurant.logo_url}
                   alt={restaurant.name}
-                  width={40}
-                  height={40}
+                  size={40}
                   className="rounded-lg"
                 />
               )}
@@ -231,23 +234,11 @@ export default function RestaurantPage({ params }: { params: Promise<{ slug: str
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         {/* Background */}
         <div className="absolute inset-0">
-          {restaurant.cover_image_url ? (
-            <Image
-              src={restaurant.cover_image_url}
-              alt={restaurant.name}
-              fill
-              className="object-cover"
-              priority
-            />
-          ) : (
-            <Image
-              src="/back_restaurant.png"
-              alt="Restaurant background"
-              fill
-              className="object-cover"
-              priority
-            />
-          )}
+          <OptimizedRestaurantHeroImage
+            src={restaurant.cover_image_url || "/back_restaurant.png"}
+            alt={restaurant.name}
+            className="absolute inset-0"
+          />
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60" />
         </div>
         
@@ -255,17 +246,13 @@ export default function RestaurantPage({ params }: { params: Promise<{ slug: str
         <div className="relative z-10 text-center text-white px-4 max-w-5xl mx-auto">
           {/* Logo */}
           {restaurant.logo_url && (
-            <div className="mb-8 animate-fade-in">
-              <div className="relative">
-                <Image
-                  src={restaurant.logo_url}
-                  alt={restaurant.name}
-                  width={120}
-                  height={120}
-                  className="mx-auto rounded-2xl border-4 border-white/20 shadow-2xl"
-                />
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 to-transparent" />
-              </div>
+            <div className="mb-8 animate-fade-in flex justify-center items-center">
+              <HeroLogo
+                src={restaurant.logo_url}
+                alt={restaurant.name}
+                size={120}
+                className="mx-auto"
+              />
             </div>
           )}
           
