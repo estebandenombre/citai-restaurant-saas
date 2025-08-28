@@ -1,6 +1,13 @@
 import { pdfGenerator } from './pdf-generator'
-import * as XLSX from 'xlsx'
 import { format, parseISO } from 'date-fns'
+
+// Dynamic import for XLSX to avoid SSR issues
+let XLSX: any = null
+if (typeof window !== 'undefined') {
+  import('xlsx').then(module => {
+    XLSX = module
+  })
+}
 
 interface AnalyticsData {
   revenue: {
@@ -59,9 +66,44 @@ interface RestaurantInfo {
   phone?: string
   email?: string
   website?: string
+  currencyConfig?: {
+    currency: string
+    position: 'before' | 'after'
+  }
 }
 
 export class ExportService {
+  
+  /**
+   * Format currency based on restaurant configuration
+   */
+  private static formatCurrency(amount: number, currencyConfig?: any, decimals: number = 2): string {
+    if (!currencyConfig) {
+      return `$${amount.toFixed(decimals)}`
+    }
+
+    const symbols: { [key: string]: string } = {
+      'USD': '$',
+      'EUR': '€',
+      'GBP': '£',
+      'JPY': '¥',
+      'CAD': 'C$',
+      'AUD': 'A$',
+      'CHF': 'CHF',
+      'CNY': '¥',
+      'MXN': '$',
+      'BRL': 'R$'
+    }
+
+    const symbol = symbols[currencyConfig.currency] || '$'
+    const formattedAmount = amount.toFixed(decimals)
+    
+    if (currencyConfig.position === 'after') {
+      return `${formattedAmount}${symbol}`
+    } else {
+      return `${symbol}${formattedAmount}`
+    }
+  }
   
   /**
    * Export analytics data in PDF format
@@ -92,6 +134,16 @@ export class ExportService {
     options: ExportOptions
   ): Promise<Blob> {
     try {
+      // Validate input data
+      if (!analyticsData) {
+        throw new Error('Analytics data is required')
+      }
+      
+      // Ensure XLSX is loaded
+      if (!XLSX) {
+        XLSX = await import('xlsx')
+      }
+      
       const workbook = XLSX.utils.book_new()
       
       // Executive Summary Sheet
@@ -104,98 +156,136 @@ export class ExportService {
         [''],
         ['Key Metrics'],
         ['Metric', 'Value', 'Growth'],
-        ['Total Revenue', `$${analyticsData.revenue.total.toFixed(2)}`, `${analyticsData.revenue.growth.toFixed(1)}%`],
-        ['Total Orders', analyticsData.orders.total, `${analyticsData.orders.growth.toFixed(1)}%`],
-        ['Average Order Value', `$${(analyticsData.revenue.total / analyticsData.orders.total).toFixed(2)}`, ''],
-        ['Total Customers', analyticsData.customers.total, ''],
-        ['New Customers', analyticsData.customers.new, ''],
-        ['Returning Customers', analyticsData.customers.returning, ''],
-        ['Customer Retention Rate', `${(analyticsData.customers.returning / analyticsData.customers.total * 100).toFixed(1)}%`, '']
+        ['Total Revenue', this.formatCurrency(analyticsData.revenue.total || 0, restaurantInfo.currencyConfig), `${(analyticsData.revenue.growth || 0).toFixed(1)}%`],
+        ['Total Orders', analyticsData.orders.total || 0, `${(analyticsData.orders.growth || 0).toFixed(1)}%`],
+        ['Average Order Value', this.formatCurrency((analyticsData.revenue.total || 0) / (analyticsData.orders.total || 1), restaurantInfo.currencyConfig), ''],
+        ['Total Customers', analyticsData.customers.total || 0, ''],
+        ['New Customers', analyticsData.customers.new || 0, ''],
+        ['Returning Customers', analyticsData.customers.returning || 0, ''],
+        ['Customer Retention Rate', `${((analyticsData.customers.returning || 0) / (analyticsData.customers.total || 1) * 100).toFixed(1)}%`, '']
       ]
       
       const summarySheet = XLSX.utils.aoa_to_sheet(summaryData)
       XLSX.utils.book_append_sheet(workbook, summarySheet, 'Executive Summary')
       
       // Top Items Sheet
-      if (options.includeTopItems && analyticsData.topItems.length > 0) {
+      if (options.includeTopItems && analyticsData.topItems && analyticsData.topItems.length > 0) {
         const topItemsData = [
           ['Top Performing Items'],
           [''],
           ['Rank', 'Item Name', 'Quantity Sold', 'Revenue Generated', 'Average Price']
         ]
         
-        analyticsData.topItems.forEach((item, index) => {
-          topItemsData.push([
-            `#${index + 1}`,
-            item.name,
-            item.quantity.toString(),
-            `$${item.revenue.toFixed(2)}`,
-            `$${(item.revenue / item.quantity).toFixed(2)}`
-          ])
-        })
+                 analyticsData.topItems.forEach((item, index) => {
+           const quantity = item.quantity || 0
+           const revenue = item.revenue || 0
+           const name = item.name || 'Unknown Item'
+           
+           topItemsData.push([
+             `#${index + 1}`,
+             name,
+             quantity.toString(),
+             this.formatCurrency(revenue, restaurantInfo.currencyConfig),
+             this.formatCurrency(quantity > 0 ? (revenue / quantity) : 0, restaurantInfo.currencyConfig)
+           ])
+         })
         
         const topItemsSheet = XLSX.utils.aoa_to_sheet(topItemsData)
         XLSX.utils.book_append_sheet(workbook, topItemsSheet, 'Top Items')
       }
       
       // Daily Trends Sheet
-      if (analyticsData.salesByDay.length > 0) {
+      if (analyticsData.salesByDay && analyticsData.salesByDay.length > 0) {
         const dailyData = [
           ['Daily Revenue Trends'],
           [''],
           ['Date', 'Revenue', 'Orders', 'Average Order Value']
         ]
         
-        analyticsData.salesByDay.forEach(day => {
-          dailyData.push([
-            format(parseISO(day.date), 'MMM dd, yyyy'),
-            day.revenue.toString(),
-            day.orders.toString(),
-            (day.orders > 0 ? (day.revenue / day.orders) : 0).toString()
-          ])
-        })
+                 analyticsData.salesByDay.forEach(day => {
+           try {
+             const parsedDate = parseISO(day.date)
+             const revenue = day.revenue || 0
+             const orders = day.orders || 0
+             
+                           if (isNaN(parsedDate.getTime())) {
+                // If date is invalid, use the original string
+                dailyData.push([
+                  day.date,
+                  this.formatCurrency(revenue, restaurantInfo.currencyConfig),
+                  orders.toString(),
+                  this.formatCurrency(orders > 0 ? (revenue / orders) : 0, restaurantInfo.currencyConfig)
+                ])
+              } else {
+                dailyData.push([
+                  format(parsedDate, 'MMM dd, yyyy'),
+                  this.formatCurrency(revenue, restaurantInfo.currencyConfig),
+                  orders.toString(),
+                  this.formatCurrency(orders > 0 ? (revenue / orders) : 0, restaurantInfo.currencyConfig)
+                ])
+              }
+                       } catch (error) {
+              // Fallback to original date string if parsing fails
+              const revenue = day.revenue || 0
+              const orders = day.orders || 0
+              dailyData.push([
+                day.date,
+                this.formatCurrency(revenue, restaurantInfo.currencyConfig),
+                orders.toString(),
+                this.formatCurrency(orders > 0 ? (revenue / orders) : 0, restaurantInfo.currencyConfig)
+              ])
+            }
+         })
         
         const dailySheet = XLSX.utils.aoa_to_sheet(dailyData)
         XLSX.utils.book_append_sheet(workbook, dailySheet, 'Daily Trends')
       }
       
       // Hourly Analysis Sheet
-      if (options.includeHourlyData && analyticsData.salesByHour.length > 0) {
+      if (options.includeHourlyData && analyticsData.salesByHour && analyticsData.salesByHour.length > 0) {
         const hourlyData = [
           ['Hourly Performance Analysis'],
           [''],
           ['Hour', 'Revenue', 'Orders', 'Average Order Value']
         ]
         
-        analyticsData.salesByHour.forEach(hour => {
-          hourlyData.push([
-            hour.hour,
-            hour.revenue.toString(),
-            hour.orders.toString(),
-            (hour.orders > 0 ? (hour.revenue / hour.orders) : 0).toString()
-          ])
-        })
+                 analyticsData.salesByHour.forEach(hour => {
+           const revenue = hour.revenue || 0
+           const orders = hour.orders || 0
+           const hourStr = hour.hour || 'Unknown'
+           
+                       hourlyData.push([
+              hourStr,
+              this.formatCurrency(revenue, restaurantInfo.currencyConfig),
+              orders.toString(),
+              this.formatCurrency(orders > 0 ? (revenue / orders) : 0, restaurantInfo.currencyConfig)
+            ])
+         })
         
         const hourlySheet = XLSX.utils.aoa_to_sheet(hourlyData)
         XLSX.utils.book_append_sheet(workbook, hourlySheet, 'Hourly Analysis')
       }
       
       // Category Performance Sheet
-      if (analyticsData.categoryPerformance.length > 0) {
+      if (analyticsData.categoryPerformance && analyticsData.categoryPerformance.length > 0) {
         const categoryData = [
           ['Category Performance'],
           [''],
           ['Category', 'Revenue', 'Orders', 'Revenue per Order']
         ]
         
-        analyticsData.categoryPerformance.forEach(category => {
-          categoryData.push([
-            category.category,
-            category.revenue.toString(),
-            category.orders.toString(),
-            (category.orders > 0 ? (category.revenue / category.orders) : 0).toString()
-          ])
-        })
+                 analyticsData.categoryPerformance.forEach(category => {
+           const revenue = category.revenue || 0
+           const orders = category.orders || 0
+           const categoryName = category.category || 'Unknown Category'
+           
+                       categoryData.push([
+              categoryName,
+              this.formatCurrency(revenue, restaurantInfo.currencyConfig),
+              orders.toString(),
+              this.formatCurrency(orders > 0 ? (revenue / orders) : 0, restaurantInfo.currencyConfig)
+            ])
+         })
         
         const categorySheet = XLSX.utils.aoa_to_sheet(categoryData)
         XLSX.utils.book_append_sheet(workbook, categorySheet, 'Category Performance')
@@ -208,19 +298,19 @@ export class ExportService {
           [''],
           ['Revenue Data'],
           ['Metric', 'Value'],
-          ['Total Revenue', analyticsData.revenue.total],
-          ['Today\'s Revenue', analyticsData.revenue.today],
-          ['This Week\'s Revenue', analyticsData.revenue.thisWeek],
-          ['This Month\'s Revenue', analyticsData.revenue.thisMonth],
-          ['Revenue Growth', analyticsData.revenue.growth],
+          ['Total Revenue', this.formatCurrency(analyticsData.revenue.total || 0, restaurantInfo.currencyConfig)],
+          ['Today\'s Revenue', this.formatCurrency(analyticsData.revenue.today || 0, restaurantInfo.currencyConfig)],
+          ['This Week\'s Revenue', this.formatCurrency(analyticsData.revenue.thisWeek || 0, restaurantInfo.currencyConfig)],
+          ['This Month\'s Revenue', this.formatCurrency(analyticsData.revenue.thisMonth || 0, restaurantInfo.currencyConfig)],
+          ['Revenue Growth', analyticsData.revenue.growth || 0],
           [''],
           ['Order Data'],
           ['Metric', 'Value'],
-          ['Total Orders', analyticsData.orders.total],
-          ['Today\'s Orders', analyticsData.orders.today],
-          ['This Week\'s Orders', analyticsData.orders.thisWeek],
-          ['This Month\'s Orders', analyticsData.orders.thisMonth],
-          ['Order Growth', analyticsData.orders.growth]
+          ['Total Orders', analyticsData.orders.total || 0],
+          ['Today\'s Orders', analyticsData.orders.today || 0],
+          ['This Week\'s Orders', analyticsData.orders.thisWeek || 0],
+          ['This Month\'s Orders', analyticsData.orders.thisMonth || 0],
+          ['Order Growth', analyticsData.orders.growth || 0]
         ]
         
         const rawSheet = XLSX.utils.aoa_to_sheet(rawData)
@@ -233,6 +323,9 @@ export class ExportService {
       
     } catch (error) {
       console.error('Excel export error:', error)
+      if (error instanceof Error) {
+        throw new Error(`Failed to generate Excel report: ${error.message}`)
+      }
       throw new Error('Failed to generate Excel report')
     }
   }
@@ -240,13 +333,18 @@ export class ExportService {
   /**
    * Export analytics data in CSV format
    */
-  static async exportToCSV(
+  static exportToCSV(
     analyticsData: AnalyticsData,
     restaurantInfo: RestaurantInfo,
     dateRange: { from: Date; to: Date },
     options: ExportOptions
-  ): Promise<Blob> {
+  ): Blob {
     try {
+      // Validate input data
+      if (!analyticsData) {
+        throw new Error('Analytics data is required')
+      }
+      
       let csvContent = ''
       
       // Header
@@ -258,51 +356,79 @@ export class ExportService {
       // Key Metrics
       csvContent += `Key Metrics\n`
       csvContent += `Metric,Value,Growth\n`
-      csvContent += `Total Revenue,$${analyticsData.revenue.total.toFixed(2)},${analyticsData.revenue.growth.toFixed(1)}%\n`
-      csvContent += `Total Orders,${analyticsData.orders.total},${analyticsData.orders.growth.toFixed(1)}%\n`
-      csvContent += `Average Order Value,$${(analyticsData.revenue.total / analyticsData.orders.total).toFixed(2)},\n`
-      csvContent += `Total Customers,${analyticsData.customers.total},\n`
-      csvContent += `New Customers,${analyticsData.customers.new},\n`
-      csvContent += `Returning Customers,${analyticsData.customers.returning},\n`
-      csvContent += `Customer Retention Rate,${(analyticsData.customers.returning / analyticsData.customers.total * 100).toFixed(1)}%,\n\n`
+      csvContent += `Total Revenue,${this.formatCurrency(analyticsData.revenue.total || 0, restaurantInfo.currencyConfig)},${(analyticsData.revenue.growth || 0).toFixed(1)}%\n`
+      csvContent += `Total Orders,${analyticsData.orders.total || 0},${(analyticsData.orders.growth || 0).toFixed(1)}%\n`
+      csvContent += `Average Order Value,${this.formatCurrency((analyticsData.revenue.total || 0) / (analyticsData.orders.total || 1), restaurantInfo.currencyConfig)},\n`
+      csvContent += `Total Customers,${analyticsData.customers.total || 0},\n`
+      csvContent += `New Customers,${analyticsData.customers.new || 0},\n`
+      csvContent += `Returning Customers,${analyticsData.customers.returning || 0},\n`
+      csvContent += `Customer Retention Rate,${((analyticsData.customers.returning || 0) / (analyticsData.customers.total || 1) * 100).toFixed(1)}%,\n\n`
       
       // Top Items
-      if (options.includeTopItems && analyticsData.topItems.length > 0) {
+      if (options.includeTopItems && analyticsData.topItems && analyticsData.topItems.length > 0) {
         csvContent += `Top Performing Items\n`
         csvContent += `Rank,Item Name,Quantity Sold,Revenue Generated,Average Price\n`
-        analyticsData.topItems.forEach((item, index) => {
-          csvContent += `#${index + 1},${item.name},${item.quantity},$${item.revenue.toFixed(2)},$${(item.revenue / item.quantity).toFixed(2)}\n`
-        })
+                 analyticsData.topItems.forEach((item, index) => {
+           const quantity = item.quantity || 0
+           const revenue = item.revenue || 0
+           const name = item.name || 'Unknown Item'
+           
+           csvContent += `#${index + 1},${name},${quantity},${this.formatCurrency(revenue, restaurantInfo.currencyConfig)},${this.formatCurrency(quantity > 0 ? (revenue / quantity) : 0, restaurantInfo.currencyConfig)}\n`
+         })
         csvContent += '\n'
       }
       
       // Daily Trends
-      if (analyticsData.salesByDay.length > 0) {
+      if (analyticsData.salesByDay && analyticsData.salesByDay.length > 0) {
         csvContent += `Daily Revenue Trends\n`
         csvContent += `Date,Revenue,Orders,Average Order Value\n`
-        analyticsData.salesByDay.forEach(day => {
-          csvContent += `${format(parseISO(day.date), 'MMM dd, yyyy')},${day.revenue},${day.orders},${day.orders > 0 ? (day.revenue / day.orders) : 0}\n`
-        })
+                 analyticsData.salesByDay.forEach(day => {
+           try {
+             const parsedDate = parseISO(day.date)
+             const revenue = day.revenue || 0
+             const orders = day.orders || 0
+             
+             if (isNaN(parsedDate.getTime())) {
+               // If date is invalid, use the original string
+               csvContent += `${day.date},${this.formatCurrency(revenue, restaurantInfo.currencyConfig)},${orders},${this.formatCurrency(orders > 0 ? (revenue / orders) : 0, restaurantInfo.currencyConfig)}\n`
+             } else {
+               csvContent += `${format(parsedDate, 'MMM dd, yyyy')},${this.formatCurrency(revenue, restaurantInfo.currencyConfig)},${orders},${this.formatCurrency(orders > 0 ? (revenue / orders) : 0, restaurantInfo.currencyConfig)}\n`
+             }
+                        } catch (error) {
+               // Fallback to original date string if parsing fails
+               const revenue = day.revenue || 0
+               const orders = day.orders || 0
+               csvContent += `${day.date},${this.formatCurrency(revenue, restaurantInfo.currencyConfig)},${orders},${this.formatCurrency(orders > 0 ? (revenue / orders) : 0, restaurantInfo.currencyConfig)}\n`
+             }
+         })
         csvContent += '\n'
       }
       
       // Hourly Analysis
-      if (options.includeHourlyData && analyticsData.salesByHour.length > 0) {
+      if (options.includeHourlyData && analyticsData.salesByHour && analyticsData.salesByHour.length > 0) {
         csvContent += `Hourly Performance Analysis\n`
         csvContent += `Hour,Revenue,Orders,Average Order Value\n`
-        analyticsData.salesByHour.forEach(hour => {
-          csvContent += `${hour.hour},${hour.revenue},${hour.orders},${hour.orders > 0 ? (hour.revenue / hour.orders) : 0}\n`
-        })
+                 analyticsData.salesByHour.forEach(hour => {
+           const revenue = hour.revenue || 0
+           const orders = hour.orders || 0
+           const hourStr = hour.hour || 'Unknown'
+           
+                       csvContent += `${hourStr},${this.formatCurrency(revenue, restaurantInfo.currencyConfig)},${orders},${this.formatCurrency(orders > 0 ? (revenue / orders) : 0, restaurantInfo.currencyConfig)}\n`
+         })
         csvContent += '\n'
       }
       
       // Category Performance
-      if (analyticsData.categoryPerformance.length > 0) {
+      if (analyticsData.categoryPerformance && analyticsData.categoryPerformance.length > 0) {
         csvContent += `Category Performance\n`
         csvContent += `Category,Revenue,Orders,Revenue per Order\n`
-        analyticsData.categoryPerformance.forEach(category => {
-          csvContent += `${category.category},${category.revenue},${category.orders},${category.orders > 0 ? (category.revenue / category.orders) : 0}\n`
-        })
+                 analyticsData.categoryPerformance.forEach(category => {
+           const revenue = category.revenue || 0
+           const orders = category.orders || 0
+           const categoryName = category.category || 'Unknown Category'
+           
+                       csvContent += `${categoryName},${this.formatCurrency(revenue, restaurantInfo.currencyConfig)},${orders},${this.formatCurrency(orders > 0 ? (revenue / orders) : 0, restaurantInfo.currencyConfig)}\n`
+         })
         csvContent += '\n'
       }
       
@@ -311,25 +437,31 @@ export class ExportService {
         csvContent += `Raw Data Summary\n`
         csvContent += `Revenue Data\n`
         csvContent += `Metric,Value\n`
-        csvContent += `Total Revenue,${analyticsData.revenue.total}\n`
-        csvContent += `Today's Revenue,${analyticsData.revenue.today}\n`
-        csvContent += `This Week's Revenue,${analyticsData.revenue.thisWeek}\n`
-        csvContent += `This Month's Revenue,${analyticsData.revenue.thisMonth}\n`
-        csvContent += `Revenue Growth,${analyticsData.revenue.growth}\n\n`
+                 csvContent += `Total Revenue,${this.formatCurrency(analyticsData.revenue.total || 0, restaurantInfo.currencyConfig)}\n`
+                 csvContent += `Today's Revenue,${this.formatCurrency(analyticsData.revenue.today || 0, restaurantInfo.currencyConfig)}\n`
+         csvContent += `This Week's Revenue,${this.formatCurrency(analyticsData.revenue.thisWeek || 0, restaurantInfo.currencyConfig)}\n`
+         csvContent += `This Month's Revenue,${this.formatCurrency(analyticsData.revenue.thisMonth || 0, restaurantInfo.currencyConfig)}\n`
+        csvContent += `Revenue Growth,${analyticsData.revenue.growth || 0}\n\n`
         
         csvContent += `Order Data\n`
         csvContent += `Metric,Value\n`
-        csvContent += `Total Orders,${analyticsData.orders.total}\n`
-        csvContent += `Today's Orders,${analyticsData.orders.today}\n`
-        csvContent += `This Week's Orders,${analyticsData.orders.thisWeek}\n`
-        csvContent += `This Month's Orders,${analyticsData.orders.thisMonth}\n`
-        csvContent += `Order Growth,${analyticsData.orders.growth}\n`
+        csvContent += `Total Orders,${analyticsData.orders.total || 0}\n`
+        csvContent += `Today's Orders,${analyticsData.orders.today || 0}\n`
+        csvContent += `This Week's Orders,${analyticsData.orders.thisWeek || 0}\n`
+        csvContent += `This Month's Orders,${analyticsData.orders.thisMonth || 0}\n`
+        csvContent += `Order Growth,${analyticsData.orders.growth || 0}\n`
       }
       
-      return new Blob([csvContent], { type: 'text/csv' })
+      // Add BOM for proper UTF-8 encoding
+      const BOM = '\uFEFF'
+      const csvWithBOM = BOM + csvContent
+      return new Blob([csvWithBOM], { type: 'text/csv;charset=utf-8' })
       
     } catch (error) {
       console.error('CSV export error:', error)
+      if (error instanceof Error) {
+        throw new Error(`Failed to generate CSV report: ${error.message}`)
+      }
       throw new Error('Failed to generate CSV report')
     }
   }
@@ -337,13 +469,18 @@ export class ExportService {
   /**
    * Export analytics data in JSON format
    */
-  static async exportToJSON(
+  static exportToJSON(
     analyticsData: AnalyticsData,
     restaurantInfo: RestaurantInfo,
     dateRange: { from: Date; to: Date },
     options: ExportOptions
-  ): Promise<Blob> {
+  ): Blob {
     try {
+      // Validate input data
+      if (!analyticsData) {
+        throw new Error('Analytics data is required')
+      }
+      
       const jsonData = {
         metadata: {
           restaurant: restaurantInfo,
@@ -355,7 +492,7 @@ export class ExportService {
           exportOptions: options
         },
         analytics: analyticsData,
-        insights: this.generateInsights(analyticsData)
+                 insights: this.generateInsights(analyticsData, restaurantInfo.currencyConfig)
       }
       
       const jsonString = JSON.stringify(jsonData, null, 2)
@@ -363,6 +500,9 @@ export class ExportService {
       
     } catch (error) {
       console.error('JSON export error:', error)
+      if (error instanceof Error) {
+        throw new Error(`Failed to generate JSON report: ${error.message}`)
+      }
       throw new Error('Failed to generate JSON report')
     }
   }
@@ -370,7 +510,7 @@ export class ExportService {
   /**
    * Generate insights from analytics data
    */
-  private static generateInsights(analyticsData: AnalyticsData) {
+  private static generateInsights(analyticsData: AnalyticsData, currencyConfig?: any) {
     const insights = []
     
     // Revenue insights
@@ -410,14 +550,14 @@ export class ExportService {
       })
     }
     
-    // Average order value
-    const avgOrderValue = analyticsData.orders.total > 0 ? analyticsData.revenue.total / analyticsData.orders.total : 0
-    insights.push({
-      type: 'info',
-      category: 'performance',
-      message: `Average order value: $${avgOrderValue.toFixed(2)}`,
-      value: avgOrderValue
-    })
+         // Average order value
+     const avgOrderValue = analyticsData.orders.total > 0 ? analyticsData.revenue.total / analyticsData.orders.total : 0
+     insights.push({
+       type: 'info',
+       category: 'performance',
+       message: `Average order value: ${this.formatCurrency(avgOrderValue, currencyConfig)}`,
+       value: avgOrderValue
+     })
     
     return insights
   }

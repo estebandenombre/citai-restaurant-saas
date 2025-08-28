@@ -23,6 +23,7 @@ import {
   Loader2
 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
+import { MenuItemImageUpload } from "./menu-item-image-upload"
 
 interface Category {
   id: string
@@ -38,6 +39,7 @@ interface MenuItem {
   name: string
   description: string | null
   price: number
+  image_url: string | null
   category_id: string | null
   allergens: string[] | null
   dietary_info: string[] | null
@@ -52,6 +54,8 @@ interface MenuItemForm {
   name: string
   description: string
   price: string
+  image_url: string | null
+  crop_data: any
   category_id: string
   allergens: string[]
   dietary_info: string[]
@@ -88,6 +92,8 @@ export default function AddMenuItemForm({ restaurantId, onSuccess, onCancel, edi
     name: '',
     description: '',
     price: '',
+    image_url: null,
+    crop_data: null,
     category_id: '',
     allergens: [],
     dietary_info: [],
@@ -112,6 +118,8 @@ export default function AddMenuItemForm({ restaurantId, onSuccess, onCancel, edi
         name: editingItem.name,
         description: editingItem.description || '',
         price: editingItem.price.toString(),
+        image_url: editingItem.image_url,
+        crop_data: editingItem.crop_data,
         category_id: editingItem.category_id || '',
         allergens: editingItem.allergens || [],
         dietary_info: editingItem.dietary_info || [],
@@ -176,6 +184,8 @@ export default function AddMenuItemForm({ restaurantId, onSuccess, onCancel, edi
           name: form.name.trim(),
           description: form.description.trim() || null,
           price: Number(form.price),
+          image_url: form.image_url,
+          crop_data: form.crop_data,
           category_id: form.category_id || null,
           allergens: form.allergens.length > 0 ? form.allergens : null,
           dietary_info: form.dietary_info.length > 0 ? form.dietary_info : null,
@@ -199,6 +209,8 @@ export default function AddMenuItemForm({ restaurantId, onSuccess, onCancel, edi
           name: form.name.trim(),
           description: form.description.trim() || null,
           price: Number(form.price),
+          image_url: form.image_url,
+          crop_data: form.crop_data,
           category_id: form.category_id || null,
           allergens: form.allergens.length > 0 ? form.allergens : null,
           dietary_info: form.dietary_info.length > 0 ? form.dietary_info : null,
@@ -298,6 +310,20 @@ export default function AddMenuItemForm({ restaurantId, onSuccess, onCancel, edi
     }
   }
 
+  const handleImageChange = (imageUrl: string | null) => {
+    setForm(prev => ({
+      ...prev,
+      image_url: imageUrl
+    }))
+  }
+
+  const handleCropDataChange = (cropData: any) => {
+    setForm(prev => ({
+      ...prev,
+      crop_data: cropData
+    }))
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -375,6 +401,16 @@ export default function AddMenuItemForm({ restaurantId, onSuccess, onCancel, edi
                 className="min-h-[80px]"
               />
             </div>
+
+            {/* Dish Image Upload */}
+            <MenuItemImageUpload
+              imageUrl={form.image_url}
+              onImageChange={handleImageChange}
+              cropData={form.crop_data}
+              onCropDataChange={handleCropDataChange}
+              restaurantId={restaurantId}
+              itemName={form.name || "dish"}
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">

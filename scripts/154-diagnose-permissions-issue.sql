@@ -107,3 +107,4 @@ WHERE sp.features->>'ai_chat' = 'true';
 
 
 
+

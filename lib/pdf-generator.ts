@@ -66,6 +66,10 @@ interface RestaurantInfo {
   phone?: string
   email?: string
   website?: string
+  currencyConfig?: {
+    currency: string
+    position: 'before' | 'after'
+  }
 }
 
 export class ProfessionalPDFGenerator {
@@ -75,6 +79,37 @@ export class ProfessionalPDFGenerator {
   private margin: number = 20
   private lineHeight: number = 7
   private sectionSpacing: number = 15
+
+  /**
+   * Format currency based on restaurant configuration
+   */
+  private formatCurrency(amount: number, currencyConfig?: any, decimals: number = 2): string {
+    if (!currencyConfig) {
+      return `$${amount.toFixed(decimals)}`
+    }
+
+    const symbols: { [key: string]: string } = {
+      'USD': '$',
+      'EUR': '€',
+      'GBP': '£',
+      'JPY': '¥',
+      'CAD': 'C$',
+      'AUD': 'A$',
+      'CHF': 'CHF',
+      'CNY': '¥',
+      'MXN': '$',
+      'BRL': 'R$'
+    }
+
+    const symbol = symbols[currencyConfig.currency] || '$'
+    const formattedAmount = amount.toFixed(decimals)
+    
+    if (currencyConfig.position === 'after') {
+      return `${formattedAmount}${symbol}`
+    } else {
+      return `${symbol}${formattedAmount}`
+    }
+  }
 
   constructor() {
     this.doc = new jsPDF('p', 'mm', 'a4')
@@ -217,10 +252,10 @@ export class ProfessionalPDFGenerator {
     this.currentY += 10
   }
 
-  private addInsights(analyticsData: AnalyticsData) {
+  private addInsights(analyticsData: AnalyticsData, currencyConfig?: any) {
     this.addSectionTitle('Performance Insights')
     
-    const insights = this.generateInsights(analyticsData)
+    const insights = this.generateInsights(analyticsData, currencyConfig)
     
     insights.forEach(insight => {
       this.checkPageBreak(15)
@@ -240,7 +275,7 @@ export class ProfessionalPDFGenerator {
     })
   }
 
-  private generateInsights(analyticsData: AnalyticsData) {
+  private generateInsights(analyticsData: AnalyticsData, currencyConfig?: any) {
     const insights = []
     
     // Revenue insights
@@ -275,14 +310,14 @@ export class ProfessionalPDFGenerator {
     // Average order value
     const avgOrderValue = analyticsData.orders.total > 0 ? analyticsData.revenue.total / analyticsData.orders.total : 0
     insights.push({
-      text: `Average order value: $${avgOrderValue.toFixed(2)}`,
+      text: `Average order value: ${this.formatCurrency(avgOrderValue, currencyConfig)}`,
       color: [168, 85, 247] // Purple
     })
     
     return insights
   }
 
-  private addTopItems(analyticsData: AnalyticsData) {
+  private addTopItems(analyticsData: AnalyticsData, currencyConfig?: any) {
     if (analyticsData.topItems.length === 0) return
     
     this.addSectionTitle('Top Performing Items')
@@ -292,14 +327,14 @@ export class ProfessionalPDFGenerator {
       `#${index + 1}`,
       item.name,
       item.quantity.toString(),
-      `$${item.revenue.toFixed(2)}`,
-      `$${(item.revenue / item.quantity).toFixed(2)}`
+      this.formatCurrency(item.revenue, currencyConfig),
+      this.formatCurrency(item.revenue / item.quantity, currencyConfig)
     ])
     
     this.addTable(headers, data)
   }
 
-  private addHourlyAnalysis(analyticsData: AnalyticsData) {
+  private addHourlyAnalysis(analyticsData: AnalyticsData, currencyConfig?: any) {
     if (analyticsData.salesByHour.length === 0) return
     
     this.addSectionTitle('Hourly Performance Analysis')
@@ -307,15 +342,15 @@ export class ProfessionalPDFGenerator {
     const headers = ['Hour', 'Revenue', 'Orders', 'Avg. Order Value']
     const data = analyticsData.salesByHour.map(hour => [
       hour.hour,
-      `$${hour.revenue.toFixed(2)}`,
+      this.formatCurrency(hour.revenue, currencyConfig),
       hour.orders.toString(),
-      `$${(hour.revenue / hour.orders).toFixed(2)}`
+      this.formatCurrency(hour.revenue / hour.orders, currencyConfig)
     ])
     
     this.addTable(headers, data)
   }
 
-  private addCategoryPerformance(analyticsData: AnalyticsData) {
+  private addCategoryPerformance(analyticsData: AnalyticsData, currencyConfig?: any) {
     if (analyticsData.categoryPerformance.length === 0) return
     
     this.addSectionTitle('Category Performance')
@@ -323,15 +358,15 @@ export class ProfessionalPDFGenerator {
     const headers = ['Category', 'Revenue', 'Orders', 'Revenue per Order']
     const data = analyticsData.categoryPerformance.map(category => [
       category.category,
-      `$${category.revenue.toFixed(2)}`,
+      this.formatCurrency(category.revenue, currencyConfig),
       category.orders.toString(),
-      `$${(category.revenue / category.orders).toFixed(2)}`
+      this.formatCurrency(category.revenue / category.orders, currencyConfig)
     ])
     
     this.addTable(headers, data)
   }
 
-  private addDailyTrends(analyticsData: AnalyticsData) {
+  private addDailyTrends(analyticsData: AnalyticsData, currencyConfig?: any) {
     if (analyticsData.salesByDay.length === 0) return
     
     this.addSectionTitle('Daily Revenue Trends')
@@ -360,9 +395,9 @@ export class ProfessionalPDFGenerator {
       
       return [
         formattedDate,
-        `$${day.revenue.toFixed(2)}`,
+        this.formatCurrency(day.revenue, currencyConfig),
         day.orders.toString(),
-        `$${(day.revenue / day.orders).toFixed(2)}`
+        this.formatCurrency(day.revenue / day.orders, currencyConfig)
       ]
     })
     
@@ -405,7 +440,7 @@ export class ProfessionalPDFGenerator {
     )
   }
 
-  private addRawData(analyticsData: AnalyticsData, options: ExportOptions) {
+  private addRawData(analyticsData: AnalyticsData, options: ExportOptions, currencyConfig?: any) {
     if (!options.includeRawData) return
     
     this.addSectionTitle('Raw Data Summary')
@@ -413,10 +448,10 @@ export class ProfessionalPDFGenerator {
     this.addSubsectionTitle('Revenue Data')
     const revenueData = [
       ['Metric', 'Value'],
-      ['Total Revenue', `$${analyticsData.revenue.total.toFixed(2)}`],
-      ['Today\'s Revenue', `$${analyticsData.revenue.today.toFixed(2)}`],
-      ['This Week\'s Revenue', `$${analyticsData.revenue.thisWeek.toFixed(2)}`],
-      ['This Month\'s Revenue', `$${analyticsData.revenue.thisMonth.toFixed(2)}`],
+      ['Total Revenue', this.formatCurrency(analyticsData.revenue.total, currencyConfig)],
+      ['Today\'s Revenue', this.formatCurrency(analyticsData.revenue.today, currencyConfig)],
+      ['This Week\'s Revenue', this.formatCurrency(analyticsData.revenue.thisWeek, currencyConfig)],
+      ['This Month\'s Revenue', this.formatCurrency(analyticsData.revenue.thisMonth, currencyConfig)],
       ['Revenue Growth', `${analyticsData.revenue.growth.toFixed(1)}%`]
     ]
     this.addTable(['Metric', 'Value'], revenueData.slice(1))
@@ -488,7 +523,7 @@ export class ProfessionalPDFGenerator {
     // Revenue metrics
     this.addMetricCard(
       'Total Revenue',
-      `$${analyticsData.revenue.total.toLocaleString()}`,
+      this.formatCurrency(analyticsData.revenue.total, restaurantInfo.currencyConfig),
       `${analyticsData.revenue.growth >= 0 ? '+' : ''}${analyticsData.revenue.growth.toFixed(1)}% vs previous period`,
       analyticsData.revenue.growth >= 0 ? '#10b981' : '#ef4444'
     )
@@ -502,7 +537,7 @@ export class ProfessionalPDFGenerator {
     
     this.addMetricCard(
       'Average Order Value',
-      `$${(analyticsData.revenue.total / analyticsData.orders.total).toFixed(2)}`,
+      this.formatCurrency(analyticsData.revenue.total / analyticsData.orders.total, restaurantInfo.currencyConfig),
       'Revenue per order'
     )
     
@@ -514,24 +549,24 @@ export class ProfessionalPDFGenerator {
     
     // Insights
     if (options.includeInsights) {
-      this.addInsights(analyticsData)
+      this.addInsights(analyticsData, restaurantInfo.currencyConfig)
     }
     
     // Top performing items
     if (options.includeTopItems) {
-      this.addTopItems(analyticsData)
+      this.addTopItems(analyticsData, restaurantInfo.currencyConfig)
     }
     
     // Hourly analysis
     if (options.includeHourlyData) {
-      this.addHourlyAnalysis(analyticsData)
+      this.addHourlyAnalysis(analyticsData, restaurantInfo.currencyConfig)
     }
     
     // Category performance
-    this.addCategoryPerformance(analyticsData)
+    this.addCategoryPerformance(analyticsData, restaurantInfo.currencyConfig)
     
     // Daily trends
-    this.addDailyTrends(analyticsData)
+    this.addDailyTrends(analyticsData, restaurantInfo.currencyConfig)
     
     // Customer analytics
     if (options.includeCustomerData) {
@@ -539,7 +574,7 @@ export class ProfessionalPDFGenerator {
     }
     
     // Raw data
-    this.addRawData(analyticsData, options)
+    this.addRawData(analyticsData, options, restaurantInfo.currencyConfig)
     
     // Footer
     this.addFooter()

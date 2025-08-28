@@ -27,30 +27,63 @@ interface Insight {
 
 interface PerformanceInsightsProps {
   analyticsData: any
+  currencyConfig?: {
+    currency: string
+    position: 'before' | 'after'
+  }
 }
 
-export function PerformanceInsights({ analyticsData }: PerformanceInsightsProps) {
+export function PerformanceInsights({ analyticsData, currencyConfig }: PerformanceInsightsProps) {
+  const getCurrencySymbol = (currency: string): string => {
+    const symbols: { [key: string]: string } = {
+      'USD': '$',
+      'EUR': '€',
+      'GBP': '£',
+      'JPY': '¥',
+      'CAD': 'C$',
+      'AUD': 'A$',
+      'CHF': 'CHF',
+      'CNY': '¥',
+      'MXN': '$',
+      'BRL': 'R$'
+    }
+    return symbols[currency] || '$'
+  }
+
+  const formatCurrency = (amount: number): string => {
+    if (!currencyConfig) {
+      return `$${amount.toLocaleString()}`
+    }
+    const symbol = getCurrencySymbol(currencyConfig.currency)
+    const formattedAmount = amount.toLocaleString()
+    if (currencyConfig.position === 'after') {
+      return `${formattedAmount}${symbol}`
+    } else {
+      return `${symbol}${formattedAmount}`
+    }
+  }
+
   const generateInsights = (): Insight[] => {
     const insights: Insight[] = []
     
     // Revenue insights
     if (analyticsData.revenue.growth > 10) {
-      insights.push({
-        type: "positive",
-        title: "Strong Revenue Growth",
-        description: `Revenue increased by ${analyticsData.revenue.growth.toFixed(1)}% compared to last week`,
-        metric: `$${analyticsData.revenue.today.toLocaleString()} today`,
-        icon: <TrendingUp className="h-5 w-5 text-green-600" />
-      })
+             insights.push({
+         type: "positive",
+         title: "Strong Revenue Growth",
+         description: `Revenue increased by ${analyticsData.revenue.growth.toFixed(1)}% compared to last week`,
+         metric: `${formatCurrency(analyticsData.revenue.today)} today`,
+         icon: <TrendingUp className="h-5 w-5 text-green-600" />
+       })
     } else if (analyticsData.revenue.growth < -5) {
-      insights.push({
-        type: "negative",
-        title: "Revenue Decline",
-        description: `Revenue decreased by ${Math.abs(analyticsData.revenue.growth).toFixed(1)}% compared to last week`,
-        metric: `$${analyticsData.revenue.today.toLocaleString()} today`,
-        action: "Consider promotional campaigns",
-        icon: <TrendingDown className="h-5 w-5 text-red-600" />
-      })
+             insights.push({
+         type: "negative",
+         title: "Revenue Decline",
+         description: `Revenue decreased by ${Math.abs(analyticsData.revenue.growth).toFixed(1)}% compared to last week`,
+         metric: `${formatCurrency(analyticsData.revenue.today)} today`,
+         action: "Consider promotional campaigns",
+         icon: <TrendingDown className="h-5 w-5 text-red-600" />
+       })
     }
 
     // Order insights
@@ -77,38 +110,38 @@ export function PerformanceInsights({ analyticsData }: PerformanceInsightsProps)
 
     // Average order value insights
     const avgOrderValue = analyticsData.orders.total > 0 ? analyticsData.revenue.total / analyticsData.orders.total : 0
-    if (avgOrderValue > 25) {
-      insights.push({
-        type: "positive",
-        title: "High Average Order Value",
-        description: `Customers are spending an average of $${avgOrderValue.toFixed(2)} per order`,
-        metric: "Above industry average",
-        icon: <DollarSign className="h-5 w-5 text-green-600" />
-      })
-    } else if (avgOrderValue < 15) {
-      insights.push({
-        type: "warning",
-        title: "Low Average Order Value",
-        description: `Average order value is $${avgOrderValue.toFixed(2)}, consider upselling strategies`,
-        metric: "Below target",
-        action: "Review menu pricing and promotions",
-        icon: <AlertTriangle className="h-5 w-5 text-yellow-600" />
-      })
-    }
+         if (avgOrderValue > 25) {
+       insights.push({
+         type: "positive",
+         title: "High Average Order Value",
+         description: `Customers are spending an average of ${formatCurrency(avgOrderValue)} per order`,
+         metric: "Above industry average",
+         icon: <DollarSign className="h-5 w-5 text-green-600" />
+       })
+     } else if (avgOrderValue < 15) {
+       insights.push({
+         type: "warning",
+         title: "Low Average Order Value",
+         description: `Average order value is ${formatCurrency(avgOrderValue)}, consider upselling strategies`,
+         metric: "Below target",
+         action: "Review menu pricing and promotions",
+         icon: <AlertTriangle className="h-5 w-5 text-yellow-600" />
+       })
+     }
 
     // Peak hours insight
     const peakHour = analyticsData.salesByHour.reduce((max: any, hour: any) => 
       hour.revenue > max.revenue ? hour : max
     )
-    if (peakHour.revenue > 0) {
-      insights.push({
-        type: "neutral",
-        title: "Peak Business Hours",
-        description: `Highest revenue at ${peakHour.hour} with $${peakHour.revenue.toLocaleString()}`,
-        metric: "Consider staffing optimization",
-        icon: <Clock className="h-5 w-5 text-blue-600" />
-      })
-    }
+         if (peakHour.revenue > 0) {
+       insights.push({
+         type: "neutral",
+         title: "Peak Business Hours",
+         description: `Highest revenue at ${peakHour.hour} with ${formatCurrency(peakHour.revenue)}`,
+         metric: "Consider staffing optimization",
+         icon: <Clock className="h-5 w-5 text-blue-600" />
+       })
+     }
 
     return insights
   }
@@ -208,16 +241,45 @@ interface KPIComparisonProps {
   previous: number
   label: string
   format?: "currency" | "number" | "percentage"
+  currencyConfig?: {
+    currency: string
+    position: 'before' | 'after'
+  }
 }
 
-export function KPIComparison({ current, previous, label, format = "number" }: KPIComparisonProps) {
+export function KPIComparison({ current, previous, label, format = "number", currencyConfig }: KPIComparisonProps) {
   const change = previous > 0 ? ((current - previous) / previous) * 100 : 0
   const isPositive = change >= 0
+
+  const getCurrencySymbol = (currency: string): string => {
+    const symbols: { [key: string]: string } = {
+      'USD': '$',
+      'EUR': '€',
+      'GBP': '£',
+      'JPY': '¥',
+      'CAD': 'C$',
+      'AUD': 'A$',
+      'CHF': 'CHF',
+      'CNY': '¥',
+      'MXN': '$',
+      'BRL': 'R$'
+    }
+    return symbols[currency] || '$'
+  }
 
   const formatValue = (value: number) => {
     switch (format) {
       case "currency":
-        return `$${value.toLocaleString()}`
+        if (!currencyConfig) {
+          return `$${value.toLocaleString()}`
+        }
+        const symbol = getCurrencySymbol(currencyConfig.currency)
+        const formattedAmount = value.toLocaleString()
+        if (currencyConfig.position === 'after') {
+          return `${formattedAmount}${symbol}`
+        } else {
+          return `${symbol}${formattedAmount}`
+        }
       case "percentage":
         return `${value.toFixed(1)}%`
       default:

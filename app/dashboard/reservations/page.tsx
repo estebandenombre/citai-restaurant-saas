@@ -85,6 +85,7 @@ export default function ReservationsPage() {
   const [loading, setLoading] = useState(true)
   const [restaurant, setRestaurant] = useState<any>(null)
   const [searchTerm, setSearchTerm] = useState("")
+  const [nameFilter, setNameFilter] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [dateFilter, setDateFilter] = useState("all")
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null)
@@ -385,13 +386,15 @@ export default function ReservationsPage() {
                          reservation.customer_email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          reservation.customer_phone.includes(searchTerm)
     
+    const matchesName = nameFilter === "" || reservation.customer_name.toLowerCase().includes(nameFilter.toLowerCase())
+    
     const matchesStatus = statusFilter === "all" || reservation.status === statusFilter
     
     const matchesDate = dateFilter === "all" || 
                        (dateFilter === "today" && reservation.reservation_date === getTodayString()) ||
                        (dateFilter === "tomorrow" && reservation.reservation_date === getTomorrowString())
 
-    return matchesSearch && matchesStatus && matchesDate
+    return matchesSearch && matchesName && matchesStatus && matchesDate
   })
 
   // Get reservations for a specific date (with search filter)
@@ -473,15 +476,15 @@ export default function ReservationsPage() {
   const timeSlots = generateTimeSlots()
 
   // Navigation functions
-  const goToPreviousWeek = () => {
+  const goToPreviousDay = () => {
     const newDate = new Date(selectedDate)
-    newDate.setDate(newDate.getDate() - 7)
+    newDate.setDate(newDate.getDate() - 1)
     setSelectedDate(newDate)
   }
 
-  const goToNextWeek = () => {
+  const goToNextDay = () => {
     const newDate = new Date(selectedDate)
-    newDate.setDate(newDate.getDate() + 7)
+    newDate.setDate(newDate.getDate() + 1)
     setSelectedDate(newDate)
   }
 
@@ -499,6 +502,20 @@ export default function ReservationsPage() {
 
   const goToToday = () => {
     setSelectedDate(new Date())
+  }
+
+  const handleDateChange = (dateString: string) => {
+    const newDate = new Date(dateString)
+    if (!isNaN(newDate.getTime())) {
+      setSelectedDate(newDate)
+    }
+  }
+
+  const clearAllFilters = () => {
+    setSearchTerm("")
+    setNameFilter("")
+    setStatusFilter("all")
+    setDateFilter("all")
   }
 
   // Generate date options for the next 30 days
@@ -653,6 +670,15 @@ export default function ReservationsPage() {
                   </div>
                 )}
               </div>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Filter by customer name..."
+                  value={nameFilter}
+                  onChange={(e) => setNameFilter(e.target.value)}
+                  className="pl-10 w-48"
+                />
+              </div>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-48">
                   <SelectValue placeholder="Filter by status" />
@@ -675,6 +701,17 @@ export default function ReservationsPage() {
                   <SelectItem value="tomorrow">Tomorrow</SelectItem>
                 </SelectContent>
               </Select>
+              {(searchTerm || nameFilter || statusFilter !== "all" || dateFilter !== "all") && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={clearAllFilters}
+                  className="text-gray-600 hover:text-gray-800"
+                >
+                  <Filter className="h-4 w-4 mr-2" />
+                  Clear filters
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -708,7 +745,7 @@ export default function ReservationsPage() {
                   <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 mb-2">No reservations found</h3>
                   <p className="text-gray-500">
-                    {searchTerm || statusFilter !== "all" || dateFilter !== "all" 
+                    {searchTerm || nameFilter || statusFilter !== "all" || dateFilter !== "all" 
                       ? "Try adjusting your filters" 
                       : "No reservations have been made yet"}
                   </p>
@@ -978,13 +1015,13 @@ export default function ReservationsPage() {
                     </CardDescription>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Button variant="outline" size="sm" onClick={goToPreviousWeek}>
+                    <Button variant="outline" size="sm" onClick={goToPreviousDay}>
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
                     <Button variant="outline" size="sm" onClick={goToToday}>
                       Today
                     </Button>
-                    <Button variant="outline" size="sm" onClick={goToNextWeek}>
+                    <Button variant="outline" size="sm" onClick={goToNextDay}>
                       <ChevronRight className="h-4 w-4" />
                     </Button>
                   </div>
@@ -1078,15 +1115,27 @@ export default function ReservationsPage() {
                     </CardDescription>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Button variant="outline" size="sm" onClick={goToPreviousWeek}>
+                    <Button variant="outline" size="sm" onClick={goToPreviousDay}>
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
                     <Button variant="outline" size="sm" onClick={goToToday}>
                       Today
                     </Button>
-                    <Button variant="outline" size="sm" onClick={goToNextWeek}>
+                    <Button variant="outline" size="sm" onClick={goToNextDay}>
                       <ChevronRight className="h-4 w-4" />
                     </Button>
+                    <div className="flex items-center space-x-2 ml-4">
+                      <Label htmlFor="date-input" className="text-sm font-medium text-gray-700">
+                        Go to date:
+                      </Label>
+                      <Input
+                        id="date-input"
+                        type="date"
+                        value={formatDateToLocalString(selectedDate)}
+                        onChange={(e) => handleDateChange(e.target.value)}
+                        className="w-40"
+                      />
+                    </div>
                   </div>
                 </div>
               </CardHeader>

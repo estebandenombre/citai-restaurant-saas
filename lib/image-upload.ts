@@ -33,7 +33,7 @@ export const validateImage = (file: File): ImageValidationResult => {
   return { isValid: true }
 }
 
-export const optimizeImage = async (file: File, maxWidth: number = 1200): Promise<File> => {
+export const optimizeImage = async (file: File, maxWidth: number = 1200, quality: number = 0.8): Promise<File> => {
   return new Promise((resolve) => {
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')
@@ -43,18 +43,35 @@ export const optimizeImage = async (file: File, maxWidth: number = 1200): Promis
       // Calcular nuevas dimensiones manteniendo aspect ratio
       let { width, height } = img
       
+      // Redimensionar solo si es necesario
       if (width > maxWidth) {
-        height = (height * maxWidth) / width
+        height = Math.round((height * maxWidth) / width)
         width = maxWidth
       }
 
-      canvas.width = width
-      canvas.height = height
+      // Optimizar para diferentes tamaños de pantalla
+      const sizes = [
+        { width: Math.min(width, 400), quality: 0.7 },   // Mobile
+        { width: Math.min(width, 800), quality: 0.75 },  // Tablet
+        { width: Math.min(width, 1200), quality: 0.8 }   // Desktop
+      ]
+
+      // Usar el tamaño más apropiado
+      const targetSize = sizes.find(size => size.width <= width) || sizes[sizes.length - 1]
+      
+      canvas.width = targetSize.width
+      canvas.height = Math.round((height * targetSize.width) / width)
+
+      // Configurar contexto para mejor calidad
+      if (ctx) {
+        ctx.imageSmoothingEnabled = true
+        ctx.imageSmoothingQuality = 'high'
+      }
 
       // Dibujar imagen redimensionada
-      ctx?.drawImage(img, 0, 0, width, height)
+      ctx?.drawImage(img, 0, 0, canvas.width, canvas.height)
 
-      // Convertir a blob
+      // Convertir a blob con calidad optimizada
       canvas.toBlob((blob) => {
         if (blob) {
           const optimizedFile = new File([blob], file.name, {
@@ -65,7 +82,7 @@ export const optimizeImage = async (file: File, maxWidth: number = 1200): Promis
         } else {
           resolve(file) // Fallback al archivo original
         }
-      }, file.type, 0.8) // Calidad 80%
+      }, file.type, targetSize.quality)
     }
 
     img.src = URL.createObjectURL(file)

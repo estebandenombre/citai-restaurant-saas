@@ -31,6 +31,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Loading } from "@/components/ui/loading"
 import { PageHeader } from "@/components/ui/page-header"
 import { useToast } from "@/hooks/use-toast"
+import { useRestaurantCurrency } from "@/hooks/use-restaurant-currency"
 
 
 interface AnalyticsData {
@@ -82,6 +83,40 @@ export default function AnalyticsPage() {
   const [restaurant, setRestaurant] = useState<any>(null)
   const [ordersData, setOrdersData] = useState<any[]>([])
   const { toast } = useToast()
+  const { currencyConfig } = useRestaurantCurrency(restaurant?.id)
+
+  // Function to format currency based on restaurant configuration
+  const formatCurrency = (amount: number, decimals: number = 2): string => {
+    if (!currencyConfig) {
+      return `$${amount.toLocaleString()}`
+    }
+
+    const formattedAmount = amount.toFixed(decimals)
+    const symbol = getCurrencySymbol(currencyConfig.currency)
+    
+    if (currencyConfig.position === 'after') {
+      return `${formattedAmount}${symbol}`
+    } else {
+      return `${symbol}${formattedAmount}`
+    }
+  }
+
+  // Function to get currency symbol
+  const getCurrencySymbol = (currency: string): string => {
+    const symbols: { [key: string]: string } = {
+      'USD': '$',
+      'EUR': '€',
+      'GBP': '£',
+      'JPY': '¥',
+      'CAD': 'C$',
+      'AUD': 'A$',
+      'CHF': 'CHF',
+      'CNY': '¥',
+      'MXN': '$',
+      'BRL': 'R$'
+    }
+    return symbols[currency] || '$'
+  }
 
   const handleExport = async (format: string, dateRange: { from: Date; to: Date }, options: any) => {
     try {
@@ -99,23 +134,24 @@ export default function AnalyticsPage() {
         address: restaurant.address,
         phone: restaurant.phone,
         email: restaurant.email,
-        website: restaurant.website
+        website: restaurant.website,
+        currencyConfig: currencyConfig || undefined
       }
 
       let blob: Blob
       
       switch (format) {
         case 'pdf':
-          blob = await ExportService.exportToPDF(analyticsData, restaurantInfo, dateRange, options)
+          blob = ExportService.exportToPDF(analyticsData, restaurantInfo, dateRange, options)
           break
         case 'excel':
           blob = await ExportService.exportToExcel(analyticsData, restaurantInfo, dateRange, options)
           break
         case 'csv':
-          blob = await ExportService.exportToCSV(analyticsData, restaurantInfo, dateRange, options)
+          blob = ExportService.exportToCSV(analyticsData, restaurantInfo, dateRange, options)
           break
         case 'json':
-          blob = await ExportService.exportToJSON(analyticsData, restaurantInfo, dateRange, options)
+          blob = ExportService.exportToJSON(analyticsData, restaurantInfo, dateRange, options)
           break
         default:
           throw new Error(`Unsupported format: ${format}`)
@@ -186,7 +222,8 @@ export default function AnalyticsPage() {
         address: restaurant.address,
         phone: restaurant.phone,
         email: restaurant.email,
-        website: restaurant.website
+        website: restaurant.website,
+        currencyConfig: currencyConfig || undefined
       }
 
       // Default options for quick export
@@ -301,6 +338,9 @@ export default function AnalyticsPage() {
         .gte("created_at", startDate.toISOString())
         .order("created_at", { ascending: true })
 
+      // Customers data will be derived from orders since customers table doesn't exist
+      const customersData: any[] = []
+
 
 
       if (ordersError) {
@@ -329,7 +369,7 @@ export default function AnalyticsPage() {
       }
 
       // Process data with real information
-      const processedData = processAnalyticsData(normalizedOrdersData, categories || [])
+      const processedData = processAnalyticsData(normalizedOrdersData, categories || [], customersData || [])
       setAnalyticsData(processedData)
       setOrdersData(normalizedOrdersData)
     } catch (error) {
@@ -339,7 +379,7 @@ export default function AnalyticsPage() {
     }
   }
 
-  const processAnalyticsData = (ordersData: any[], categories: any[]): AnalyticsData => {
+  const processAnalyticsData = (ordersData: any[], categories: any[], customersData: any[]): AnalyticsData => {
     const now = new Date()
     
     // Check if orders have future dates (indicating a date issue in the database)
@@ -373,8 +413,12 @@ export default function AnalyticsPage() {
     let displayOrders = []
     let comparisonOrders = []
     let comparisonPeriod = ""
+    let startDate: Date
+    let comparisonStartDate: Date
 
     if (timeRange === "today") {
+      startDate = today
+      comparisonStartDate = yesterday
       displayOrders = ordersData.filter(order => 
         new Date(order.created_at) >= today
       )
@@ -385,6 +429,8 @@ export default function AnalyticsPage() {
       
 
     } else if (timeRange === "7d") {
+      startDate = weekAgo
+      comparisonStartDate = previousWeekAgo
       displayOrders = ordersData.filter(order => 
         new Date(order.created_at) >= weekAgo
       )
@@ -393,6 +439,8 @@ export default function AnalyticsPage() {
       )
       comparisonPeriod = "previous week"
     } else if (timeRange === "30d") {
+      startDate = monthAgo
+      comparisonStartDate = new Date(monthAgo.getTime() - 30 * 24 * 60 * 60 * 1000)
       displayOrders = ordersData.filter(order => 
         new Date(order.created_at) >= monthAgo
       )
@@ -404,6 +452,8 @@ export default function AnalyticsPage() {
       comparisonPeriod = "previous month"
     } else if (timeRange === "90d") {
       const ninetyDaysAgo = new Date(today.getTime() - 90 * 24 * 60 * 60 * 1000)
+      startDate = ninetyDaysAgo
+      comparisonStartDate = new Date(ninetyDaysAgo.getTime() - 90 * 24 * 60 * 60 * 1000)
       displayOrders = ordersData.filter(order => 
         new Date(order.created_at) >= ninetyDaysAgo
       )
@@ -415,6 +465,8 @@ export default function AnalyticsPage() {
       comparisonPeriod = "previous 90 days"
     } else {
       // Default to all data
+      startDate = new Date(0) // Beginning of time
+      comparisonStartDate = new Date(0)
       displayOrders = ordersData
       comparisonOrders = []
       comparisonPeriod = "no comparison"
@@ -559,25 +611,42 @@ export default function AnalyticsPage() {
     const categoryPerformance = Array.from(categoryStats.values())
       .sort((a, b) => b.revenue - a.revenue)
 
-    // Calculate unique customers (only for display period)
-    const uniqueCustomers = new Set()
+    // Calculate customers from orders data since customers table doesn't exist
+    const uniqueCustomerEmails = new Set()
+    const customerOrderCount = new Map()
+    
+    // Count orders per customer in display period
     displayOrders.forEach(order => {
       if (order.customer_email) {
-        uniqueCustomers.add(order.customer_email)
+        uniqueCustomerEmails.add(order.customer_email)
+        const count = customerOrderCount.get(order.customer_email) || 0
+        customerOrderCount.set(order.customer_email, count + 1)
       }
     })
 
-    // Calculate new vs returning customers (simplified - based on order frequency)
-    const customerOrderCount = new Map()
-    displayOrders.forEach(order => {
+    // Count orders per customer in comparison period (for growth calculation)
+    comparisonOrders.forEach(order => {
       if (order.customer_email) {
         const count = customerOrderCount.get(order.customer_email) || 0
         customerOrderCount.set(order.customer_email, count + 1)
       }
     })
 
+    const displayCustomers = Array.from(uniqueCustomerEmails).map(email => ({ email }))
     const newCustomers = Array.from(customerOrderCount.values()).filter(count => count === 1).length
     const returningCustomers = Array.from(customerOrderCount.values()).filter(count => count > 1).length
+    
+    // Calculate growth based on unique emails in comparison period
+    const comparisonEmails = new Set()
+    comparisonOrders.forEach(order => {
+      if (order.customer_email) {
+        comparisonEmails.add(order.customer_email)
+      }
+    })
+    
+    const customerGrowth = comparisonEmails.size > 0 
+      ? ((uniqueCustomerEmails.size - comparisonEmails.size) / comparisonEmails.size) * 100 
+      : 0
 
 
 
@@ -597,7 +666,7 @@ export default function AnalyticsPage() {
         growth: ordersGrowth
       },
       customers: {
-        total: uniqueCustomers.size,
+        total: displayCustomers.length,
         new: newCustomers,
         returning: returningCustomers
       },
@@ -669,7 +738,7 @@ export default function AnalyticsPage() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${analyticsData.revenue.total.toLocaleString()}</div>
+            <div className="text-2xl font-bold">{formatCurrency(analyticsData.revenue.total)}</div>
             <p className="text-xs text-muted-foreground">
               <span className={analyticsData.revenue.growth >= 0 ? "text-green-600" : "text-red-600"}>
                 {analyticsData.revenue.growth >= 0 ? "+" : ""}{analyticsData.revenue.growth.toFixed(1)}%
@@ -723,7 +792,7 @@ export default function AnalyticsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              ${analyticsData.orders.total > 0 ? (analyticsData.revenue.total / analyticsData.orders.total).toFixed(2) : "0.00"}
+                                {formatCurrency(analyticsData.orders.total > 0 ? (analyticsData.revenue.total / analyticsData.orders.total) : 0)}
             </div>
             <p className="text-xs text-muted-foreground">
               per order
@@ -856,9 +925,9 @@ export default function AnalyticsPage() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-medium">${item.revenue.toLocaleString()}</p>
+                  <p className="font-medium">{formatCurrency(item.revenue)}</p>
                   <p className="text-sm text-muted-foreground">
-                    ${(item.revenue / item.quantity).toFixed(2)} avg
+                    {formatCurrency(item.revenue / item.quantity)} avg
                   </p>
                 </div>
               </div>
@@ -868,7 +937,7 @@ export default function AnalyticsPage() {
       </Card>
 
       {/* Performance Insights */}
-      <PerformanceInsights analyticsData={analyticsData} />
+                    <PerformanceInsights analyticsData={analyticsData} currencyConfig={currencyConfig || undefined} />
 
       {/* Export Section */}
       <div className="grid gap-6 md:grid-cols-2">
@@ -889,7 +958,7 @@ export default function AnalyticsPage() {
                 </p>
               </div>
               <div className="text-center p-3 bg-green-50 rounded-lg">
-                <p className="text-2xl font-bold text-green-600">${analyticsData.revenue.total.toLocaleString()}</p>
+                <p className="text-2xl font-bold text-green-600">{formatCurrency(analyticsData.revenue.total)}</p>
                 <p className="text-sm text-gray-600">
                   {timeRange === "today" ? "Today's Revenue" : "Total Revenue"}
                 </p>
@@ -900,7 +969,7 @@ export default function AnalyticsPage() {
               </div>
               <div className="text-center p-3 bg-orange-50 rounded-lg">
                 <p className="text-2xl font-bold text-orange-600">
-                  ${analyticsData.orders.total > 0 ? (analyticsData.revenue.total / analyticsData.orders.total).toFixed(2) : "0.00"}
+                  {formatCurrency(analyticsData.orders.total > 0 ? (analyticsData.revenue.total / analyticsData.orders.total) : 0)}
                 </p>
                 <p className="text-sm text-gray-600">Avg Order Value</p>
               </div>

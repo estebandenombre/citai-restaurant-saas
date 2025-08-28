@@ -343,6 +343,7 @@ export default function WebsitePreviewPage() {
                     className="w-48 h-48 border border-gray-200 rounded-lg"
                   />
                   <div className="flex space-x-2">
+                    {/* Print button temporarily disabled
                     <Button
                       variant="outline"
                       size="sm"
@@ -351,6 +352,7 @@ export default function WebsitePreviewPage() {
                       <Printer className="h-4 w-4 mr-2" />
                       Print
                     </Button>
+                    */}
                     <Button
                       variant="outline"
                       size="sm"
@@ -387,6 +389,7 @@ export default function WebsitePreviewPage() {
               <CardTitle className="text-lg">Quick Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
+              {/* Copy URL & Print QR button temporarily disabled
               <Button
                 variant="outline"
                 onClick={() => {
@@ -400,6 +403,7 @@ export default function WebsitePreviewPage() {
                 <Copy className="h-4 w-4 mr-2" />
                 Copy URL & Print QR
               </Button>
+              */}
               <Button
                 variant="outline"
                 onClick={() => {

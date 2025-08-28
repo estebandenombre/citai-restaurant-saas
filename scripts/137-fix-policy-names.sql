@@ -105,3 +105,4 @@ SELECT '✅ Registration should now work correctly' as status;
 
 
 
+

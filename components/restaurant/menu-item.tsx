@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { ShoppingCart, Plus, Minus, Clock, Star } from "lucide-react"
 import { FormattedPrice } from "@/components/ui/formatted-price"
+import { CroppedDishImage } from "@/components/ui/cropped-image"
 interface MenuItemProps {
   item: {
     id: string
@@ -17,6 +18,7 @@ interface MenuItemProps {
     description?: string
     price: number
     image_url?: string
+    crop_data?: any
     is_featured?: boolean
     dietary_info?: string[]
     allergens?: string[]
@@ -73,6 +75,25 @@ export default function MenuItem({ item, restaurantId }: MenuItemProps) {
   return (
     <Card className="group relative overflow-hidden bg-white border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 rounded-xl h-full flex flex-col">
 
+      {/* Dish Image */}
+      {item.image_url && (
+        <div className="relative overflow-hidden">
+          <CroppedDishImage
+            src={item.image_url}
+            alt={item.name}
+            cropData={item.crop_data}
+            className="w-full h-48 group-hover:scale-105 transition-transform duration-300"
+          />
+          {item.is_featured && (
+            <div className="absolute top-3 left-3 z-10">
+              <Badge className="bg-yellow-500 text-white border-0 shadow-sm">
+                <Star className="w-3 h-3 mr-1" />
+                Featured
+              </Badge>
+            </div>
+          )}
+        </div>
+      )}
       
       {/* Card Header */}
       <div className="p-5 pb-3 flex-1">
@@ -162,6 +183,17 @@ export default function MenuItem({ item, restaurantId }: MenuItemProps) {
           <div className="space-y-4">
             {/* Item Info */}
             <div className="text-center p-3 bg-slate-50 rounded-lg">
+              {/* Item Image in Dialog */}
+              {item.image_url && (
+                <div className="mb-3">
+                  <CroppedDishImage
+                    src={item.image_url}
+                    alt={item.name}
+                    cropData={item.crop_data}
+                    className="w-full h-32 rounded-lg"
+                  />
+                </div>
+              )}
               <h3 className="font-semibold text-slate-900">{item.name}</h3>
               {item.description && (
                 <p className="text-sm text-slate-600 mt-1">{item.description}</p>

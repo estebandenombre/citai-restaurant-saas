@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { RestaurantConfig } from "@/components/restaurant/restaurant-config"
+import { ImageConfig } from "@/components/restaurant/image-config"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -61,6 +62,8 @@ export default function SettingsPage() {
   const [restaurant, setRestaurant] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [useDatabase, setUseDatabase] = useState(false)
+  const [logoUrl, setLogoUrl] = useState<string | null>(null)
+  const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null)
   const { toast } = useToast()
   
   // Default settings
@@ -97,6 +100,10 @@ export default function SettingsPage() {
         // Get restaurant info
         const { restaurant: userRestaurant } = await getCurrentUserRestaurant()
         setRestaurant(userRestaurant)
+        
+        // Set image URLs
+        setLogoUrl(userRestaurant?.logo_url || null)
+        setCoverImageUrl(userRestaurant?.cover_image_url || null)
 
         if (userRestaurant && typeof userRestaurant === 'object' && 'id' in userRestaurant) {
           console.log('Loading settings for restaurant:', userRestaurant.id)
@@ -164,6 +171,58 @@ export default function SettingsPage() {
 
     fetchData()
   }, [toast])
+
+  const handleLogoChange = async (url: string | null) => {
+    if (!restaurant) return
+    
+    try {
+      const { error } = await supabase
+        .from('restaurants')
+        .update({ logo_url: url })
+        .eq('id', restaurant.id)
+      
+      if (error) throw error
+      
+      setLogoUrl(url)
+      toast({
+        title: "Logo updated",
+        description: "Your restaurant logo has been updated successfully.",
+      })
+    } catch (error) {
+      console.error('Error updating logo:', error)
+      toast({
+        title: "Error",
+        description: "Failed to update logo. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleCoverImageChange = async (url: string | null) => {
+    if (!restaurant) return
+    
+    try {
+      const { error } = await supabase
+        .from('restaurants')
+        .update({ cover_image_url: url })
+        .eq('id', restaurant.id)
+      
+      if (error) throw error
+      
+      setCoverImageUrl(url)
+      toast({
+        title: "Hero image updated",
+        description: "Your restaurant hero image has been updated successfully.",
+      })
+    } catch (error) {
+      console.error('Error updating hero image:', error)
+      toast({
+        title: "Error",
+        description: "Failed to update hero image. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
 
   const handleSave = async () => {
     setSaving(true)
@@ -462,6 +521,17 @@ export default function SettingsPage() {
 
       {/* Restaurant Configuration */}
       <RestaurantConfig />
+
+      {/* Image Configuration */}
+      {restaurant && (
+        <ImageConfig
+          logoUrl={logoUrl}
+          coverImageUrl={coverImageUrl}
+          onLogoChange={handleLogoChange}
+          onCoverImageChange={handleCoverImageChange}
+          restaurantId={restaurant.id}
+        />
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Order Types */}

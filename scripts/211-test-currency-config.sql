@@ -89,3 +89,4 @@ AND indexname LIKE '%currency%';
 
 
 
+

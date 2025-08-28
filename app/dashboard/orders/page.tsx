@@ -1905,10 +1905,12 @@ export default function OrdersPage() {
                   </Button>
                 )}
 
+                {/* Print receipt button temporarily disabled
                 <Button variant="outline" className="border-gray-300 hover:bg-gray-50 transition-all duration-200">
                   <Printer className="h-4 w-4 mr-2" />
                   Print receipt
                 </Button>
+                */}
 
                 <Button variant="outline" className="border-gray-300 hover:bg-gray-50 transition-all duration-200">
                   <MessageSquare className="h-4 w-4 mr-2" />
@@ -2520,6 +2522,7 @@ export default function OrdersPage() {
                   </Button>
                 )}
 
+                {/* Print Receipt button temporarily disabled
                 <Button 
                   onClick={() => printReceipt(selectedOrder)}
                   variant="outline" 
@@ -2528,6 +2531,7 @@ export default function OrdersPage() {
                   <Printer className="h-4 w-4 mr-2" />
                   Print Receipt
                 </Button>
+                */}
 
                 <Button variant="outline" className="border-gray-300 hover:bg-gray-50 transition-all duration-200">
                   <MessageSquare className="h-4 w-4 mr-2" />
@@ -2749,6 +2753,7 @@ export default function OrdersPage() {
                   </Button>
                 )}
 
+                {/* Print Receipt button temporarily disabled
                 <Button 
                   onClick={() => printReceipt(editingOrder)}
                   variant="outline" 
@@ -2757,6 +2762,7 @@ export default function OrdersPage() {
                   <Printer className="h-4 w-4 mr-2" />
                   Print Receipt
                 </Button>
+                */}
 
                 <Button variant="outline" className="border-gray-300 hover:bg-gray-50 transition-all duration-200">
                   <MessageSquare className="h-4 w-4 mr-2" />

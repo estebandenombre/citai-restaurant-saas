@@ -28,6 +28,7 @@ import { getCurrentUserRestaurant } from "@/lib/auth-utils"
 import { PageHeader } from "@/components/ui/page-header"
 import { Loading } from "@/components/ui/loading"
 import { FormattedPrice } from "@/components/ui/formatted-price"
+import Image from "next/image"
 import AddMenuItemForm from "@/components/menu/add-menu-item-form"
 
 interface Category {
@@ -46,6 +47,8 @@ interface MenuItem {
   name: string
   description: string | null
   price: number
+  image_url: string | null
+  crop_data: any
   allergens: string[] | null
   dietary_info: string[] | null
   ingredients: string[] | null
@@ -79,6 +82,8 @@ export default function MenuPage() {
     name: "",
     description: "",
     price: "",
+    image_url: null as string | null,
+    crop_data: null as any,
     category_id: "uncategorized",
     allergens: "",
     dietary_info: "",
@@ -303,6 +308,8 @@ export default function MenuPage() {
         name: item.name,
         description: item.description || "",
         price: item.price.toString(),
+        image_url: item.image_url,
+        crop_data: item.crop_data,
         category_id: item.category_id || "uncategorized",
         allergens: item.allergens?.join(", ") || "",
         dietary_info: item.dietary_info?.join(", ") || "",
@@ -317,6 +324,8 @@ export default function MenuPage() {
         name: "",
         description: "",
         price: "",
+        image_url: null,
+        crop_data: null,
         category_id: "uncategorized",
         allergens: "",
         dietary_info: "",
@@ -336,6 +345,8 @@ export default function MenuPage() {
       name: "",
       description: "",
       price: "",
+      image_url: null,
+      crop_data: null,
       category_id: "uncategorized",
       allergens: "",
       dietary_info: "",
@@ -788,6 +799,20 @@ export default function MenuPage() {
                         </Button>
                       </div>
                     </div>
+                    
+                    {/* Dish Image */}
+                    {item.image_url && (
+                      <div className="mb-3">
+                        <div className="relative w-full h-32 rounded-lg overflow-hidden">
+                          <Image
+                            src={item.image_url}
+                            alt={item.name}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                      </div>
+                    )}
                     
                     {/* Description */}
                     {item.description && (

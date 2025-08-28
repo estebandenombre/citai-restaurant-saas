@@ -31,7 +31,8 @@ import {
   Globe,
   LogOut,
   Crown,
-  Clock
+  Clock,
+  CreditCard
 } from "lucide-react"
 
 const navigation = [
@@ -149,13 +150,13 @@ export function Sidebar({ sidebarCollapsed, setSidebarCollapsed }: SidebarProps)
         {/* Sidebar Background */}
         <div className="h-full bg-white border-r border-gray-100 shadow-sm">
           {/* Sidebar Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-100">
+          <div className="flex items-center justify-between p-3 border-b border-gray-100">
             {!sidebarCollapsed && (
               <Link href="/dashboard" className="flex items-center">
                 <img 
                     src="/tably_logo_completo.png"
                   alt="Tably" 
-                  className="h-8 w-auto object-contain"
+                  className="h-6 w-auto object-contain"
                 />
               </Link>
             )}
@@ -163,24 +164,24 @@ export function Sidebar({ sidebarCollapsed, setSidebarCollapsed }: SidebarProps)
               variant="ghost"
               size="sm"
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className="text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-lg"
+              className="text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-md h-8 w-8 p-0"
             >
-              {sidebarCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+              {sidebarCollapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
             </Button>
           </div>
 
           {/* Sidebar Navigation */}
-          <div className="px-3 py-4">
+          <div className="px-2.5 py-3 flex flex-col h-full">
             {/* Main Menu Section */}
             {!sidebarCollapsed && (
-              <div className="mb-6">
-                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-3">
+              <div className="mb-4">
+                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-2.5">
                   Main Menu
                 </h3>
               </div>
             )}
             
-            <nav className="space-y-1 mb-8">
+            <nav className="space-y-1 mb-4">
               {navigation.map((item) => {
                 const isActive = pathname === item.href
                 const Icon = item.icon
@@ -188,113 +189,131 @@ export function Sidebar({ sidebarCollapsed, setSidebarCollapsed }: SidebarProps)
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`flex items-center justify-center lg:justify-start space-x-3 px-3 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    className={`flex items-center justify-center lg:justify-start space-x-3 px-3 py-2.5 rounded-md text-sm font-medium transition-all duration-200 ${
                       isActive 
-                        ? "bg-gradient-to-r text-white shadow-md"
+                        ? "bg-gradient-to-r text-white shadow-sm"
                         : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                     } ${isActive ? item.color : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}
                   >
                     <div className="flex items-center justify-center w-6 h-6">
                       <Icon className="h-5 w-5" />
                     </div>
-                    {!sidebarCollapsed && <span>{item.name}</span>}
+                    {!sidebarCollapsed && <span className="text-sm">{item.name}</span>}
                   </Link>
                 )
               })}
             </nav>
-          </div>
 
-          {/* Sidebar Footer */}
-          <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-100 bg-white space-y-3">
-            <div className="flex items-start space-x-3">
-              <Avatar className="h-8 w-8 flex-shrink-0">
-                <AvatarImage src="/placeholder-user.jpg" />
-                <AvatarFallback className="bg-gray-900 text-white text-sm font-medium">
-                  {userInfo?.name?.charAt(0).toUpperCase() || 'U'}
-                </AvatarFallback>
-              </Avatar>
-              {sidebarCollapsed && trialStatus && (
-                <div className="absolute -top-1 -right-1">
-                  <div className="w-3 h-3 bg-blue-500 rounded-full border-2 border-white" />
-                </div>
-              )}
-              {!sidebarCollapsed && (
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">{userInfo?.name || 'Usuario'}</p>
-                  <p className="text-xs text-gray-500 truncate mb-2">{userInfo?.email || 'info@tably.digital'}</p>
-                  
-                  {/* Trial Status Badge */}
-                  <div className="mb-3">
-                    {trialLoading ? (
-                      <div className="animate-pulse bg-gray-200 h-6 rounded-md w-20" />
-                    ) : trialStatus ? (
-                      <div 
-                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium cursor-pointer hover:bg-blue-50 transition-colors"
-                        onClick={() => router.push('/pricing')}
-                      >
-                        {trialStatus.isExpired ? (
-                          <Badge variant="destructive" className="text-xs">
-                            <Clock className="w-3 h-3 mr-1" />
-                            Trial Expired
-                          </Badge>
-                        ) : (
-                          <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-800 hover:bg-blue-200">
-                            <Clock className="w-3 h-3 mr-1" />
-                            {trialStatus.daysRemaining} days left
-                          </Badge>
-                        )}
-                      </div>
-                    ) : (
-                      <Badge variant="outline" className="text-xs">
-                        Free Trial
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-            
-            {/* Logout Button */}
-            <div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleLogout}
-                className="w-full justify-center lg:justify-start text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg px-3 py-2 flex items-center"
-              >
-                <div className="flex items-center justify-center w-5 h-5">
-                  <LogOut className="h-4 w-4" />
-                </div>
-                {!sidebarCollapsed && <span className="ml-2">Logout</span>}
-              </Button>
-            </div>
-          </div>
-
-          {/* Other Section */}
-          <div className="absolute bottom-40 left-0 right-0 px-3">
-            
+            {/* General Section */}
+            {!sidebarCollapsed && (
+              <div className="mb-4">
+                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-2.5">
+                  General
+                </h3>
+              </div>
+            )}
+            <div className="space-y-1 mb-6">
               <Link
                 href="/dashboard/settings"
-                className="w-full justify-center lg:justify-start text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-lg px-3 py-3 flex items-center"
+                className="w-full justify-center lg:justify-start text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-md px-3 py-2.5 flex items-center"
               >
                 <div className="flex items-center justify-center w-6 h-6">
                   <Settings className="h-5 w-5" />
                 </div>
-                {!sidebarCollapsed && <span className="ml-3">Settings</span>}
+                {!sidebarCollapsed && <span className="ml-3 text-sm">Settings</span>}
               </Link>
+              
               <Link
-                href="/dashboard/settings/printer"
-                className="w-full justify-center lg:justify-start text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-lg px-3 py-3 flex items-center"
+                href="/dashboard/settings/payments"
+                className="w-full justify-center lg:justify-start text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-md px-3 py-2.5 flex items-center"
               >
                 <div className="flex items-center justify-center w-6 h-6">
-                  <Printer className="h-5 w-5" />
+                  <CreditCard className="h-5 w-5" />
                 </div>
-                {!sidebarCollapsed && <span className="ml-3">Printer</span>}
+                {!sidebarCollapsed && <span className="ml-3 text-sm">Payments</span>}
               </Link>
-
-
-
+              
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLogout}
+                className="w-full justify-center lg:justify-start text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-md px-3 py-2.5 flex items-center"
+              >
+                <div className="flex items-center justify-center w-6 h-6">
+                  <LogOut className="h-5 w-5" />
+                </div>
+                {!sidebarCollapsed && <span className="ml-3 text-sm">Logout</span>}
+              </Button>
             </div>
+            
+            {/* Spacer to push user info to bottom */}
+            <div className="flex-1" />
+            
+            {/* User Info Section */}
+            <div className="p-4 border-t border-gray-100 bg-white">
+              <div className="space-y-3">
+                {/* User Info */}
+                <div className="flex items-start space-x-3">
+                  <Avatar className="h-8 w-8 flex-shrink-0">
+                    <AvatarImage src="/placeholder-user.jpg" />
+                    <AvatarFallback className="bg-gray-900 text-white text-sm font-medium">
+                      {userInfo?.name?.charAt(0).toUpperCase() || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  {sidebarCollapsed && trialStatus && (
+                    <div className="absolute -top-1 -right-1">
+                      <div className="w-3 h-3 bg-blue-500 rounded-full border-2 border-white" />
+                    </div>
+                  )}
+                  {!sidebarCollapsed && (
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">{userInfo?.name || 'Usuario'}</p>
+                      <p className="text-xs text-gray-500 truncate mb-2">{userInfo?.email || 'info@tably.digital'}</p>
+                      
+                      {/* Trial Status Badge */}
+                      <div className="mb-3">
+                        {trialLoading ? (
+                          <div className="animate-pulse bg-gray-200 h-6 rounded-md w-20" />
+                        ) : trialStatus ? (
+                          <div 
+                            className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium cursor-pointer hover:bg-blue-50 transition-colors"
+                            onClick={() => router.push('/pricing')}
+                          >
+                            {trialStatus.isExpired ? (
+                              <Badge variant="destructive" className="text-xs">
+                                <Clock className="w-3 h-3 mr-1" />
+                                Trial Expired
+                              </Badge>
+                            ) : (
+                              <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-800 hover:bg-blue-200">
+                                <Clock className="w-3 h-3 mr-1" />
+                                {trialStatus.daysRemaining} days left
+                              </Badge>
+                            )}
+                          </div>
+                        ) : (
+                          <Badge variant="outline" className="text-xs">
+                            Free Trial
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Update Plan Button */}
+                {!sidebarCollapsed && (
+                  <Button
+                    onClick={() => router.push('/pricing')}
+                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-medium py-2 px-3 rounded-md shadow-sm hover:shadow-md transition-all duration-200"
+                  >
+                    <Crown className="h-3 w-3 mr-2" />
+                    Update Plan
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 

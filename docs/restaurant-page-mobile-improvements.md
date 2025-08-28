@@ -242,3 +242,4 @@ lg:grid-cols-2
 **Fecha**: $(date)  
 **Versión**: 1.0
 
+
