@@ -170,7 +170,7 @@ export default function PaymentCheckout({
         // Now confirm the payment with card details
         const confirmResult = await PaymentProcessor.confirmStripePaymentWithCard(
           restaurantId as string,
-          intentResult.payment_intent_id,
+          intentResult.payment_intent_id as string,
           {
             card_number: cardNumber,
             expiry_date: expiryDate,

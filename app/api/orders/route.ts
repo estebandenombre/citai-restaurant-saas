@@ -116,6 +116,84 @@ export async function POST(request: NextRequest) {
       }, { status: 500 })
     }
 
+<<<<<<< HEAD
+    // Send confirmation email if customer email is provided and order settings allow it
+    let emailSent = false
+    if (customerInfo.email) {
+      // Check order settings for email configuration
+      const { data: orderSettings, error: settingsError } = await supabase
+        .from('order_settings')
+        .select('require_email, send_confirmation_email')
+        .eq('restaurant_id', restaurantId)
+        .single()
+
+      if (!settingsError && orderSettings) {
+        const emailsEnabled = orderSettings.require_email && orderSettings.send_confirmation_email
+
+        if (emailsEnabled) {
+          try {
+            // Get order items with menu item details
+            const { data: orderItemsWithDetails, error: itemsError } = await supabase
+              .from('order_items')
+              .select(`
+                quantity,
+                unit_price,
+                total_price,
+                special_instructions,
+                menu_items (
+                  name
+                )
+              `)
+              .eq('order_id', order.id)
+
+            if (!itemsError && orderItemsWithDetails) {
+              const emailData = {
+                orderNumber: order.order_number,
+                customerName: customerInfo.name || 'Cliente',
+                customerEmail: customerInfo.email,
+                restaurantName: 'Restaurante',
+                orderType: customerInfo.order_type || 'dine-in',
+                items: orderItemsWithDetails.map((item: any) => ({
+                  name: item.menu_items?.name || 'Producto',
+                  quantity: item.quantity,
+                  unitPrice: item.unit_price,
+                  totalPrice: item.total_price,
+                  specialInstructions: item.special_instructions
+                })),
+                subtotal: subtotal,
+                taxAmount: taxAmount,
+                deliveryFee: deliveryFee,
+                totalAmount: totalAmount,
+                specialInstructions: customerInfo.special_instructions,
+                tableNumber: customerInfo.table_number,
+                pickupTime: customerInfo.pickup_time,
+                address: customerInfo.address
+              }
+
+              const emailResult = await emailService.sendOrderConfirmation(emailData)
+              emailSent = emailResult.success
+              
+              if (emailResult.success) {
+                console.log('✅ Order confirmation email sent successfully')
+                
+                // Update order to mark email as sent
+                await supabase
+                  .from('orders')
+                  .update({ email_sent: true })
+                  .eq('id', order.id)
+              } else {
+                console.error('❌ Failed to send order confirmation email:', emailResult.error)
+              }
+            }
+          } catch (emailError) {
+            console.error('❌ Error sending order confirmation email:', emailError)
+          }
+        }
+      }
+    }
+
+=======
+>>>>>>> parent of 7e8d86b (emails)
     return NextResponse.json({ 
       success: true, 
       order: order,
