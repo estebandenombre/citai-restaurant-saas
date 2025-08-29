@@ -59,6 +59,7 @@ import { getCurrentUserRestaurant } from "@/lib/auth-utils"
 import { Loading } from "@/components/ui/loading"
 import { Skeleton } from "@/components/ui/skeleton"
 import { FormattedPrice } from "@/components/ui/formatted-price"
+import { EmailStatusBadge, EmailStatusIndicator } from "@/components/ui/email-status-badge"
 
 interface OrderItem {
   id: string
@@ -90,6 +91,7 @@ interface Order {
   delivery_fee: number
   total_amount: number
   created_at: string
+  email_sent?: boolean
   order_items: OrderItem[]
 }
 
@@ -184,6 +186,7 @@ export default function OrdersPage() {
   const [showOrderDetail, setShowOrderDetail] = useState(false)
   const [currentStep, setCurrentStep] = useState(1)
   const [creatingOrder, setCreatingOrder] = useState(false)
+  const [resendingEmail, setResendingEmail] = useState<string | null>(null)
   const [newOrder, setNewOrder] = useState({
     customer_name: "",
     customer_phone: "",
@@ -476,6 +479,31 @@ export default function OrdersPage() {
 
   const resetSteps = () => {
     setCurrentStep(1)
+  }
+
+  const resendOrderEmail = async (orderId: string) => {
+    setResendingEmail(orderId)
+    try {
+      const response = await fetch(`/api/orders/${orderId}/resend-email`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      })
+
+      const result = await response.json()
+
+      if (response.ok) {
+        // Refresh orders to update email status
+        fetchOrders()
+      } else {
+        console.error('Failed to resend email:', result.error)
+      }
+    } catch (error) {
+      console.error('Error resending email:', error)
+    } finally {
+      setResendingEmail(null)
+    }
   }
 
   const createOrder = async () => {
@@ -944,6 +972,17 @@ export default function OrdersPage() {
                                 <span className="text-sm text-gray-600">{order.customer_phone}</span>
                               </div>
                             )}
+                            {order.customer_email && (
+                              <div className="flex items-center space-x-2">
+                                <Mail className="h-4 w-4 text-gray-400" />
+                                <span className="text-sm text-gray-600">{order.customer_email}</span>
+                                <EmailStatusIndicator 
+                                  emailSent={order.email_sent} 
+                                  customerEmail={order.customer_email}
+                                  size="sm"
+                                />
+                              </div>
+                            )}
                             <div className="space-y-2">
                               {order.order_items.slice(0, 3).map((item) => (
                                 <div key={item.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
@@ -990,6 +1029,21 @@ export default function OrdersPage() {
                               <Edit className="h-4 w-4 mr-1" />
                               Edit
                             </Button>
+                            {order.customer_email && (
+                              <Button 
+                                onClick={() => resendOrderEmail(order.id)}
+                                size="sm"
+                                variant="outline"
+                                disabled={resendingEmail === order.id}
+                                className="text-blue-600 border-blue-300 hover:bg-blue-50"
+                              >
+                                {resendingEmail === order.id ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  <Mail className="h-4 w-4" />
+                                )}
+                              </Button>
+                            )}
                             {['pending', 'confirmed', 'preparing'].includes(order.status) && (
                               <Button 
                                 onClick={() => cancelOrder(order.id)}

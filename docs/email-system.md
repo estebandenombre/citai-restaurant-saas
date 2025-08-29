@@ -36,7 +36,7 @@ El sistema de emails automáticos permite enviar confirmaciones y actualizacione
 La API key está configurada como variable de entorno en `.env.local`:
 
 ```bash
-BREVO_API_KEY=tu_clave_api_de_brevo_aqui
+BREVO_API_KEY=your_brevo_api_key_here
 ```
 
 **Para configurar:**

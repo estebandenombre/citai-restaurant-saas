@@ -24,7 +24,7 @@ import { formatCurrency } from '@/lib/currency-utils'
 import { supabase } from '@/lib/supabase'
 
 interface PaymentCheckoutProps {
-  restaurantId: string
+  restaurantId: string | undefined
   amount: number
   currency?: string
   orderData?: any
@@ -62,8 +62,13 @@ export default function PaymentCheckout({
         setLoading(true)
         console.log('🔍 Loading payment settings for restaurant:', restaurantId)
         
+        if (!restaurantId) {
+          onPaymentError('Restaurant ID is required')
+          return
+        }
+        
         // Check if payments are enabled for this restaurant
-        const hasPayments = await PaymentProcessor.hasPaymentsEnabled(restaurantId)
+        const hasPayments = await PaymentProcessor.hasPaymentsEnabled(restaurantId!)
         console.log('🔍 Has payments enabled:', hasPayments)
         
         if (!hasPayments) {
@@ -72,7 +77,7 @@ export default function PaymentCheckout({
         }
 
         // Get payment settings
-        const settings = await PaymentProcessor.getRestaurantPaymentSettings(restaurantId)
+        const settings = await PaymentProcessor.getRestaurantPaymentSettings(restaurantId!)
         console.log('🔍 Payment settings:', settings)
         setPaymentSettings(settings)
 
@@ -106,7 +111,7 @@ export default function PaymentCheckout({
           const { data: restaurantData } = await supabase
             .from('restaurants')
             .select('currency_config')
-            .eq('id', restaurantId)
+            .eq('id', restaurantId!)
             .single()
           
           if (restaurantData?.currency_config) {
@@ -153,7 +158,7 @@ export default function PaymentCheckout({
 
         // Create Stripe payment intent first
         const intentResult = await PaymentProcessor.createStripePaymentIntent(
-          restaurantId as string,
+          restaurantId!,
           amount + (processingFee / 100), // Add processing fee
           (currency || 'USD').toLowerCase(),
           {
@@ -182,8 +187,12 @@ export default function PaymentCheckout({
         paymentResult = confirmResult
       } else if (selectedGateway === 'paypal') {
         // Create PayPal order
+        if (!restaurantId) {
+          throw new Error('Restaurant ID is required')
+        }
+        
         paymentResult = await PaymentProcessor.createPayPalPaymentIntent(
-          restaurantId,
+          restaurantId!,
           amount + (processingFee / 100), // Add processing fee
           currency || 'USD',
           {

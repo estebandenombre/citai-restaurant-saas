@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 import { getCurrentUserRestaurant } from '@/lib/auth-utils'
+import { emailService } from '@/lib/email-service'
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,18 +28,21 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify restaurant exists
-    const { data: restaurant, error: restaurantError } = await supabase
+    const { data: restaurantData, error: restaurantError } = await supabase
       .from('restaurants')
       .select('id, name')
       .eq('id', restaurantId)
       .single()
 
-    if (restaurantError || !restaurant) {
+    if (restaurantError || !restaurantData) {
       console.error('Restaurant not found:', restaurantError)
       return NextResponse.json({ error: 'Restaurant not found' }, { status: 404 })
     }
 
-    console.log('Restaurant found:', restaurant)
+    console.log('Restaurant found:', restaurantData)
+
+    // Store restaurant name for later use
+    const restaurantName = restaurantData.name
 
     // Prepare order data with proper null handling - using actual schema
     const orderData = {
@@ -116,7 +120,6 @@ export async function POST(request: NextRequest) {
       }, { status: 500 })
     }
 
-<<<<<<< HEAD
     // Send confirmation email if customer email is provided and order settings allow it
     let emailSent = false
     if (customerInfo.email) {
@@ -151,10 +154,10 @@ export async function POST(request: NextRequest) {
                 orderNumber: order.order_number,
                 customerName: customerInfo.name || 'Cliente',
                 customerEmail: customerInfo.email,
-                restaurantName: 'Restaurante',
+                restaurantName: restaurantName || 'Restaurant',
                 orderType: customerInfo.order_type || 'dine-in',
-                items: orderItemsWithDetails.map((item: any) => ({
-                  name: item.menu_items?.name || 'Producto',
+                items: orderItemsWithDetails.map(item => ({
+                  name: (item.menu_items as any)?.name || 'Producto',
                   quantity: item.quantity,
                   unitPrice: item.unit_price,
                   totalPrice: item.total_price,
@@ -192,11 +195,10 @@ export async function POST(request: NextRequest) {
       }
     }
 
-=======
->>>>>>> parent of 7e8d86b (emails)
     return NextResponse.json({ 
       success: true, 
       order: order,
+      emailSent: emailSent,
       message: 'Order created successfully' 
     })
 

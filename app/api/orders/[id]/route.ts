@@ -1,18 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
-import { getCurrentUserRestaurant } from '@/lib/auth-utils'
+import { emailService } from '@/lib/email-service'
 
 export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    // Get current user's restaurant
-    const { restaurant } = await getCurrentUserRestaurant()
-    if (!restaurant || typeof restaurant === 'object' && !('id' in restaurant)) {
-      return NextResponse.json({ error: 'Restaurant not found' }, { status: 404 })
-    }
-
+    const { id } = params
     const body = await request.json()
     const { status } = body
 
@@ -20,41 +15,135 @@ export async function PATCH(
       return NextResponse.json({ error: 'Status is required' }, { status: 400 })
     }
 
-    // Validate status
-    const validStatuses = ['pending', 'confirmed', 'preparing', 'ready', 'served', 'cancelled']
-    if (!validStatuses.includes(status)) {
-      return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
+    // Get current order details
+    const { data: order, error: orderError } = await supabase
+      .from('orders')
+      .select(`
+        *,
+        restaurants (
+          name
+        )
+      `)
+      .eq('id', id)
+      .single()
+
+    if (orderError || !order) {
+      return NextResponse.json({ error: 'Order not found' }, { status: 404 })
     }
 
     // Update order status
-    const { data: order, error } = await supabase
+    const { data: updatedOrder, error: updateError } = await supabase
       .from('orders')
       .update({ 
-        status: status, // Use 'status' instead of 'order_status'
+        status: status,
         updated_at: new Date().toISOString()
       })
-      .eq('id', params.id)
-      .eq('restaurant_id', restaurant.id) // Ensure we only update our restaurant's orders
+      .eq('id', id)
       .select()
       .single()
 
-    if (error) {
-      console.error('Error updating order:', error)
-      return NextResponse.json({ error: 'Failed to update order' }, { status: 500 })
+    if (updateError) {
+      console.error('Error updating order status:', updateError)
+      return NextResponse.json({ 
+        error: 'Failed to update order status',
+        details: updateError.message 
+      }, { status: 500 })
     }
 
-    if (!order) {
-      return NextResponse.json({ error: 'Order not found' }, { status: 404 })
+    // Send status update email if customer email is provided and restaurant has emails enabled
+    let emailSent = false
+    if (order.customer_email && order.customer_name) {
+      // Check restaurant email settings
+      const { data: restaurantData, error: restaurantError } = await supabase
+        .from('restaurants')
+        .select('email_settings')
+        .eq('id', order.restaurant_id)
+        .single()
+
+      if (!restaurantError && restaurantData?.email_settings) {
+        const emailSettings = restaurantData.email_settings
+        const emailsEnabled = emailSettings.enabled && emailSettings.send_status_updates
+
+        if (emailsEnabled) {
+          try {
+            const emailResult = await emailService.sendOrderStatusUpdate(
+              order.customer_email,
+              order.customer_name,
+              order.order_number,
+              order.restaurants?.name || 'Restaurante',
+              status
+            )
+            
+            emailSent = emailResult.success
+            
+            if (emailResult.success) {
+              console.log('✅ Order status update email sent successfully')
+            } else {
+              console.error('❌ Failed to send order status update email:', emailResult.error)
+            }
+          } catch (emailError) {
+            console.error('❌ Error sending order status update email:', emailError)
+          }
+        }
+      }
     }
 
     return NextResponse.json({ 
       success: true, 
-      order: order,
+      order: updatedOrder,
+      emailSent: emailSent,
       message: 'Order status updated successfully' 
     })
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in PATCH /api/orders/[id]:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ 
+      error: 'Internal server error',
+      details: error.message 
+    }, { status: 500 })
+  }
+}
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const { id } = params
+
+    const { data: order, error } = await supabase
+      .from('orders')
+      .select(`
+        *,
+        order_items (
+          *,
+          menu_items (
+            name,
+            description,
+            price
+          )
+        ),
+        restaurants (
+          name,
+          phone,
+          email,
+          address
+        )
+      `)
+      .eq('id', id)
+      .single()
+
+    if (error || !order) {
+      return NextResponse.json({ error: 'Order not found' }, { status: 404 })
+    }
+
+    return NextResponse.json({ order })
+
+  } catch (error: any) {
+    console.error('Error in GET /api/orders/[id]:', error)
+    return NextResponse.json({ 
+      error: 'Internal server error',
+      details: error.message 
+    }, { status: 500 })
   }
 } 

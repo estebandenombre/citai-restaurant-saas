@@ -16,9 +16,7 @@ import {
   Mail, 
   Globe, 
   Clock, 
-  Palette,
-  Save,
-  Loader2
+  Palette
 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { supabase } from '@/lib/supabase'
@@ -47,7 +45,6 @@ interface RestaurantConfig {
 export function RestaurantConfig() {
   const [restaurant, setRestaurant] = useState<RestaurantConfig | null>(null)
   const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
   const { toast } = useToast()
 
   // Form state
@@ -163,52 +160,7 @@ export function RestaurantConfig() {
     }
   }
 
-  const handleSave = async () => {
-    if (!restaurant) return
 
-    try {
-      setSaving(true)
-      
-      const { error } = await supabase
-        .from('restaurants')
-        .update({
-          name: formData.name,
-          description: formData.description,
-          address: formData.address,
-          phone: formData.phone,
-          email: formData.email,
-          website: formData.website,
-          cuisine_type: formData.cuisine_type,
-          is_active: formData.is_active,
-                     theme_colors: formData.theme_colors,
-           opening_hours: formData.opening_hours,
-           social_media: formData.social_media,
-           currency_config: formData.currency_config,
-           printer_config: formData.printer_config,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', restaurant.id)
-
-      if (error) throw error
-
-      toast({
-        title: "Restaurant updated successfully",
-        description: "Your restaurant information has been saved.",
-      })
-
-      // Refresh data
-      await fetchRestaurantData()
-    } catch (error) {
-      console.error('Error updating restaurant:', error)
-      toast({
-        title: "Error updating restaurant",
-        description: "Please try again.",
-        variant: "destructive",
-      })
-    } finally {
-      setSaving(false)
-    }
-  }
 
   const updateOpeningHours = (day: string, field: string, value: any) => {
     setFormData(prev => ({
@@ -586,22 +538,7 @@ export function RestaurantConfig() {
           />
         </div>
 
-        {/* Save Button */}
-        <div className="flex justify-end pt-4">
-          <Button onClick={handleSave} disabled={saving}>
-            {saving ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save className="mr-2 h-4 w-4" />
-                Save Changes
-              </>
-            )}
-          </Button>
-        </div>
+
       </CardContent>
     </Card>
   )

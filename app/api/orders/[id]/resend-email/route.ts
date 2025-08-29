@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
-import { emailService } from '@/lib/email-service'
+// @ts-ignore: emailService module might not have type declarations
+import emailService from '@/lib/email-service'
 
 export async function POST(
   request: NextRequest,
