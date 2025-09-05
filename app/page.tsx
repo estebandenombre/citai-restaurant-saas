@@ -811,7 +811,7 @@ export default function HomePage() {
             </div>
             <div className="flex items-center space-x-2">
               <Headphones className="w-4 h-4" />
-              <span>24/7 support</span>
+              <span>24/7 support</span> 
             </div>
           </div>
         </div>
