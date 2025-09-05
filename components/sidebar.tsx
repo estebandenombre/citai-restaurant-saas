@@ -31,8 +31,7 @@ import {
   Globe,
   LogOut,
   Crown,
-  Clock,
-  CreditCard
+  Clock
 } from "lucide-react"
 
 const navigation = [
@@ -212,7 +211,7 @@ export function Sidebar({ sidebarCollapsed, setSidebarCollapsed }: SidebarProps)
                 </h3>
               </div>
             )}
-            <div className="space-y-1 mb-6">
+            <div className="space-y-1 mb-0">
               <Link
                 href="/dashboard/settings"
                 className="w-full justify-center lg:justify-start text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-md px-3 py-2.5 flex items-center"
@@ -223,15 +222,6 @@ export function Sidebar({ sidebarCollapsed, setSidebarCollapsed }: SidebarProps)
                 {!sidebarCollapsed && <span className="ml-3 text-sm">Settings</span>}
               </Link>
               
-              <Link
-                href="/dashboard/settings/payments"
-                className="w-full justify-center lg:justify-start text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-md px-3 py-2.5 flex items-center"
-              >
-                <div className="flex items-center justify-center w-6 h-6">
-                  <CreditCard className="h-5 w-5" />
-                </div>
-                {!sidebarCollapsed && <span className="ml-3 text-sm">Payments</span>}
-              </Link>
               
               <Button
                 variant="ghost"
@@ -245,9 +235,6 @@ export function Sidebar({ sidebarCollapsed, setSidebarCollapsed }: SidebarProps)
                 {!sidebarCollapsed && <span className="ml-3 text-sm">Logout</span>}
               </Button>
             </div>
-            
-            {/* Spacer to push user info to bottom */}
-            <div className="flex-1" />
             
             {/* User Info Section */}
             <div className="p-4 border-t border-gray-100 bg-white">

@@ -5,10 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Textarea } from '@/components/ui/textarea'
 import { Check, Crown, Sparkles, MessageSquare, BarChart3, Download, Building2, Users, Zap, Mail, Globe, ShoppingCart, Printer } from 'lucide-react'
 import { SubscriptionService, SubscriptionPlan } from '@/lib/subscription-service'
-import { UpgradeRequestService } from '@/lib/upgrade-request-service'
 import { useSubscription } from '@/hooks/use-subscription'
 import { useToast } from '@/hooks/use-toast'
 
@@ -18,38 +16,19 @@ export default function PricingPage() {
   const [contactModalOpen, setContactModalOpen] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState<string>('')
   const [contactMessage, setContactMessage] = useState('')
-  const [sendingMessage, setSendingMessage] = useState(false)
   const { subscriptionStatus } = useSubscription()
   const { toast } = useToast()
 
-  const handleUpgradeRequest = async () => {
-    try {
-      setSendingMessage(true)
-      
-      // Create upgrade request in database
-      await UpgradeRequestService.createUpgradeRequest({
-        requestedPlan: selectedPlan,
-        message: contactMessage.trim() || undefined
-      })
-
-      toast({
-        title: "Request Sent",
-        description: "Your upgrade request has been sent. We'll contact you soon!",
-      })
-
-      setContactModalOpen(false)
-      setContactMessage('')
-      setSelectedPlan('')
-    } catch (error) {
-      console.error('Error sending upgrade request:', error)
-      toast({
-        title: "Error",
-        description: "Failed to send upgrade request. Please try again.",
-        variant: "destructive",
-      })
-    } finally {
-      setSendingMessage(false)
-    }
+  const handleUpgradeRequest = () => {
+    setContactModalOpen(false)
+    setContactMessage('')
+    setSelectedPlan('')
+    
+    toast({
+      title: "Contact Required",
+      description: "Please contact us at info@tably.digital to upgrade your plan.",
+      duration: 5000,
+    })
   }
 
   const openContactModal = (planName: string) => {
@@ -590,39 +569,34 @@ export default function PricingPage() {
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <Mail className="h-5 w-5" />
-                Request Plan Upgrade
+                Contact to Upgrade
               </DialogTitle>
               <DialogDescription>
-                Contact us to upgrade to the {selectedPlan} plan. We'll get back to you within 24 hours.
+                To upgrade to the {selectedPlan} plan, please contact us directly.
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <label htmlFor="message" className="text-sm font-medium">
-                  Message (Optional)
-                </label>
-                <Textarea
-                  id="message"
-                  placeholder="Tell us about your needs or any questions you have..."
-                  value={contactMessage}
-                  onChange={(e) => setContactMessage(e.target.value)}
-                  rows={4}
-                />
+              <div className="text-center p-6 bg-blue-50 rounded-lg border border-blue-200">
+                <Mail className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-blue-900 mb-2">
+                  Contact Us to Upgrade
+                </h3>
+                <p className="text-blue-700 mb-4">
+                  Please send us an email to upgrade your plan:
+                </p>
+                <div className="bg-white p-3 rounded border border-blue-300">
+                  <p className="font-mono text-blue-800 text-lg">
+                    info@tably.digital
+                  </p>
+                </div>
+                <p className="text-sm text-blue-600 mt-3">
+                  We'll respond within 24 hours to help you upgrade.
+                </p>
               </div>
             </div>
-            <div className="flex justify-end gap-3">
-              <Button
-                variant="outline"
-                onClick={() => setContactModalOpen(false)}
-                disabled={sendingMessage}
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleUpgradeRequest}
-                disabled={sendingMessage}
-              >
-                {sendingMessage ? 'Sending...' : 'Send Request'}
+            <div className="flex justify-end">
+              <Button onClick={handleUpgradeRequest}>
+                Got it!
               </Button>
             </div>
           </DialogContent>

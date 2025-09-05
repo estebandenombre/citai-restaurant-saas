@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { emailService } from './email-service'
 
 export interface UpgradeRequest {
   id: string
@@ -33,7 +34,7 @@ export class UpgradeRequestService {
       // Get current user data
       const { data: userData } = await supabase
         .from('users')
-        .select('id, email, plan_status')
+        .select('id, email, plan_status, first_name, last_name')
         .eq('email', user.email)
         .single()
 
@@ -58,6 +59,26 @@ export class UpgradeRequestService {
       if (error) {
         console.error('Error creating upgrade request:', error)
         throw new Error('Failed to create upgrade request')
+      }
+
+      // Send email notification to info@tably.digital
+      try {
+        const userName = `${userData.first_name || ''} ${userData.last_name || ''}`.trim() || user.email?.split('@')[0] || 'User'
+        const requestDate = new Date().toLocaleString()
+        
+        await emailService.sendUpgradeRequestNotification({
+          userName,
+          userEmail: userData.email,
+          currentPlan: userData.plan_status,
+          requestedPlan: params.requestedPlan,
+          message: params.message || null,
+          requestDate
+        })
+        
+        console.log('✅ Upgrade request email sent successfully')
+      } catch (emailError) {
+        console.error('❌ Error sending upgrade request email:', emailError)
+        // Don't throw error here - the request was created successfully, email is just a notification
       }
 
       return data

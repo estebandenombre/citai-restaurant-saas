@@ -1,10 +1,15 @@
+'use client'
+
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Logo } from "@/components/ui/logo"
 import { VideoModal } from "@/components/video-modal"
+// Language selector temporarily disabled
+// import { LanguageSelector } from "@/components/ui/language-selector"
 import TawkToScript from "@/components/tawk-to-script"
+import { useTranslations } from "@/hooks/use-translations"
 import { 
   ArrowRight, 
   Play, 
@@ -42,8 +47,41 @@ import {
   Flame,
   Heart
 } from "lucide-react"
+import { useEffect, useState } from "react"
 
 export default function HomePage() {
+  const { t, locale, isReady } = useTranslations()
+  const [translations, setTranslations] = useState<any>(null)
+
+  useEffect(() => {
+    const loadTranslations = async () => {
+      if (isReady) {
+        const trans = await import(`../src/locales/${locale}/common.json`)
+        setTranslations(trans.default)
+      }
+    }
+    loadTranslations()
+  }, [locale, isReady])
+
+  if (!translations) {
+    return <div>Loading...</div>
+  }
+
+  const getTranslation = (key: string, fallback?: string) => {
+    const keys = key.split('.')
+    let value: any = translations
+    
+    for (const k of keys) {
+      if (value && typeof value === 'object' && k in value) {
+        value = value[k]
+      } else {
+        return fallback || key
+      }
+    }
+
+    return typeof value === 'string' ? value : fallback || key
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-purple-50/30 to-coral-50/30">
       {/* Header */}
@@ -54,22 +92,24 @@ export default function HomePage() {
           </div>
           <nav className="hidden md:flex items-center space-x-8">
             <Link href="#features" className="text-gray-600 hover:text-[#7C3AED] transition-colors font-medium">
-              Features
+              {getTranslation('navigation.features')}
             </Link>
             <Link href="#pricing" className="text-gray-600 hover:text-[#7C3AED] transition-colors font-medium">
-              Pricing
+              {getTranslation('navigation.pricing')}
             </Link>
             <Link href="#testimonials" className="text-gray-600 hover:text-[#7C3AED] transition-colors font-medium">
-              Reviews
+              {getTranslation('navigation.reviews')}
             </Link>
             <Link href="/auth/login" className="text-gray-600 hover:text-[#7C3AED] transition-colors font-medium">
-              Sign In
+              {getTranslation('navigation.signIn')}
             </Link>
           </nav>
           <div className="flex items-center space-x-4">
+            {/* Language selector temporarily disabled */}
+            {/* <LanguageSelector /> */}
             <Link href="/auth/register">
               <Button className="bg-gradient-to-r from-[#7C3AED] to-[#D64DD2] hover:from-[#6B21A8] hover:to-[#C2185B] text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]">
-                Get Started Free
+                {getTranslation('navigation.getStartedFree')}
               </Button>
             </Link>
           </div>
@@ -88,21 +128,21 @@ export default function HomePage() {
             <div className="flex justify-center mb-8">
               <Badge className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 text-sm font-medium border-0 shadow-lg">
                 <Flame className="w-4 h-4 mr-2" />
-                🚀 Now Live on Product Hunt
+                {getTranslation('hero.productHuntBadge')}
               </Badge>
             </div>
 
             {/* Main Headline */}
             <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
-              AI-Powered Restaurant Management Software
+              {getTranslation('hero.mainHeadline')}
               <span className="block bg-gradient-to-r from-[#7C3AED] to-[#D64DD2] bg-clip-text text-transparent">
-                That Actually Works
+                {getTranslation('hero.mainHeadlineHighlight')}
               </span>
             </h1>
 
             {/* Subheadline */}
             <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Transform your restaurant with Tably's comprehensive SaaS platform. Accept online orders, manage reservations, track kitchen tickets, and get AI-powered insights to boost revenue and streamline operations.
+              {getTranslation('hero.subheadline')}
             </p>
 
             {/* CTA Buttons */}
@@ -110,13 +150,13 @@ export default function HomePage() {
               <Link href="/auth/register">
                 <Button size="lg" className="bg-gradient-to-r from-[#7C3AED] to-[#D64DD2] hover:from-[#6B21A8] hover:to-[#C2185B] text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] text-lg px-8 py-4">
                   <Rocket className="w-5 h-5 mr-2" />
-                  Start Free Trial
+                  {getTranslation('hero.startFreeTrial')}
                 </Button>
               </Link>
               <VideoModal videoId="623Cw28jD8o" title="Tably Restaurant Management Demo">
                 <Button variant="outline" size="lg" className="border-2 border-gray-300 text-gray-900 hover:bg-gray-50 hover:text-gray-900 text-lg px-8 py-4 font-medium">
                   <Play className="w-5 h-5 mr-2" />
-                  Watch Demo
+                  {getTranslation('hero.watchDemo')}
                 </Button>
               </VideoModal>
             </div>
@@ -125,15 +165,15 @@ export default function HomePage() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-8 text-sm text-gray-600">
               <div className="flex items-center space-x-2">
                 <CheckCircle className="w-4 h-4 text-green-500" />
-                <span>No credit card required</span>
+                <span>{getTranslation('hero.trustIndicators.noCreditCard')}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Timer className="w-4 h-4 text-blue-500" />
-                <span>Setup in 5 minutes</span>
+                <span>{getTranslation('hero.trustIndicators.setupIn5Minutes')}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Headphones className="w-4 h-4 text-purple-500" />
-                <span>24/7 support</span>
+                <span>{getTranslation('hero.trustIndicators.support24_7')}</span>
               </div>
             </div>
           </div>
@@ -144,26 +184,26 @@ export default function HomePage() {
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Trusted by 500+ Restaurants Worldwide</h2>
-            <p className="text-gray-600">Join restaurants that have transformed their operations with Tably</p>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">{getTranslation('socialProof.title')}</h2>
+            <p className="text-gray-600">{getTranslation('socialProof.subtitle')}</p>
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center">
             <div className="text-center">
               <div className="text-3xl font-bold text-[#7C3AED] mb-2">500+</div>
-              <div className="text-sm text-gray-600">Active Restaurants</div>
+              <div className="text-sm text-gray-600">{getTranslation('socialProof.stats.activeRestaurants')}</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-[#D64DD2] mb-2">50K+</div>
-              <div className="text-sm text-gray-600">Orders Processed</div>
+              <div className="text-sm text-gray-600">{getTranslation('socialProof.stats.ordersProcessed')}</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-[#FF6B6B] mb-2">99.9%</div>
-              <div className="text-sm text-gray-600">Uptime</div>
+              <div className="text-sm text-gray-600">{getTranslation('socialProof.stats.uptime')}</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-[#4B0082] mb-2">4.9★</div>
-              <div className="text-sm text-gray-600">Customer Rating</div>
+              <div className="text-sm text-gray-600">{getTranslation('socialProof.stats.customerRating')}</div>
             </div>
           </div>
         </div>
@@ -175,11 +215,11 @@ export default function HomePage() {
           <div className="text-center mb-16">
             <Badge className="bg-blue-100 text-blue-700 border-blue-200 mb-4">
               <Sparkles className="w-4 h-4 mr-2" />
-              All-in-One Restaurant SaaS
+              {getTranslation('features.badge')}
             </Badge>
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Complete Restaurant Management Software</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">{getTranslation('features.title')}</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              From online ordering and reservations to kitchen management and AI analytics, Tably provides everything you need to run your restaurant efficiently and profitably.
+              {getTranslation('features.subtitle')}
             </p>
           </div>
 
@@ -189,25 +229,19 @@ export default function HomePage() {
                 <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mb-4">
                   <ShoppingCart className="w-6 h-6 text-white" />
                 </div>
-                <CardTitle className="text-xl">Online Ordering System</CardTitle>
+                <CardTitle className="text-xl">{getTranslation('features.cards.onlineOrdering.title')}</CardTitle>
                 <CardDescription>
-                  Accept online orders, track status in real-time, and manage your kitchen workflow seamlessly with our restaurant POS system.
+                  {getTranslation('features.cards.onlineOrdering.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2 text-sm text-gray-600">
-                  <li className="flex items-center space-x-2">
-                    <Check className="w-4 h-4 text-green-500" />
-                    <span>Real-time order tracking</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <Check className="w-4 h-4 text-green-500" />
-                    <span>Kitchen display system</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <Check className="w-4 h-4 text-green-500" />
-                    <span>Payment processing</span>
-                  </li>
+                  {getTranslation('features.cards.onlineOrdering.features').map((feature: string, index: number) => (
+                    <li key={index} className="flex items-center space-x-2">
+                      <Check className="w-4 h-4 text-green-500" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
                 </ul>
               </CardContent>
             </Card>
@@ -217,25 +251,19 @@ export default function HomePage() {
                 <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mb-4">
                   <Calendar className="w-6 h-6 text-white" />
                 </div>
-                <CardTitle className="text-xl">Restaurant Reservation System</CardTitle>
+                <CardTitle className="text-xl">{getTranslation('features.cards.reservations.title')}</CardTitle>
                 <CardDescription>
-                  Manage your table bookings, optimize seating capacity, and streamline your restaurant reservation system.
+                  {getTranslation('features.cards.reservations.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2 text-sm text-gray-600">
-                  <li className="flex items-center space-x-2">
-                    <Check className="w-4 h-4 text-green-500" />
-                    <span>Online booking system</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <Check className="w-4 h-4 text-green-500" />
-                    <span>Table management</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <Check className="w-4 h-4 text-green-500" />
-                    <span>Waitlist management</span>
-                  </li>
+                  {getTranslation('features.cards.reservations.features').map((feature: string, index: number) => (
+                    <li key={index} className="flex items-center space-x-2">
+                      <Check className="w-4 h-4 text-green-500" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
                 </ul>
               </CardContent>
             </Card>
@@ -245,25 +273,19 @@ export default function HomePage() {
                 <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl flex items-center justify-center mb-4">
                   <ChefHat className="w-6 h-6 text-white" />
                 </div>
-                <CardTitle className="text-xl">Digital Menu Management</CardTitle>
+                <CardTitle className="text-xl">{getTranslation('features.cards.menuManagement.title')}</CardTitle>
                 <CardDescription>
-                  Create and manage your digital menu with categories, pricing, and real-time availability updates.
+                  {getTranslation('features.cards.menuManagement.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2 text-sm text-gray-600">
-                  <li className="flex items-center space-x-2">
-                    <Check className="w-4 h-4 text-green-500" />
-                    <span>Digital menu builder</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <Check className="w-4 h-4 text-green-500" />
-                    <span>Category organization</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <Check className="w-4 h-4 text-green-500" />
-                    <span>Pricing management</span>
-                  </li>
+                  {getTranslation('features.cards.menuManagement.features').map((feature: string, index: number) => (
+                    <li key={index} className="flex items-center space-x-2">
+                      <Check className="w-4 h-4 text-green-500" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
                 </ul>
               </CardContent>
             </Card>
@@ -273,25 +295,19 @@ export default function HomePage() {
                 <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-600 rounded-xl flex items-center justify-center mb-4">
                   <Package className="w-6 h-6 text-white" />
                 </div>
-                <CardTitle className="text-xl">Inventory Management Software</CardTitle>
+                <CardTitle className="text-xl">{getTranslation('features.cards.inventory.title')}</CardTitle>
                 <CardDescription>
-                  Track your stock levels, manage inventory efficiently, and get automated alerts for low stock with our restaurant inventory management software.
+                  {getTranslation('features.cards.inventory.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2 text-sm text-gray-600">
-                  <li className="flex items-center space-x-2">
-                    <Check className="w-4 h-4 text-green-500" />
-                    <span>Stock level tracking</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <Check className="w-4 h-4 text-green-500" />
-                    <span>Low stock alerts</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <Check className="w-4 h-4 text-green-500" />
-                    <span>Supplier management</span>
-                  </li>
+                  {getTranslation('features.cards.inventory.features').map((feature: string, index: number) => (
+                    <li key={index} className="flex items-center space-x-2">
+                      <Check className="w-4 h-4 text-green-500" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
                 </ul>
               </CardContent>
             </Card>
@@ -301,25 +317,19 @@ export default function HomePage() {
                 <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-blue-600 rounded-xl flex items-center justify-center mb-4">
                   <BarChart3 className="w-6 h-6 text-white" />
                 </div>
-                <CardTitle className="text-xl">AI Restaurant Analytics</CardTitle>
+                <CardTitle className="text-xl">{getTranslation('features.cards.analytics.title')}</CardTitle>
                 <CardDescription>
-                  Get AI-powered insights into your restaurant's performance, trends, and actionable recommendations to boost revenue.
+                  {getTranslation('features.cards.analytics.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2 text-sm text-gray-600">
-                  <li className="flex items-center space-x-2">
-                    <Check className="w-4 h-4 text-green-500" />
-                    <span>Sales analytics</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <Check className="w-4 h-4 text-green-500" />
-                    <span>Customer insights</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <Check className="w-4 h-4 text-green-500" />
-                    <span>Performance reports</span>
-                  </li>
+                  {getTranslation('features.cards.analytics.features').map((feature: string, index: number) => (
+                    <li key={index} className="flex items-center space-x-2">
+                      <Check className="w-4 h-4 text-green-500" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
                 </ul>
               </CardContent>
             </Card>
@@ -329,25 +339,19 @@ export default function HomePage() {
                 <div className="w-12 h-12 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-xl flex items-center justify-center mb-4">
                   <Settings className="w-6 h-6 text-white" />
                 </div>
-                <CardTitle className="text-xl">Restaurant Staff Management</CardTitle>
+                <CardTitle className="text-xl">{getTranslation('features.cards.staffManagement.title')}</CardTitle>
                 <CardDescription>
-                  Manage your team schedules, roles, and permissions effectively with our comprehensive restaurant management software.
+                  {getTranslation('features.cards.staffManagement.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2 text-sm text-gray-600">
-                  <li className="flex items-center space-x-2">
-                    <Check className="w-4 h-4 text-green-500" />
-                    <span>Employee scheduling</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <Check className="w-4 h-4 text-green-500" />
-                    <span>Role-based access</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <Check className="w-4 h-4 text-green-500" />
-                    <span>Performance tracking</span>
-                  </li>
+                  {getTranslation('features.cards.staffManagement.features').map((feature: string, index: number) => (
+                    <li key={index} className="flex items-center space-x-2">
+                      <Check className="w-4 h-4 text-green-500" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
                 </ul>
               </CardContent>
             </Card>
@@ -362,33 +366,23 @@ export default function HomePage() {
             <div>
               <Badge className="bg-purple-100 text-purple-700 border-purple-200 mb-4">
                 <Play className="w-4 h-4 mr-2" />
-                See It In Action
+                {getTranslation('demo.badge')}
               </Badge>
               <h2 className="text-4xl font-bold text-gray-900 mb-6">
-                Restaurant Management Dashboard That Actually Works
+                {getTranslation('demo.title')}
               </h2>
               <p className="text-xl text-gray-600 mb-8">
-                Tably's intuitive restaurant management software interface makes running your restaurant effortless. Everything you need is just one click away.
+                {getTranslation('demo.subtitle')}
               </p>
               <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                    <Check className="w-4 h-4 text-green-600" />
+                {getTranslation('demo.features').map((feature: string, index: number) => (
+                  <div key={index} className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                      <Check className="w-4 h-4 text-green-600" />
+                    </div>
+                    <span className="text-gray-700">{feature}</span>
                   </div>
-                  <span className="text-gray-700">Mobile-responsive design</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                    <Check className="w-4 h-4 text-green-600" />
-                  </div>
-                  <span className="text-gray-700">Real-time updates</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                    <Check className="w-4 h-4 text-green-600" />
-                  </div>
-                  <span className="text-gray-700">Cloud-based sync</span>
-                </div>
+                ))}
               </div>
             </div>
             <div className="relative">
@@ -539,86 +533,40 @@ export default function HomePage() {
           <div className="text-center mb-16">
             <Badge className="bg-green-100 text-green-700 border-green-200 mb-4">
               <Heart className="w-4 h-4 mr-2" />
-              Customer Love
+              {getTranslation('testimonials.badge')}
             </Badge>
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">What Our Customers Say</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">{getTranslation('testimonials.title')}</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Join hundreds of restaurant owners who have transformed their business with Tably
+              {getTranslation('testimonials.subtitle')}
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <Card className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-              <CardContent className="p-6">
-                <div className="flex items-center mb-4">
-                  <div className="flex text-yellow-400">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-current" />
-                    ))}
+            {getTranslation('testimonials.testimonials').map((testimonial: any, index: number) => (
+              <Card key={index} className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                <CardContent className="p-6">
+                  <div className="flex items-center mb-4">
+                    <div className="flex text-yellow-400">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="w-4 h-4 fill-current" />
+                      ))}
+                    </div>
                   </div>
-                </div>
-                <p className="text-gray-700 mb-4">
-                  "Tably has completely transformed how we run our restaurant. The order management is seamless, and the analytics help us make better decisions. Our revenue increased by 40% in just 3 months!"
-                </p>
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold">S</span>
+                  <p className="text-gray-700 mb-4">
+                    "{testimonial.text}"
+                  </p>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
+                      <span className="text-white font-bold">{testimonial.author.charAt(0)}</span>
+                    </div>
+                    <div>
+                      <div className="font-semibold text-gray-900">{testimonial.author}</div>
+                      <div className="text-sm text-gray-600">{testimonial.role}</div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="font-semibold text-gray-900">Sarah Chen</div>
-                    <div className="text-sm text-gray-600">Owner, Dragon Wok</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-              <CardContent className="p-6">
-                <div className="flex items-center mb-4">
-                  <div className="flex text-yellow-400">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-current" />
-                    ))}
-                  </div>
-                </div>
-                <p className="text-gray-700 mb-4">
-                  "The reservation system is a game-changer. We've reduced no-shows by 60% and our staff can focus on providing excellent service instead of managing bookings manually."
-                </p>
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold">M</span>
-                  </div>
-                  <div>
-                    <div className="font-semibold text-gray-900">Miguel Rodriguez</div>
-                    <div className="text-sm text-gray-600">Manager, La Casa</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-              <CardContent className="p-6">
-                <div className="flex items-center mb-4">
-                  <div className="flex text-yellow-400">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-current" />
-                    ))}
-                  </div>
-                </div>
-                <p className="text-gray-700 mb-4">
-                  "Setup was incredibly easy - we were up and running in under 10 minutes. The inventory management has saved us thousands in waste, and the customer support is outstanding."
-                </p>
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold">E</span>
-                  </div>
-                  <div>
-                    <div className="font-semibold text-gray-900">Emma Thompson</div>
-                    <div className="text-sm text-gray-600">Chef, Fresh Bites</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
@@ -629,11 +577,11 @@ export default function HomePage() {
           <div className="text-center mb-16">
             <Badge className="bg-blue-100 text-blue-700 border-blue-200 mb-4">
               <DollarSign className="w-4 h-4 mr-2" />
-              Simple Pricing
+              {getTranslation('pricing.badge')}
             </Badge>
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Choose Your Plan</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">{getTranslation('pricing.title')}</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Start free and scale as you grow. No hidden fees, no surprises.
+              {getTranslation('pricing.subtitle')}
             </p>
           </div>
 
@@ -641,146 +589,84 @@ export default function HomePage() {
             {/* Starter Plan */}
             <Card className="bg-white border-2 border-gray-200 hover:border-[#7C3AED] transition-all duration-300 hover:shadow-xl">
               <CardHeader className="text-center pb-6">
-                <CardTitle className="text-2xl font-bold text-gray-900">Starter</CardTitle>
-                <div className="text-4xl font-bold text-gray-900 mb-2">$29</div>
-                <div className="text-gray-600">per month</div>
+                <CardTitle className="text-2xl font-bold text-gray-900">{getTranslation('pricing.plans.starter.name')}</CardTitle>
+                <div className="text-4xl font-bold text-gray-900 mb-2">{getTranslation('pricing.plans.starter.price')}</div>
+                <div className="text-gray-600">{getTranslation('pricing.plans.starter.period')}</div>
                 <CardDescription className="text-gray-600">
-                  Essential tools to sell without chaos
+                  {getTranslation('pricing.plans.starter.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <ul className="space-y-3">
-                  <li className="flex items-center space-x-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">1 restaurant location</span>
-                  </li>
-                  <li className="flex items-center space-x-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">1 user account</span>
-                  </li>
-                  <li className="flex items-center space-x-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">500 orders per month</span>
-                  </li>
-                  <li className="flex items-center space-x-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">Menu & order management</span>
-                  </li>
-                  <li className="flex items-center space-x-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">Email support</span>
-                  </li>
+                  {getTranslation('pricing.plans.starter.features').map((feature: string, index: number) => (
+                    <li key={index} className="flex items-center space-x-3">
+                      <Check className="w-5 h-5 text-green-500" />
+                      <span className="text-gray-700">{feature}</span>
+                    </li>
+                  ))}
                 </ul>
                 <Link href="/auth/register">
                   <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white">
-                    Start Free Trial
+                    {getTranslation('pricing.plans.starter.cta')}
                   </Button>
                 </Link>
               </CardContent>
             </Card>
 
-            {/* Growth Plan */}
+            {/* Professional Plan */}
             <Card className="bg-white border-2 border-[#7C3AED] relative shadow-xl">
               <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                 <Badge className="bg-[#7C3AED] text-white border-0">
-                  Most Popular
+                  {getTranslation('pricing.plans.professional.badge')}
                 </Badge>
               </div>
               <CardHeader className="text-center pb-6">
-                <CardTitle className="text-2xl font-bold text-gray-900">Growth</CardTitle>
-                <div className="text-4xl font-bold text-gray-900 mb-2">$69</div>
-                <div className="text-gray-600">per month</div>
+                <CardTitle className="text-2xl font-bold text-gray-900">{getTranslation('pricing.plans.professional.name')}</CardTitle>
+                <div className="text-4xl font-bold text-gray-900 mb-2">{getTranslation('pricing.plans.professional.price')}</div>
+                <div className="text-gray-600">{getTranslation('pricing.plans.professional.period')}</div>
                 <CardDescription className="text-gray-600">
-                  Grow with intelligence - AI-powered insights
+                  {getTranslation('pricing.plans.professional.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <ul className="space-y-3">
-                  <li className="flex items-center space-x-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">2 restaurant locations</span>
-                  </li>
-                  <li className="flex items-center space-x-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">3 user accounts</span>
-                  </li>
-                  <li className="flex items-center space-x-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">2,000 orders per month</span>
-                  </li>
-                  <li className="flex items-center space-x-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">AI-powered insights</span>
-                  </li>
-                  <li className="flex items-center space-x-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">Advanced analytics</span>
-                  </li>
-                  <li className="flex items-center space-x-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">Data export & backup</span>
-                  </li>
-                  <li className="flex items-center space-x-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">Priority support</span>
-                  </li>
+                  {getTranslation('pricing.plans.professional.features').map((feature: string, index: number) => (
+                    <li key={index} className="flex items-center space-x-3">
+                      <Check className="w-5 h-5 text-green-500" />
+                      <span className="text-gray-700">{feature}</span>
+                    </li>
+                  ))}
                 </ul>
                 <Link href="/auth/register">
                   <Button className="w-full bg-gradient-to-r from-[#7C3AED] to-[#D64DD2] hover:from-[#6B21A8] hover:to-[#C2185B] text-white">
-                    Start Free Trial
+                    {getTranslation('pricing.plans.professional.cta')}
                   </Button>
                 </Link>
               </CardContent>
             </Card>
 
-            {/* Multi Plan */}
+            {/* Enterprise Plan */}
             <Card className="bg-white border-2 border-gray-200 hover:border-[#7C3AED] transition-all duration-300 hover:shadow-xl">
               <CardHeader className="text-center pb-6">
-                <CardTitle className="text-2xl font-bold text-gray-900">Multi</CardTitle>
-                <div className="text-4xl font-bold text-gray-900 mb-2">$149</div>
-                <div className="text-gray-600">per month</div>
+                <CardTitle className="text-2xl font-bold text-gray-900">{getTranslation('pricing.plans.enterprise.name')}</CardTitle>
+                <div className="text-4xl font-bold text-gray-900 mb-2">{getTranslation('pricing.plans.enterprise.price')}</div>
+                <div className="text-gray-600">{getTranslation('pricing.plans.enterprise.period')}</div>
                 <CardDescription className="text-gray-600">
-                  Total control of multiple locations
+                  {getTranslation('pricing.plans.enterprise.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <ul className="space-y-3">
-                  <li className="flex items-center space-x-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">5 restaurant locations</span>
-                  </li>
-                  <li className="flex items-center space-x-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">10 user accounts</span>
-                  </li>
-                  <li className="flex items-center space-x-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">10,000 orders per month</span>
-                  </li>
-                  <li className="flex items-center space-x-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">Multi-location management</span>
-                  </li>
-                  <li className="flex items-center space-x-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">AI-powered insights</span>
-                  </li>
-                  <li className="flex items-center space-x-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">Advanced analytics</span>
-                  </li>
-                  <li className="flex items-center space-x-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">Data export & backup</span>
-                  </li>
-                  <li className="flex items-center space-x-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">Priority support</span>
-                  </li>
+                  {getTranslation('pricing.plans.enterprise.features').map((feature: string, index: number) => (
+                    <li key={index} className="flex items-center space-x-3">
+                      <Check className="w-5 h-5 text-green-500" />
+                      <span className="text-gray-700">{feature}</span>
+                    </li>
+                  ))}
                 </ul>
-                <Link href="/pricing">
+                <Link href="/auth/register">
                   <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white">
-                    Contact Sales
+                    {getTranslation('pricing.plans.enterprise.cta')}
                   </Button>
                 </Link>
               </CardContent>
@@ -793,37 +679,37 @@ export default function HomePage() {
       <section className="py-20 bg-gradient-to-r from-[#7C3AED] to-[#D64DD2]">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Ready to Transform Your Restaurant with AI-Powered Software?
+            {getTranslation('cta.title')}
           </h2>
           <p className="text-xl text-white/90 mb-8 max-w-3xl mx-auto">
-            Join 500+ restaurants that have already streamlined their operations with Tably's restaurant management software. Start your free trial today and see the difference.
+            {getTranslation('cta.subtitle')}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
             <Link href="/auth/register">
               <Button size="lg" className="bg-white text-[#7C3AED] hover:bg-gray-100 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] text-lg px-8 py-4">
                 <Rocket className="w-5 h-5 mr-2" />
-                Start Free Trial
+                {getTranslation('cta.startFreeTrial')}
               </Button>
             </Link>
-                         <VideoModal videoId="623Cw28jD8o" title="Tably Restaurant Management Demo">
-                           <Button size="lg" className="bg-white/10 backdrop-blur-sm border-2 border-white/20 text-white hover:bg-white hover:text-[#7C3AED] text-lg px-8 py-4 font-medium transition-all duration-300">
-                             <Play className="w-5 h-5 mr-2" />
-                             Watch Demo
-                           </Button>
-                         </VideoModal>
+            <VideoModal videoId="623Cw28jD8o" title="Tably Restaurant Management Demo">
+              <Button size="lg" className="bg-white/10 backdrop-blur-sm border-2 border-white/20 text-white hover:bg-white hover:text-[#7C3AED] text-lg px-8 py-4 font-medium transition-all duration-300">
+                <Play className="w-5 h-5 mr-2" />
+                {getTranslation('cta.watchDemo')}
+              </Button>
+            </VideoModal>
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 text-white/80 text-sm">
             <div className="flex items-center space-x-2">
               <CheckCircle className="w-4 h-4" />
-              <span>No credit card required</span>
+              <span>{getTranslation('cta.trustIndicators.noCreditCard')}</span>
             </div>
             <div className="flex items-center space-x-2">
               <Timer className="w-4 h-4" />
-              <span>Setup in 5 minutes</span>
+              <span>{getTranslation('cta.trustIndicators.setupIn5Minutes')}</span>
             </div>
             <div className="flex items-center space-x-2">
               <Headphones className="w-4 h-4" />
-              <span>24/7 support</span>
+              <span>{getTranslation('cta.trustIndicators.support24_7')}</span>
             </div>
           </div>
         </div>
@@ -838,41 +724,49 @@ export default function HomePage() {
             <div className="col-span-1 sm:col-span-2 lg:col-span-1">
               <Logo size="lg" />
               <p className="text-gray-400 mt-4 text-sm md:text-base leading-relaxed">
-                The restaurant management platform that actually works. Streamline your operations, boost your revenue, and delight your customers.
+                {getTranslation('footer.description')}
               </p>
             </div>
             
             {/* Product Links */}
             <div className="text-center sm:text-left">
-              <h3 className="font-semibold mb-4 text-white">Product</h3>
+              <h3 className="font-semibold mb-4 text-white">{getTranslation('footer.sections.product.title')}</h3>
               <ul className="space-y-3 text-gray-400">
-                <li><Link href="#" className="hover:text-white transition-colors text-sm md:text-base block py-1">Features</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors text-sm md:text-base block py-1">Pricing</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors text-sm md:text-base block py-1">Demo</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors text-sm md:text-base block py-1">API</Link></li>
+                {getTranslation('footer.sections.product.links').map((link: string, index: number) => (
+                  <li key={index}>
+                    <Link href="#" className="hover:text-white transition-colors text-sm md:text-base block py-1">
+                      {link}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
             
             {/* Support Links */}
             <div className="text-center sm:text-left">
-              <h3 className="font-semibold mb-4 text-white">Support</h3>
+              <h3 className="font-semibold mb-4 text-white">{getTranslation('footer.sections.support.title')}</h3>
               <ul className="space-y-3 text-gray-400">
-                <li><Link href="#" className="hover:text-white transition-colors text-sm md:text-base block py-1">Help Center</Link></li>
-                <li><a href="mailto:info@tably.digital" className="hover:text-white transition-colors text-sm md:text-base block py-1">Contact Us</a></li>
-                <li><Link href="#" className="hover:text-white transition-colors text-sm md:text-base block py-1">Status</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors text-sm md:text-base block py-1">Training</Link></li>
+                {getTranslation('footer.sections.support.links').map((link: string, index: number) => (
+                  <li key={index}>
+                    <Link href="#" className="hover:text-white transition-colors text-sm md:text-base block py-1">
+                      {link}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
             
             {/* Company Links */}
             <div className="text-center sm:text-left">
-              <h3 className="font-semibold mb-4 text-white">Company</h3>
+              <h3 className="font-semibold mb-4 text-white">{getTranslation('footer.sections.company.title')}</h3>
               <ul className="space-y-3 text-gray-400">
-                <li><Link href="#" className="hover:text-white transition-colors text-sm md:text-base block py-1">About</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors text-sm md:text-base block py-1">Blog</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors text-sm md:text-base block py-1">Careers</Link></li>
-                <li><Link href="/legal/privacy" className="hover:text-white transition-colors text-sm md:text-base block py-1">Privacy</Link></li>
-                <li><Link href="/legal/terms" className="hover:text-white transition-colors text-sm md:text-base block py-1">Terms</Link></li>
+                {getTranslation('footer.sections.company.links').map((link: string, index: number) => (
+                  <li key={index}>
+                    <Link href="#" className="hover:text-white transition-colors text-sm md:text-base block py-1">
+                      {link}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
@@ -881,11 +775,11 @@ export default function HomePage() {
           <div className="border-t border-gray-800 mt-8 md:mt-12 pt-6 md:pt-8">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <p className="text-gray-400 text-sm md:text-base text-center md:text-left">
-                &copy; 2024 Tably. All rights reserved. Made with ❤️ for restaurant owners.
+                {getTranslation('footer.copyright')}
               </p>
               <div className="flex items-center space-x-4 text-gray-400">
                 <a href="mailto:info@tably.digital" className="hover:text-white transition-colors text-sm">
-                  info@tably.digital
+                  {getTranslation('footer.email')}
                 </a>
               </div>
             </div>

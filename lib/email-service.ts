@@ -21,6 +21,15 @@ interface OrderEmailData {
   address?: string
 }
 
+interface UpgradeRequestEmailData {
+  userName: string
+  userEmail: string
+  currentPlan: string | null
+  requestedPlan: string
+  message: string | null
+  requestDate: string
+}
+
 interface EmailResponse {
   success: boolean
   messageId?: string
@@ -92,6 +101,77 @@ class EmailService {
       style: 'currency',
       currency: 'USD'
     }).format(amount)
+  }
+
+  private generateUpgradeRequestEmailHTML(data: UpgradeRequestEmailData): string {
+    const planNames: { [key: string]: string } = {
+      'free-trial-plan': 'Free Trial',
+      'starter-plan': 'Starter Plan',
+      'growth-plan': 'Growth Plan',
+      'multi-plan': 'Multi-Location Plan'
+    }
+
+    const currentPlanDisplay = data.currentPlan ? planNames[data.currentPlan] || data.currentPlan : 'No active plan'
+    const requestedPlanDisplay = planNames[data.requestedPlan] || data.requestedPlan
+
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Upgrade Request</title>
+      </head>
+      <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 10px; margin-bottom: 30px;">
+          <h1 style="color: white; margin: 0; text-align: center; font-size: 28px;">🚀 Tably Upgrade Request</h1>
+          <p style="color: white; text-align: center; margin: 10px 0 0 0; font-size: 16px;">New Plan Upgrade Request</p>
+        </div>
+
+        <div style="background: #f8f9fa; padding: 25px; border-radius: 10px; margin-bottom: 25px;">
+          <h2 style="color: #333; margin: 0 0 15px 0; font-size: 24px;">New Upgrade Request</h2>
+          <p style="margin: 0 0 20px 0; font-size: 16px;">A user has requested to upgrade their subscription plan.</p>
+          
+          <div style="background: white; padding: 20px; border-radius: 8px; border-left: 4px solid #667eea;">
+            <div style="margin-bottom: 15px;">
+              <strong>User Name:</strong> <span style="color: #667eea; font-weight: bold;">${data.userName}</span>
+            </div>
+            <div style="margin-bottom: 15px;">
+              <strong>User Email:</strong> <span style="color: #667eea; font-weight: bold;">${data.userEmail}</span>
+            </div>
+            <div style="margin-bottom: 15px;">
+              <strong>Current Plan:</strong> <span style="color: #667eea; font-weight: bold;">${currentPlanDisplay}</span>
+            </div>
+            <div style="margin-bottom: 15px;">
+              <strong>Requested Plan:</strong> <span style="color: #28a745; font-weight: bold; font-size: 18px;">${requestedPlanDisplay}</span>
+            </div>
+            <div style="margin-bottom: 15px;">
+              <strong>Request Date:</strong> <span style="color: #667eea; font-weight: bold;">${data.requestDate}</span>
+            </div>
+            ${data.message ? `
+            <div style="margin-bottom: 15px;">
+              <strong>Message:</strong>
+              <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 10px; border-left: 3px solid #667eea;">
+                <p style="margin: 0; font-style: italic; color: #555;">"${data.message}"</p>
+              </div>
+            </div>
+            ` : ''}
+          </div>
+        </div>
+
+        <div style="background: #e8f5e8; padding: 20px; border-radius: 10px; border-left: 4px solid #28a745; margin-bottom: 25px;">
+          <h3 style="margin: 0 0 10px 0; color: #155724;">📋 Next Steps</h3>
+          <p style="margin: 0; color: #155724;">Please review this request and contact the user to process their upgrade.</p>
+        </div>
+
+        <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+          <p style="margin: 0; color: #666; font-size: 14px;">
+            This email was automatically sent by the Tably upgrade request system.
+          </p>
+        </div>
+      </body>
+      </html>
+    `
   }
 
   private generateOrderEmailHTML(data: OrderEmailData): string {
@@ -198,6 +278,13 @@ class EmailService {
       </body>
       </html>
     `
+  }
+
+  async sendUpgradeRequestNotification(data: UpgradeRequestEmailData): Promise<EmailResponse> {
+    const subject = `New Upgrade Request - ${data.userName} (${data.userEmail})`
+    const htmlContent = this.generateUpgradeRequestEmailHTML(data)
+    
+    return this.sendEmail('info@tably.digital', subject, htmlContent)
   }
 
   async sendOrderConfirmation(data: OrderEmailData): Promise<EmailResponse> {
