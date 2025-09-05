@@ -1,13 +1,12 @@
 # CitAI Restaurant SaaS
 
-Una aplicación SaaS para restaurantes construida con Next.js, Supabase y Stripe.
+Una aplicación SaaS para restaurantes construida con Next.js y Supabase.
 
 ## 🚀 Tecnologías
 
 - **Frontend**: Next.js 15, React 19, TypeScript
 - **UI**: Tailwind CSS, Radix UI, Shadcn/ui
 - **Backend**: Supabase (PostgreSQL, Auth, Storage)
-- **Pagos**: Stripe
 - **Deploy**: Vercel
 
 ## 📦 Instalación

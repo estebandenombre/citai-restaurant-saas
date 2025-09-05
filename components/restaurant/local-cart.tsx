@@ -130,8 +130,39 @@ export default function LocalCart({
     localStorage.removeItem(`local_cart_${restaurantId}`)
   }
 
+  const validateCustomerInfo = () => {
+    const errors: string[] = []
+    
+    if (!customerInfo.name.trim()) {
+      errors.push('Nombre completo es requerido')
+    }
+    
+    if (!customerInfo.phone.trim()) {
+      errors.push('Teléfono es requerido')
+    }
+    
+    if (orderType === 'dine-in' && !customerInfo.tableNumber.trim()) {
+      errors.push('Número de mesa es requerido para servicio en mesa')
+    }
+    
+    if (orderType === 'delivery' && !customerInfo.address.trim()) {
+      errors.push('Dirección de entrega es requerida')
+    }
+    
+    return {
+      isValid: errors.length === 0,
+      errors
+    }
+  }
+
   const handleCheckout = async () => {
     if (cartItems.length === 0) return
+
+    const validation = validateCustomerInfo()
+    if (!validation.isValid) {
+      alert(`Por favor completa todos los campos requeridos:\n${validation.errors.join('\n')}`)
+      return
+    }
 
     setIsSubmitting(true)
     try {
@@ -524,8 +555,12 @@ export default function LocalCart({
               </Button>
               <Button
                 onClick={handleCheckout}
-                className="flex-1"
-                disabled={isSubmitting || !customerInfo.name || !customerInfo.phone}
+                className={`flex-1 ${
+                  validateCustomerInfo().isValid 
+                    ? 'bg-slate-900 hover:bg-slate-800' 
+                    : 'bg-gray-400 cursor-not-allowed'
+                }`}
+                disabled={isSubmitting || !validateCustomerInfo().isValid}
               >
                 {isSubmitting ? 'Enviando...' : 'Confirmar Pedido'}
               </Button>

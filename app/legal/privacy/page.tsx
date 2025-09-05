@@ -55,7 +55,7 @@ export default function PrivacyPage() {
 
             <section>
               <h2 className="text-xl font-semibold text-gray-900 mb-3">6. Third-Party Services</h2>
-              <p>We may use third-party services for analytics, payment processing, and support. These services have their own privacy policies.</p>
+              <p>We may use third-party services for analytics and support. These services have their own privacy policies.</p>
             </section>
 
             <section>

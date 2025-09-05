@@ -206,7 +206,7 @@ export default function HomePage() {
                   </li>
                   <li className="flex items-center space-x-2">
                     <Check className="w-4 h-4 text-green-500" />
-                    <span>Payment processing</span>
+                    <span>Order management</span>
                   </li>
                 </ul>
               </CardContent>

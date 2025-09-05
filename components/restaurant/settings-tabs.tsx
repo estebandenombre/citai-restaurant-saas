@@ -27,7 +27,6 @@ import {
   Image as ImageIcon,
   Store,
   Building2,
-  CreditCard,
   Truck,
   Calendar,
   FileText,
@@ -141,10 +140,6 @@ export function SettingsTabs({
               )}
             </div>
             <span className="text-xs">Customers</span>
-          </TabsTrigger>
-          <TabsTrigger value="payments" className="flex flex-col items-center gap-1 py-2">
-            <CreditCard className="h-5 w-5" />
-            <span className="text-xs">Payments</span>
           </TabsTrigger>
           <TabsTrigger value="appearance" className="flex flex-col items-center gap-1 py-2">
             <Palette className="h-5 w-5" />
@@ -614,33 +609,6 @@ export function SettingsTabs({
           </div>
         </TabsContent>
 
-        {/* Payments Settings Tab */}
-        <TabsContent value="payments" className="space-y-6 mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <CreditCard className="h-5 w-5" />
-                <span>Payment Settings</span>
-              </CardTitle>
-              <CardDescription>
-                Configure payment gateways and processing
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8">
-                <CreditCard className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Payment Configuration</h3>
-                <p className="text-gray-500 mb-4">
-                  Configure your payment gateways and processing settings
-                </p>
-                <Button variant="outline">
-                  <Globe className="h-4 w-4 mr-2" />
-                  Configure Payment Gateways
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
 
         {/* Appearance Settings Tab */}
         <TabsContent value="appearance" className="space-y-6 mt-6">

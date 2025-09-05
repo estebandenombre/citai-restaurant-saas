@@ -686,11 +686,11 @@ export default function PricingPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">What payment methods do you accept?</CardTitle>
+                <CardTitle className="text-lg">How does billing work?</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  We accept all major credit cards (Visa, Mastercard, American Express) and PayPal. All payments are processed securely through Stripe.
+                  You can start with our free trial and upgrade to a paid plan when you're ready. All billing is handled securely through our platform.
                 </p>
               </CardContent>
             </Card>
@@ -701,7 +701,7 @@ export default function PricingPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  No setup fees! Your first payment is only charged after your 14-day free trial ends. We also offer a 30% discount for the first 3 months to help you get started.
+                  No setup fees! Your subscription starts after your 14-day free trial ends. We also offer a 30% discount for the first 3 months to help you get started.
                 </p>
               </CardContent>
             </Card>

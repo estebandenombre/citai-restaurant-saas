@@ -41,8 +41,6 @@ export interface OrderData {
   taxAmount: number
   deliveryFee: number
   totalAmount: number
-  paymentMethod?: string
-  paymentStatus?: string
 }
 
 export class TicketGenerator {
@@ -125,15 +123,6 @@ export class TicketGenerator {
     doc.text(`Order Type: ${orderData.customer.order_type}`, 20, yPosition)
     yPosition += 5
     
-    if (orderData.paymentMethod) {
-      doc.text(`Payment Method: ${orderData.paymentMethod}`, 20, yPosition)
-      yPosition += 5
-    }
-    
-    if (orderData.paymentStatus) {
-      doc.text(`Payment Status: ${orderData.paymentStatus}`, 20, yPosition)
-      yPosition += 5
-    }
     
     yPosition += 5
     doc.setDrawColor(200, 200, 200)

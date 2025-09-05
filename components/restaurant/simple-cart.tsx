@@ -12,8 +12,6 @@ import { Separator } from "@/components/ui/separator"
 import { FormattedPrice } from "@/components/ui/formatted-price"
 import { getCurrentUserRestaurant } from "@/lib/auth-utils"
 import { supabase } from "@/lib/supabase"
-import { PaymentProcessor } from "@/lib/payment-processor"
-import PaymentCheckout from "./payment-checkout"
 import DownloadTicketButton from "./download-ticket-button"
 import { TicketGenerator, OrderData as TicketOrderData } from "@/lib/ticket-generator"
 import { getCurrencySymbol } from "@/lib/currency-utils"
@@ -92,10 +90,11 @@ export default function SimpleCart({ restaurantId }: SimpleCartProps) {
   const [isCheckout, setIsCheckout] = useState(false)
   const [isOrderPlaced, setIsOrderPlaced] = useState(false)
   const [orderNumber, setOrderNumber] = useState("")
-  const [checkoutStep, setCheckoutStep] = useState(1) // 1: order type, 2: customer info, 3: payment
+  const [checkoutStep, setCheckoutStep] = useState(1) // 1: order type, 2: customer info
   const [orderData, setOrderData] = useState<any>(null)
   const [ticketData, setTicketData] = useState<TicketOrderData | null>(null)
   const [restaurant, setRestaurant] = useState<any>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo>({
     name: "",
     phone: "",
@@ -276,37 +275,51 @@ export default function SimpleCart({ restaurantId }: SimpleCartProps) {
     return `ORD-${Date.now().toString().slice(-6)}`
   }
 
-  const handleCheckout = async () => {
-    try {
-      console.log('🔍 Starting checkout process...')
-      console.log('🔍 Restaurant ID:', restaurantId || 'undefined')
-      
-      // Generate order number
-      const newOrderNumber = generateOrderNumber()
-      setOrderNumber(newOrderNumber)
-      
-      // Prepare order data (but don't send to API yet)
-      const orderData = {
-        restaurantId: restaurantId,
-        orderNumber: newOrderNumber,
-        customerInfo,
-        cartItems,
-        subtotal: getSubtotal(),
-        taxAmount: getTax(),
-        deliveryFee: getDeliveryFee(),
-        totalAmount: getTotal()
-      }
-
-      // Store order data for payment step (without sending to API)
-      setOrderData(orderData)
-      console.log('🔍 Order data prepared for payment step')
-    } catch (error: any) {
-      console.error('Error in checkout:', error)
-      alert(`Error preparing order: ${error.message}`)
+  const validateCustomerInfo = () => {
+    const errors: string[] = []
+    
+    // Check if order type is selected
+    if (!customerInfo.order_type) {
+      errors.push('Please select an order type')
+    }
+    
+    // Check required fields based on settings
+    if (settings.require_name && !customerInfo.name.trim()) {
+      errors.push('Full name is required')
+    }
+    
+    if (settings.require_phone && !customerInfo.phone.trim()) {
+      errors.push('Phone number is required')
+    }
+    
+    if (settings.require_email && !customerInfo.email.trim()) {
+      errors.push('Email address is required')
+    }
+    
+    // Check order type specific requirements
+    if (customerInfo.order_type === 'table_service' && settings.require_table_number && !customerInfo.table_number.trim()) {
+      errors.push('Table number is required for table service')
+    }
+    
+    if (customerInfo.order_type === 'pickup' && settings.require_pickup_time && !customerInfo.pickup_time.trim()) {
+      errors.push('Pickup time is required')
+    }
+    
+    if (customerInfo.order_type === 'delivery' && settings.require_address && !customerInfo.address.trim()) {
+      errors.push('Delivery address is required')
+    }
+    
+    return {
+      isValid: errors.length === 0,
+      errors
     }
   }
 
+
   const handleRegularCheckout = async () => {
+    if (isSubmitting) return // Prevent multiple submissions
+    
+    setIsSubmitting(true)
     try {
       // Generate order number
       const newOrderNumber = generateOrderNumber()
@@ -394,108 +407,12 @@ export default function SimpleCart({ restaurantId }: SimpleCartProps) {
     } catch (error: any) {
       console.error('Error placing order:', error)
       alert(`Error placing order: ${error.message}`)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
-  const handlePaymentSuccess = async (paymentResult: any) => {
-    console.log('Payment successful:', paymentResult)
-    
-    try {
-      // Now send the order to the API with payment information
-      const orderWithPayment = {
-        ...orderData,
-        paymentIntentId: paymentResult.payment_intent_id,
-        paymentMethod: paymentResult.payment_method,
-        paymentStatus: 'completed'
-      }
 
-      const response = await fetch('/api/orders', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(orderWithPayment)
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.details || errorData.error || `Failed to place order (Status: ${response.status})`)
-      }
-
-      const result = await response.json()
-      console.log('🔍 Order sent to kitchen successfully:', result)
-      
-      // Get currency configuration
-      const currencyConfig = restaurant?.currency_config || { currency: 'USD', position: 'before' }
-      const currencySymbol = getCurrencySymbol(currencyConfig.currency)
-
-      // Prepare ticket data
-      const ticketData: TicketOrderData = {
-        orderNumber: orderData.orderNumber,
-        orderDate: new Date().toLocaleString(),
-        restaurant: {
-          name: restaurant?.name || 'Restaurant',
-          address: restaurant?.address,
-          phone: restaurant?.phone,
-          email: restaurant?.email,
-          currency: currencyConfig.currency,
-          currencySymbol: currencySymbol,
-          currencyPosition: currencyConfig.position
-        },
-        customer: {
-          name: customerInfo.name,
-          phone: customerInfo.phone,
-          email: customerInfo.email,
-          table_number: customerInfo.table_number,
-          pickup_time: customerInfo.pickup_time,
-          address: customerInfo.address,
-          order_type: customerInfo.order_type,
-          special_instructions: customerInfo.special_instructions
-        },
-        items: cartItems.map(item => ({
-          name: item.name,
-          quantity: item.quantity,
-          price: item.price,
-          total: item.price * item.quantity,
-          notes: item.specialInstructions
-        })),
-        subtotal: getSubtotal(),
-        taxAmount: getTax(),
-        deliveryFee: getDeliveryFee(),
-        totalAmount: getTotal(),
-        paymentMethod: paymentResult.payment_method,
-        paymentStatus: 'completed'
-      }
-      
-      setTicketData(ticketData)
-      
-      // Mark order as placed
-      setIsOrderPlaced(true)
-      setCheckoutStep(1)
-      
-      // Clear cart after order is placed
-      clearCart()
-    } catch (error: any) {
-      console.error('Error sending order to kitchen:', error)
-      alert(`Payment successful but order failed: ${error.message}`)
-      setCheckoutStep(2)
-    }
-  }
-
-  const handlePaymentError = (error: string) => {
-    console.error('Payment error:', error)
-    alert(`Payment failed: ${error}`)
-    setCheckoutStep(2)
-  }
-
-  const handlePaymentCancel = () => {
-    console.log('Payment cancelled')
-    setCheckoutStep(2)
-    // Optionally delete the order if payment was cancelled
-    if (orderData) {
-      console.log('Payment cancelled, order may need to be deleted:', orderData.id)
-    }
-  }
 
   const resetOrder = () => {
     setIsCheckout(false)
@@ -504,6 +421,7 @@ export default function SimpleCart({ restaurantId }: SimpleCartProps) {
     setCheckoutStep(1)
     setOrderData(null)
     setTicketData(null)
+    setIsSubmitting(false)
     setCustomerInfo({
       name: "",
       phone: "",
@@ -641,15 +559,6 @@ export default function SimpleCart({ restaurantId }: SimpleCartProps) {
                           2
                         </div>
                         <span className="text-sm font-medium">Details</span>
-                      </div>
-                      <div className={`w-8 h-1 rounded-full ${checkoutStep >= 3 ? 'bg-blue-600' : 'bg-slate-200'}`}></div>
-                      <div className={`flex items-center space-x-2 ${checkoutStep >= 3 ? 'text-blue-600' : 'text-slate-400'}`}>
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                          checkoutStep >= 3 ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-500'
-                        }`}>
-                          3
-                        </div>
-                        <span className="text-sm font-medium">Payment</span>
                       </div>
                     </div>
 
@@ -826,26 +735,6 @@ export default function SimpleCart({ restaurantId }: SimpleCartProps) {
                           )}
                         </div>
                       </div>
-                    ) : checkoutStep === 3 ? (
-                      // Step 3: Payment Method Selection
-                      <div className="space-y-6">
-                        <div className="text-center mb-6">
-                          <h3 className="text-xl font-bold text-slate-900 mb-2">Payment Method</h3>
-                          <p className="text-slate-600">Choose how you'd like to pay</p>
-                        </div>
-                        
-                        <div className="space-y-4">
-                          <PaymentCheckout
-                            restaurantId={restaurantId || ''}
-                            amount={getTotal()}
-                            currency={restaurant?.currency_config?.currency || 'USD'}
-                            orderData={orderData}
-                            onPaymentSuccess={handlePaymentSuccess}
-                            onPaymentError={handlePaymentError}
-                            onCancel={handlePaymentCancel}
-                          />
-                        </div>
-                      </div>
                     ) : null}
 
                     {/* Action Buttons */}
@@ -863,25 +752,33 @@ export default function SimpleCart({ restaurantId }: SimpleCartProps) {
                         <>
                           <Button
                             onClick={async () => {
-                              // Check if restaurant has payments enabled
-                              if (restaurantId) {
-                                const hasPayments = await PaymentProcessor.hasPaymentsEnabled(restaurantId)
-                                if (hasPayments) {
-                                  // Create order and go to payment step
-                                  await handleCheckout()
-                                  setCheckoutStep(3)
-                                } else {
-                                  // No payments, place order directly
-                                  await handleRegularCheckout()
-                                }
-                              } else {
-                                await handleRegularCheckout()
+                              if (isSubmitting) return // Prevent multiple clicks
+                              
+                              const validation = validateCustomerInfo()
+                              if (!validation.isValid) {
+                                alert(`Please complete all required fields:\n${validation.errors.join('\n')}`)
+                                return
                               }
+                              await handleRegularCheckout()
                             }}
-                            className="w-full h-14 text-base font-bold rounded-xl transition-all duration-200 hover:scale-[1.02] bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 shadow-lg"
+                            disabled={isSubmitting || !validateCustomerInfo().isValid}
+                            className={`w-full h-14 text-base font-bold rounded-xl transition-all duration-200 hover:scale-[1.02] shadow-lg ${
+                              isSubmitting || !validateCustomerInfo().isValid
+                                ? 'bg-gray-400 cursor-not-allowed' 
+                                : 'bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700'
+                            }`}
                           >
-                            <Package className="h-5 w-5 mr-3" />
-                            Continue to Payment - <FormattedPrice amount={getTotal()} restaurantId={restaurantId} />
+                            {isSubmitting ? (
+                              <>
+                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3" />
+                                Processing...
+                              </>
+                            ) : (
+                              <>
+                                <Package className="h-5 w-5 mr-3" />
+                                Place Order - <FormattedPrice amount={getTotal()} restaurantId={restaurantId} />
+                              </>
+                            )}
                           </Button>
                           <Button
                             variant="outline"
@@ -892,15 +789,6 @@ export default function SimpleCart({ restaurantId }: SimpleCartProps) {
                             Back to Order Type
                           </Button>
                         </>
-                      ) : checkoutStep === 3 ? (
-                        <Button
-                          variant="outline"
-                          onClick={() => setCheckoutStep(2)}
-                          className="w-full h-12 text-base font-semibold rounded-xl transition-all duration-200 hover:scale-[1.02] border-slate-300 hover:border-slate-400 hover:bg-slate-50"
-                        >
-                          <ArrowLeft className="h-5 w-5 mr-2" />
-                          Back to Details
-                        </Button>
                       ) : null}
                     </div>
                   </div>
