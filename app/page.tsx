@@ -351,7 +351,7 @@ export default function HomePage() {
             <LocaleSwitcher inline className="hidden md:block" />
             <Link
               href="/auth/login"
-              className="hidden md:inline-flex text-sm text-zinc-700 hover:text-zinc-950 px-3 py-1.5 transition-colors"
+              className="inline-flex text-sm text-zinc-700 hover:text-zinc-950 px-2 md:px-3 py-1.5 transition-colors"
             >
               {isEs ? "Iniciar sesión" : "Sign in"}
             </Link>
