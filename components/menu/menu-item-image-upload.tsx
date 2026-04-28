@@ -77,7 +77,6 @@ export function MenuItemImageUpload({
   }, [imageUrl])
 
   const handleImageUpload = async (file: File) => {
-    console.log('Starting upload for file:', file.name)
     setUploading(true)
     try {
       // Crear preview temporal para mostrar inmediatamente
@@ -87,8 +86,6 @@ export function MenuItemImageUpload({
       // Subir imagen real a Supabase
       const result = await uploadImage(file, restaurantId, 'menu-items')
       if (result.success && result.url) {
-        console.log('Upload successful, URL:', result.url)
-        
         // Actualizar con la URL real de Supabase
         setImagePreview(null) // Limpiar preview temporal
         setImageUrlInput(result.url)
@@ -102,7 +99,6 @@ export function MenuItemImageUpload({
         throw new Error(result.error || 'Upload failed')
       }
     } catch (error) {
-      console.error('Error uploading image:', error)
       setImagePreview(null) // Limpiar preview temporal en caso de error
       toast({
         title: "Upload failed",
@@ -115,12 +111,9 @@ export function MenuItemImageUpload({
   }
 
   const handleFileSelect = async (file: File) => {
-    console.log('File selected in MenuItemImageUpload:', file)
-    
     // Validación completa
     const validation = validateImage(file)
     if (!validation.isValid) {
-      console.log('Validation failed:', validation.error)
       toast({
         title: "Invalid file",
         description: validation.error,
@@ -129,11 +122,9 @@ export function MenuItemImageUpload({
       return
     }
 
-    console.log('File validation passed, uploading...')
     try {
       await handleImageUpload(file)
     } catch (error) {
-      console.error('Error handling file:', error)
       toast({
         title: "Error",
         description: "Failed to process image",
@@ -163,16 +154,6 @@ export function MenuItemImageUpload({
   }
 
   const currentImageUrl = imageUrl || imagePreview
-
-  // Debug logs
-  console.log('🔍 MenuItemImageUpload Debug:', {
-    imageUrl,
-    imagePreview,
-    currentImageUrl,
-    imageUrlInput,
-    uploading,
-    showCropper
-  })
 
   const handleCropSave = (newCropData: any) => {
     onCropDataChange?.(newCropData)
@@ -238,7 +219,6 @@ export function MenuItemImageUpload({
                     size="sm"
                     variant="outline"
                     onClick={() => {
-                      console.log('Change button clicked, fileRef:', fileRef.current)
                       fileRef.current?.click()
                     }}
                     disabled={uploading}
@@ -277,7 +257,6 @@ export function MenuItemImageUpload({
                   <Button
                     variant="outline"
                     onClick={() => {
-                      console.log('Upload button clicked, fileRef:', fileRef.current)
                       fileRef.current?.click()
                     }}
                     disabled={uploading}
@@ -301,12 +280,9 @@ export function MenuItemImageUpload({
               accept="image/*"
               className="hidden"
               onChange={(e) => {
-                console.log('File input changed:', e.target.files)
                 const file = e.target.files?.[0]
                 if (file) {
                   handleFileSelect(file)
-                } else {
-                  console.log('No file selected')
                 }
               }}
             />
