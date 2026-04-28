@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -60,6 +60,7 @@ import { Loading } from "@/components/ui/loading"
 import { Skeleton } from "@/components/ui/skeleton"
 import { FormattedPrice } from "@/components/ui/formatted-price"
 import { EmailStatusBadge, EmailStatusIndicator } from "@/components/ui/email-status-badge"
+import { useI18n } from "@/components/i18n/i18n-provider"
 
 interface OrderItem {
   id: string
@@ -95,80 +96,231 @@ interface Order {
   order_items: OrderItem[]
 }
 
-const statusConfig = {
-  pending: { 
-    label: 'NEW', 
-    color: 'bg-red-100 text-red-800 border-red-300', 
-    icon: Bell,
-    bgColor: 'bg-gradient-to-r from-red-50 to-red-100',
-    textColor: 'text-red-700',
-    buttonColor: 'bg-red-600 hover:bg-red-700',
-    buttonText: 'text-white',
-    priority: 1
-  },
-  confirmed: { 
-    label: 'CONFIRMED', 
-    color: 'bg-blue-100 text-blue-800 border-blue-300', 
-    icon: CheckCircle,
-    bgColor: 'bg-gradient-to-r from-blue-50 to-blue-100',
-    textColor: 'text-blue-700',
-    buttonColor: 'bg-blue-600 hover:bg-blue-700',
-    buttonText: 'text-white',
-    priority: 2
-  },
-  preparing: { 
-    label: 'PREPARING', 
-    color: 'bg-orange-100 text-orange-800 border-orange-300', 
-    icon: Timer,
-    bgColor: 'bg-gradient-to-r from-orange-50 to-orange-100',
-    textColor: 'text-orange-700',
-    buttonColor: 'bg-orange-600 hover:bg-orange-700',
-    buttonText: 'text-white',
-    priority: 3
-  },
-  ready: { 
-    label: 'READY', 
-    color: 'bg-green-100 text-green-800 border-green-300', 
-    icon: Zap,
-    bgColor: 'bg-gradient-to-r from-green-50 to-green-100',
-    textColor: 'text-green-700',
-    buttonColor: 'bg-green-600 hover:bg-green-700',
-    buttonText: 'text-white',
-    priority: 4
-  },
-  served: { 
-    label: 'COMPLETED', 
-    color: 'bg-gray-100 text-gray-800 border-gray-300', 
-    icon: Check,
-    bgColor: 'bg-gradient-to-r from-gray-50 to-gray-100',
-    textColor: 'text-gray-700',
-    buttonColor: 'bg-gray-600 hover:bg-gray-700',
-    buttonText: 'text-white',
-    priority: 5
-  },
-  cancelled: { 
-    label: 'CANCELLED', 
-    color: 'bg-red-100 text-red-800 border-red-300', 
-    icon: XCircle,
-    bgColor: 'bg-gradient-to-r from-red-50 to-red-100',
-    textColor: 'text-red-700',
-    buttonColor: 'bg-red-600 hover:bg-red-700',
-    buttonText: 'text-white',
-    priority: 6
+function buildStatusConfig(t: (key: string) => string) {
+  return {
+    pending: {
+      label: t("orders.statusUpper.pending"),
+      color: "bg-red-100 text-red-800 border-red-300",
+      icon: Bell,
+      bgColor: "bg-muted/60",
+      textColor: "text-red-700",
+      buttonColor: "bg-red-600 hover:bg-red-700",
+      buttonText: "text-white",
+      priority: 1,
+    },
+    confirmed: {
+      label: t("orders.statusUpper.confirmed"),
+      color: "bg-blue-100 text-blue-800 border-blue-300",
+      icon: CheckCircle,
+      bgColor: "bg-muted/60",
+      textColor: "text-blue-700",
+      buttonColor: "bg-blue-600 hover:bg-blue-700",
+      buttonText: "text-white",
+      priority: 2,
+    },
+    preparing: {
+      label: t("orders.statusUpper.preparing"),
+      color: "bg-orange-100 text-orange-800 border-orange-300",
+      icon: Timer,
+      bgColor: "bg-muted/60",
+      textColor: "text-orange-700",
+      buttonColor: "bg-orange-600 hover:bg-orange-700",
+      buttonText: "text-white",
+      priority: 3,
+    },
+    ready: {
+      label: t("orders.statusUpper.ready"),
+      color: "bg-green-100 text-green-800 border-green-300",
+      icon: Zap,
+      bgColor: "bg-muted/60",
+      textColor: "text-green-700",
+      buttonColor: "bg-green-600 hover:bg-green-700",
+      buttonText: "text-white",
+      priority: 4,
+    },
+    served: {
+      label: t("orders.statusUpper.served"),
+      color: "bg-gray-100 text-gray-800 border-gray-300",
+      icon: Check,
+      bgColor: "bg-muted/60",
+      textColor: "text-gray-700",
+      buttonColor: "bg-gray-600 hover:bg-gray-700",
+      buttonText: "text-white",
+      priority: 5,
+    },
+    cancelled: {
+      label: t("orders.statusUpper.cancelled"),
+      color: "bg-red-100 text-red-800 border-red-300",
+      icon: XCircle,
+      bgColor: "bg-muted/60",
+      textColor: "text-red-700",
+      buttonColor: "bg-red-600 hover:bg-red-700",
+      buttonText: "text-white",
+      priority: 6,
+    },
   }
 }
 
-const orderTypeConfig = {
-  pickup: { label: 'Pickup', icon: Package, color: 'text-blue-600' },
-  delivery: { label: 'Delivery', icon: Truck, color: 'text-green-600' },
-  table_service: { label: 'Table', icon: Table, color: 'text-purple-600' },
-  'dine-in': { label: 'Dine-in', icon: Table, color: 'text-purple-600' }
+function buildOrderTypeConfig(t: (key: string) => string) {
+  return {
+    pickup: { label: t("orders.typePickup"), icon: Package, color: "text-foreground" },
+    delivery: { label: t("orders.typeDelivery"), icon: Truck, color: "text-foreground" },
+    table_service: { label: t("orders.typeTable"), icon: Table, color: "text-foreground" },
+    "dine-in": { label: t("orders.typeDineIn"), icon: Table, color: "text-foreground" },
+  }
 }
 
 type ViewMode = 'kitchen' | 'server' | 'manager' | 'client'
 type DisplayMode = 'cards' | 'rows'
 
 export default function OrdersPage() {
+  const { t, intlLocale } = useI18n()
+  const tx =
+    intlLocale === "es-ES"
+      ? {
+          total: "Total:",
+          tableHead: {
+            order: "Pedido",
+            customer: "Cliente",
+            type: "Tipo",
+            status: "Estado",
+            items: "Items",
+            total: "Total",
+            date: "Fecha",
+            actions: "Acciones",
+          },
+          ready: "Listo!",
+          completedOk: "Pedido completado correctamente",
+          noOrdersAvailable: "No hay pedidos disponibles",
+          orderDetails: "Detalles del pedido",
+          customerInformation: "Informacion del cliente",
+          name: "Nombre:",
+          phone: "Telefono:",
+          email: "Email:",
+          table: "Mesa:",
+          pickupTime: "Hora de recogida:",
+          address: "Direccion:",
+          orderItems: "Items del pedido",
+          orderSummary: "Resumen del pedido",
+          subtotal: "Subtotal:",
+          tax: "Impuestos:",
+          deliveryFee: "Gastos de envio:",
+          specialInstructions: "Instrucciones especiales",
+          createNewOrder: "Crear nuevo pedido",
+          enterCustomerDetails: "Introduce datos del cliente y tipo de pedido",
+          customerNameReq: "Nombre del cliente *",
+          phoneNumber: "Telefono",
+          orderTypeReq: "Tipo de pedido *",
+          tableNumber: "Numero de mesa",
+          deliveryAddress: "Direccion de entrega",
+          addItemsToOrder: "Anade items al pedido",
+          noItemsAdded: "Aun no hay items",
+          clickAddItem: 'Haz clic en "Anadir item" para empezar',
+          menuItem: "Item del menu",
+          quantity: "Cantidad",
+          unitPrice: "Precio unitario",
+          reviewConfirm: "Revisa y confirma el pedido",
+          orderType: "Tipo de pedido:",
+          na: "N/D",
+          orderInformation: "Informacion del pedido",
+          orderNumber: "Numero de pedido:",
+          date: "Fecha:",
+          type: "Tipo:",
+          status: "Estado:",
+          editOrder: "Editar pedido",
+          view: "Ver",
+          edit: "Editar",
+          serve: "Servir",
+          complete: "Completar",
+          moreItems: "+{n} items mas",
+          each: "cada uno",
+          contactCustomer: "Contactar cliente",
+          printReceipt: "Imprimir ticket",
+          clickPrintHelp: "Haz clic en imprimir para sacar este ticket",
+          printingInstructions: "Instrucciones de impresion:",
+          printStep1: '1. Haz clic en "Imprimir ticket" o pulsa Ctrl+P',
+          printStep2: "2. Selecciona tu impresora USB",
+          printStep3: '3. Elige papel "80mm" si esta disponible',
+          printStep4: "4. Imprime el ticket",
+          alertNetwork: "Error de red. Revisa tu conexion e intentalo de nuevo.",
+          alertSession: "Sesion caducada. Vuelve a iniciar sesion.",
+          alertAddItem: "Anade al menos un item al pedido",
+          pickupDelivery: "Recogida y entrega",
+          readyForPickup: "Listo para recoger",
+        }
+      : {
+          total: "Total:",
+          tableHead: {
+            order: "Order",
+            customer: "Customer",
+            type: "Type",
+            status: "Status",
+            items: "Items",
+            total: "Total",
+            date: "Date",
+            actions: "Actions",
+          },
+          ready: "Ready!",
+          completedOk: "Order completed successfully",
+          noOrdersAvailable: "No orders available",
+          orderDetails: "Order details",
+          customerInformation: "Customer information",
+          name: "Name:",
+          phone: "Phone:",
+          email: "Email:",
+          table: "Table:",
+          pickupTime: "Pickup time:",
+          address: "Address:",
+          orderItems: "Order items",
+          orderSummary: "Order summary",
+          subtotal: "Subtotal:",
+          tax: "Tax:",
+          deliveryFee: "Delivery fee:",
+          specialInstructions: "Special instructions",
+          createNewOrder: "Create New Order",
+          enterCustomerDetails: "Enter customer details and order type",
+          customerNameReq: "Customer Name *",
+          phoneNumber: "Phone Number",
+          orderTypeReq: "Order Type *",
+          tableNumber: "Table Number",
+          deliveryAddress: "Delivery Address",
+          addItemsToOrder: "Add items to the order",
+          noItemsAdded: "No items added yet",
+          clickAddItem: 'Click "Add Item" to start building the order',
+          menuItem: "Menu Item",
+          quantity: "Quantity",
+          unitPrice: "Unit Price",
+          reviewConfirm: "Review and confirm the order",
+          orderType: "Order Type:",
+          na: "N/A",
+          orderInformation: "Order Information",
+          orderNumber: "Order Number:",
+          date: "Date:",
+          type: "Type:",
+          status: "Status:",
+          editOrder: "Edit Order",
+          view: "View",
+          edit: "Edit",
+          serve: "Serve",
+          complete: "Complete",
+          moreItems: "+{n} more items",
+          each: "each",
+          contactCustomer: "Contact Customer",
+          printReceipt: "Print Receipt",
+          clickPrintHelp: "Click the print button to print this receipt",
+          printingInstructions: "Printing Instructions:",
+          printStep1: '1. Click "Print Receipt" button or press Ctrl+P',
+          printStep2: "2. Select your USB printer",
+          printStep3: '3. Choose "80mm" paper size if available',
+          printStep4: "4. Print the receipt",
+          alertNetwork: "Network error. Please check your connection and try again.",
+          alertSession: "Session expired. Please log in again.",
+          alertAddItem: "Please add at least one item to the order",
+          pickupDelivery: "Pickup & Delivery",
+          readyForPickup: "Ready for Pickup",
+        }
+  const statusConfig = useMemo(() => buildStatusConfig(t), [t])
+  const orderTypeConfig = useMemo(() => buildOrderTypeConfig(t), [t])
   const [orders, setOrders] = useState<Order[]>([])
   const [menuItems, setMenuItems] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -356,9 +508,9 @@ export default function OrdersPage() {
       console.error('Error updating order status:', error)
       
       if (error.message?.includes('Failed to fetch') || error.message?.includes('NetworkError')) {
-        alert('Network error. Please check your connection and try again.')
+        alert(tx.alertNetwork)
       } else if (error.message?.includes('not authenticated')) {
-        alert('Session expired. Please log in again.')
+        alert(tx.alertSession)
       } else {
         alert(`Failed to update order status: ${error.message || 'Unknown error occurred'}`)
       }
@@ -508,7 +660,7 @@ export default function OrdersPage() {
 
   const createOrder = async () => {
     if (newOrder.items.length === 0) {
-      alert('Please add at least one item to the order')
+      alert(tx.alertAddItem)
       return
     }
 
@@ -696,18 +848,18 @@ export default function OrdersPage() {
               </head>
               <body>
                 <button class="print-button" onclick="window.print()">
-                  🖨️ Print Receipt
+                  🖨️ ${tx.printReceipt}
                 </button>
                 <div class="order-header">
                   <h2>Order #${order.order_number}</h2>
-                  <p>Click the print button to print this receipt</p>
+                  <p>${tx.clickPrintHelp}</p>
                 </div>
                 <div class="instructions">
-                  <strong>Printing Instructions:</strong><br>
-                  1. Click "Print Receipt" button or press Ctrl+P<br>
-                  2. Select your USB printer<br>
-                  3. Choose "80mm" paper size if available<br>
-                  4. Print the receipt
+                  <strong>${tx.printingInstructions}</strong><br>
+                  ${tx.printStep1}<br>
+                  ${tx.printStep2}<br>
+                  ${tx.printStep3}<br>
+                  ${tx.printStep4}
                 </div>
                 ${result.pdfUrl}
               </body>
@@ -731,7 +883,7 @@ export default function OrdersPage() {
   }
 
   if (loading) {
-    return <Loading text="Loading orders..." />
+    return <Loading text={t("orders.loading")} />
   }
 
   if (error) {
@@ -739,9 +891,9 @@ export default function OrdersPage() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Error loading orders</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">{t("orders.errorTitle")}</h2>
           <p className="text-gray-600 mb-4">{error}</p>
-          <Button onClick={() => fetchOrders()}>Try again</Button>
+          <Button onClick={() => fetchOrders()}>{t("orders.tryAgain")}</Button>
         </div>
       </div>
     )
@@ -757,12 +909,8 @@ export default function OrdersPage() {
               <ShoppingCart className="h-5 w-5 text-green-600" />
             </div>
             <div>
-              <h1 className="text-2xl font-semibold text-gray-900">
-                Orders
-              </h1>
-              <p className="text-gray-500 text-sm">
-                Track and manage all restaurant orders
-              </p>
+              <h1 className="text-2xl font-semibold text-gray-900">{t("orders.title")}</h1>
+              <p className="text-gray-500 text-sm">{t("orders.subtitle")}</p>
             </div>
           </div>
           <div className="flex items-center space-x-3">
@@ -774,25 +922,25 @@ export default function OrdersPage() {
                 <SelectItem value="kitchen">
                   <div className="flex items-center space-x-2">
                     <ChefHat className="h-4 w-4 text-orange-600" />
-                    <span>Kitchen</span>
+                    <span>{t("orders.viewKitchen")}</span>
                   </div>
                 </SelectItem>
                 <SelectItem value="server">
                   <div className="flex items-center space-x-2">
-                    <Users className="h-4 w-4 text-purple-600" />
-                    <span>Server</span>
+                    <Users className="h-4 w-4 text-foreground/70" />
+                    <span>{t("orders.viewServer")}</span>
                   </div>
                 </SelectItem>
                 <SelectItem value="manager">
                   <div className="flex items-center space-x-2">
                     <BarChart3 className="h-4 w-4 text-green-600" />
-                    <span>Manager</span>
+                    <span>{t("orders.viewManager")}</span>
                   </div>
                 </SelectItem>
                 <SelectItem value="client">
                   <div className="flex items-center space-x-2">
                     <User className="h-4 w-4 text-blue-600" />
-                    <span>Client View</span>
+                    <span>{t("orders.viewClient")}</span>
                   </div>
                 </SelectItem>
               </SelectContent>
@@ -831,7 +979,7 @@ export default function OrdersPage() {
               className="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-lg shadow-sm"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Create Order
+              {t("orders.createOrder")}
             </Button>
             <Button 
               onClick={async () => {
@@ -847,7 +995,7 @@ export default function OrdersPage() {
               className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg shadow-sm"
             >
               <Monitor className="h-4 w-4 mr-2" />
-              TV Display
+              {t("orders.tvDisplay")}
             </Button>
           </div>
         </div>
@@ -863,9 +1011,13 @@ export default function OrdersPage() {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
-                  placeholder={viewMode === 'kitchen' ? "Search by dish name..." : 
-                             viewMode === 'server' ? "Search by table, customer..." : 
-                             "Search by order number, customer, phone..."}
+                  placeholder={
+                    viewMode === "kitchen"
+                      ? t("orders.searchKitchen")
+                      : viewMode === "server"
+                        ? t("orders.searchServer")
+                        : t("orders.searchDefault")
+                  }
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 border border-gray-200 bg-white"
@@ -875,29 +1027,29 @@ export default function OrdersPage() {
             
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-full md:w-48 border border-gray-200">
-                <SelectValue placeholder="Filter by status" />
+                <SelectValue placeholder={t("orders.filterStatus")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All statuses</SelectItem>
-                <SelectItem value="pending">New</SelectItem>
-                <SelectItem value="confirmed">Confirmed</SelectItem>
-                <SelectItem value="preparing">Preparing</SelectItem>
-                <SelectItem value="ready">Ready</SelectItem>
-                <SelectItem value="served">Completed</SelectItem>
-                <SelectItem value="cancelled">Cancelled</SelectItem>
+                <SelectItem value="all">{t("orders.allStatuses")}</SelectItem>
+                <SelectItem value="pending">{t("orders.status.pending")}</SelectItem>
+                <SelectItem value="confirmed">{t("orders.status.confirmed")}</SelectItem>
+                <SelectItem value="preparing">{t("orders.status.preparing")}</SelectItem>
+                <SelectItem value="ready">{t("orders.status.ready")}</SelectItem>
+                <SelectItem value="served">{t("orders.status.served")}</SelectItem>
+                <SelectItem value="cancelled">{t("orders.status.cancelled")}</SelectItem>
               </SelectContent>
             </Select>
 
             <Select value={typeFilter} onValueChange={setTypeFilter}>
               <SelectTrigger className="w-full md:w-48 border border-gray-200">
-                <SelectValue placeholder="Filter by type" />
+                <SelectValue placeholder={t("orders.filterType")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All types</SelectItem>
-                <SelectItem value="pickup">Pickup</SelectItem>
-                <SelectItem value="delivery">Delivery</SelectItem>
-                <SelectItem value="table_service">Table</SelectItem>
-                <SelectItem value="dine-in">Table</SelectItem>
+                <SelectItem value="all">{t("orders.allTypes")}</SelectItem>
+                <SelectItem value="pickup">{t("orders.typePickup")}</SelectItem>
+                <SelectItem value="delivery">{t("orders.typeDelivery")}</SelectItem>
+                <SelectItem value="table_service">{t("orders.typeTable")}</SelectItem>
+                <SelectItem value="dine-in">{t("orders.typeDineIn")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -909,12 +1061,9 @@ export default function OrdersPage() {
         <Card className="bg-white border border-gray-200 shadow-sm">
           <CardContent className="p-12 text-center">
             <Package className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No orders found</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">{t("orders.emptyTitle")}</h3>
             <p className="text-gray-600 mb-4">
-              {orders.length === 0 
-                ? "Orders will appear here when customers place them"
-                : "No orders match your current filters"
-              }
+              {orders.length === 0 ? t("orders.emptyNoOrders") : t("orders.emptyFiltered")}
             </p>
             {orders.length > 0 && (
               <Button 
@@ -946,7 +1095,7 @@ export default function OrdersPage() {
                         <CardHeader className="pb-3">
                           <div className="flex items-center justify-between">
                             <div>
-                              <h4 className="font-bold text-lg">#{order.order_number}</h4>
+                              <h4 className="font-mono font-medium text-base tabular-nums tracking-tight">#{order.order_number}</h4>
                               <p className="text-sm text-gray-600">{formatDate(order.created_at)}</p>
                             </div>
                             <div className="text-right">
@@ -997,13 +1146,13 @@ export default function OrdersPage() {
                               ))}
                               {order.order_items.length > 3 && (
                                 <div className="text-center">
-                                  <span className="text-xs text-gray-500">+{order.order_items.length - 3} more items</span>
+                                  <span className="text-xs text-gray-500">{tx.moreItems.replace("{n}", String(order.order_items.length - 3))}</span>
                                 </div>
                               )}
                             </div>
                             <div className="border-t pt-3">
                               <div className="flex items-center justify-between">
-                                <span className="font-semibold">Total:</span>
+                                <span className="font-semibold">{tx.total}</span>
                                 <span className="font-semibold text-lg">
                                   <FormattedPrice amount={order.total_amount} restaurantId={restaurantId} />
                                 </span>
@@ -1018,7 +1167,7 @@ export default function OrdersPage() {
                               className="flex-1"
                             >
                               <Eye className="h-4 w-4 mr-1" />
-                              View
+                              {tx.view}
                             </Button>
                             <Button 
                               onClick={() => editOrder(order)}
@@ -1027,7 +1176,7 @@ export default function OrdersPage() {
                               className="flex-1"
                             >
                               <Edit className="h-4 w-4 mr-1" />
-                              Edit
+                              {tx.edit}
                             </Button>
                             {order.customer_email && (
                               <Button 
@@ -1068,14 +1217,14 @@ export default function OrdersPage() {
                       <table className="w-full">
                         <thead className="bg-gray-50 border-b border-gray-200">
                           <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{tx.tableHead.order}</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{tx.tableHead.customer}</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{tx.tableHead.type}</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{tx.tableHead.status}</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{tx.tableHead.items}</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{tx.tableHead.total}</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{tx.tableHead.date}</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{tx.tableHead.actions}</th>
                           </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
@@ -1085,7 +1234,7 @@ export default function OrdersPage() {
                             return (
                               <tr key={order.id} className="hover:bg-gray-50">
                                 <td className="px-6 py-4 whitespace-nowrap">
-                                  <div className="text-sm font-medium text-gray-900">#{order.order_number}</div>
+                                  <div className="text-sm font-mono font-medium text-gray-900 tabular-nums">#{order.order_number}</div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                   <div className="text-sm text-gray-900">{order.customer_name}</div>
@@ -1178,11 +1327,13 @@ export default function OrdersPage() {
                           <CardHeader className="pb-3">
                             <div className="flex items-center justify-between">
                               <div>
-                                <h4 className="font-bold text-lg">#{order.order_number}</h4>
+                                <h4 className="font-mono font-medium text-base tabular-nums tracking-tight">#{order.order_number}</h4>
                                 <p className="text-sm text-gray-600">{formatDate(order.created_at)}</p>
                               </div>
                               <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300">
-                                {order.order_type === 'table_service' || order.order_type === 'dine-in' ? `Table ${order.customer_table_number}` : (orderTypeConfig[order.order_type] || orderTypeConfig['pickup']).label}
+                                {order.order_type === 'table_service' || order.order_type === 'dine-in'
+                                  ? t("orders.tableNumber", { n: order.customer_table_number || "—" })
+                                  : (orderTypeConfig[order.order_type] || orderTypeConfig["pickup"]).label}
                               </Badge>
                             </div>
                           </CardHeader>
@@ -1248,11 +1399,13 @@ export default function OrdersPage() {
                           <CardHeader className="pb-3">
                             <div className="flex items-center justify-between">
                               <div>
-                                <h4 className="font-bold text-lg">#{order.order_number}</h4>
+                                <h4 className="font-mono font-medium text-base tabular-nums tracking-tight">#{order.order_number}</h4>
                                 <p className="text-sm text-gray-600">{formatDate(order.created_at)}</p>
                               </div>
                               <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-300">
-                                {order.order_type === 'table_service' || order.order_type === 'dine-in' ? `Table ${order.customer_table_number}` : (orderTypeConfig[order.order_type] || orderTypeConfig['pickup']).label}
+                                {order.order_type === 'table_service' || order.order_type === 'dine-in'
+                                  ? t("orders.tableNumber", { n: order.customer_table_number || "—" })
+                                  : (orderTypeConfig[order.order_type] || orderTypeConfig["pickup"]).label}
                               </Badge>
                             </div>
                           </CardHeader>
@@ -1306,11 +1459,13 @@ export default function OrdersPage() {
                           <CardHeader className="pb-3">
                             <div className="flex items-center justify-between">
                               <div>
-                                <h4 className="font-bold text-lg">#{order.order_number}</h4>
+                                <h4 className="font-mono font-medium text-base tabular-nums tracking-tight">#{order.order_number}</h4>
                                 <p className="text-sm text-gray-600">{formatDate(order.created_at)}</p>
                               </div>
                               <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
-                                {order.order_type === 'table_service' || order.order_type === 'dine-in' ? `Table ${order.customer_table_number}` : (orderTypeConfig[order.order_type] || orderTypeConfig['pickup']).label}
+                                {order.order_type === 'table_service' || order.order_type === 'dine-in'
+                                  ? t("orders.tableNumber", { n: order.customer_table_number || "—" })
+                                  : (orderTypeConfig[order.order_type] || orderTypeConfig["pickup"]).label}
                               </Badge>
                             </div>
                           </CardHeader>
@@ -1358,7 +1513,7 @@ export default function OrdersPage() {
               {filteredOrders.filter(o => ['table_service', 'dine-in'].includes(o.order_type)).length > 0 && (
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                    <Table className="h-5 w-5 text-purple-500 mr-2" />
+                    <Table className="mr-2 h-5 w-5 text-foreground/70" />
                     Table Orders
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1367,7 +1522,7 @@ export default function OrdersPage() {
                       .map((order) => {
                         const statusInfo = statusConfig[order.status]
                         return (
-                          <Card key={order.id} className="border-2 border-purple-200 bg-purple-50 hover:shadow-lg transition-all duration-200">
+                          <Card key={order.id} className="border border-border bg-card transition-shadow hover:shadow-md">
                             <CardHeader className="pb-3">
                               <div className="flex items-center justify-between">
                                 <div>
@@ -1384,7 +1539,7 @@ export default function OrdersPage() {
                                 {order.order_items.slice(0, 3).map((item) => (
                                   <div key={item.id} className="flex items-center justify-between p-2 bg-white rounded border">
                                     <div className="flex items-center space-x-3">
-                                      <span className="font-bold text-lg text-purple-600">{item.quantity}x</span>
+                                      <span className="text-lg font-semibold tabular-nums text-foreground">{item.quantity}×</span>
                                       <div>
                                         <p className="font-medium">{item.menu_items?.name || `Item ${item.menu_item_id}`}</p>
                                         {item.special_instructions && (
@@ -1398,7 +1553,7 @@ export default function OrdersPage() {
                                 ))}
                                 {order.order_items.length > 3 && (
                                   <div className="text-center">
-                                    <span className="text-xs text-gray-500">+{order.order_items.length - 3} more items</span>
+                                    <span className="text-xs text-gray-500">{tx.moreItems.replace("{n}", String(order.order_items.length - 3))}</span>
                                   </div>
                                 )}
                               </div>
@@ -1410,7 +1565,7 @@ export default function OrdersPage() {
                                     className="flex-1 bg-green-600 hover:bg-green-700 text-white"
                                   >
                                     <Check className="h-4 w-4 mr-1" />
-                                    Serve
+                                    {tx.serve}
                                   </Button>
                                 )}
                                 <Button 
@@ -1420,7 +1575,7 @@ export default function OrdersPage() {
                                   className="flex-1"
                                 >
                                   <Eye className="h-4 w-4 mr-1" />
-                                  View
+                                  {tx.view}
                                 </Button>
                               </div>
                             </CardContent>
@@ -1439,7 +1594,7 @@ export default function OrdersPage() {
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                     <Package className="h-5 w-5 text-blue-500 mr-2" />
-                    Pickup & Delivery
+                    {tx.pickupDelivery}
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {filteredOrders
@@ -1452,7 +1607,7 @@ export default function OrdersPage() {
                             <CardHeader>
                               <div className="flex items-center justify-between">
                                 <div>
-                                  <h4 className="font-bold text-lg">#{order.order_number}</h4>
+                                  <h4 className="font-mono font-medium text-base tabular-nums tracking-tight">#{order.order_number}</h4>
                                   <p className="text-sm text-gray-600">{order.customer_name}</p>
                                 </div>
                                 <div className="text-right">
@@ -1481,7 +1636,7 @@ export default function OrdersPage() {
                                 ))}
                                 {order.order_items.length > 3 && (
                                   <div className="text-center">
-                                    <span className="text-xs text-gray-500">+{order.order_items.length - 3} more items</span>
+                                    <span className="text-xs text-gray-500">{tx.moreItems.replace("{n}", String(order.order_items.length - 3))}</span>
                                   </div>
                                 )}
                               </div>
@@ -1493,7 +1648,7 @@ export default function OrdersPage() {
                                     className="flex-1 bg-green-600 hover:bg-green-700 text-white"
                                   >
                                     <Check className="h-4 w-4 mr-1" />
-                                    Complete
+                                    {tx.complete}
                                   </Button>
                                 )}
                                 <Button 
@@ -1503,7 +1658,7 @@ export default function OrdersPage() {
                                   className="flex-1"
                                 >
                                   <Eye className="h-4 w-4 mr-1" />
-                                  View
+                                  {tx.view}
                                 </Button>
                               </div>
                             </CardContent>
@@ -1535,7 +1690,7 @@ export default function OrdersPage() {
                     {filteredOrders
                       .filter(o => ['pending', 'confirmed', 'preparing'].includes(o.status))
                       .map((order) => (
-                        <Card key={order.id} className="bg-gradient-to-br from-orange-50 to-amber-50 border-2 border-orange-200 hover:shadow-lg transition-all duration-300">
+                        <Card key={order.id} className="bg-card border border-border hover:shadow-lg transition-all duration-300">
                           <CardHeader className="pb-4">
                             <div className="flex items-center justify-between">
                               <div>
@@ -1582,13 +1737,13 @@ export default function OrdersPage() {
                               ))}
                               {order.order_items.length > 4 && (
                                 <div className="text-center py-2">
-                                  <span className="text-sm text-gray-500">+{order.order_items.length - 4} more items</span>
+                                  <span className="text-sm text-gray-500">{tx.moreItems.replace("{n}", String(order.order_items.length - 4))}</span>
                                 </div>
                               )}
                             </div>
                             <div className="border-t border-orange-200 pt-4">
                               <div className="flex items-center justify-between mb-3">
-                                <span className="text-sm text-gray-600">Total:</span>
+                                <span className="text-sm text-gray-600">{tx.total}</span>
                                 <span className="text-xl font-bold text-gray-900">
                                   <FormattedPrice amount={order.total_amount} restaurantId={restaurantId} />
                                 </span>
@@ -1622,7 +1777,7 @@ export default function OrdersPage() {
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="text-2xl font-bold text-gray-900 flex items-center">
                       <Zap className="h-6 w-6 text-green-500 mr-3" />
-                      Ready for Pickup
+                      {tx.readyForPickup}
                     </h3>
                     <Badge className="bg-green-100 text-green-800 border-green-300">
                       {filteredOrders.filter(o => o.status === 'ready').length} orders
@@ -1632,7 +1787,7 @@ export default function OrdersPage() {
                     {filteredOrders
                       .filter(o => o.status === 'ready')
                       .map((order) => (
-                        <Card key={order.id} className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 hover:shadow-lg transition-all duration-300">
+                        <Card key={order.id} className="bg-card border border-border hover:shadow-lg transition-all duration-300">
                           <CardHeader className="pb-4">
                             <div className="flex items-center justify-between">
                               <div>
@@ -1678,13 +1833,13 @@ export default function OrdersPage() {
                               ))}
                               {order.order_items.length > 4 && (
                                 <div className="text-center py-2">
-                                  <span className="text-sm text-gray-500">+{order.order_items.length - 4} more items</span>
+                                  <span className="text-sm text-gray-500">{tx.moreItems.replace("{n}", String(order.order_items.length - 4))}</span>
                                 </div>
                               )}
                             </div>
                             <div className="border-t border-green-200 pt-4">
                               <div className="flex items-center justify-between mb-3">
-                                <span className="text-sm text-gray-600">Total:</span>
+                                <span className="text-sm text-gray-600">{tx.total}</span>
                                 <span className="text-xl font-bold text-gray-900">
                                   <FormattedPrice amount={order.total_amount} restaurantId={restaurantId} />
                                 </span>
@@ -1693,7 +1848,7 @@ export default function OrdersPage() {
                                 <div className="flex-1 bg-green-100 rounded-full h-2">
                                   <div className="h-2 rounded-full bg-green-500 w-full"></div>
                                 </div>
-                                <span className="text-xs text-green-600 font-medium">Ready!</span>
+                                <span className="text-xs text-green-600 font-medium">{tx.ready}</span>
                               </div>
                             </div>
                           </CardContent>
@@ -1720,7 +1875,7 @@ export default function OrdersPage() {
                       .filter(o => o.status === 'served')
                       .slice(0, 6) // Show only last 6 completed orders
                       .map((order) => (
-                        <Card key={order.id} className="bg-gradient-to-br from-gray-50 to-slate-50 border-2 border-gray-200 hover:shadow-md transition-all duration-300">
+                        <Card key={order.id} className="bg-card border border-border hover:shadow-md transition-all duration-300">
                           <CardHeader className="pb-4">
                             <div className="flex items-center justify-between">
                               <div>
@@ -1749,7 +1904,7 @@ export default function OrdersPage() {
                               </div>
                               <div className="flex items-center space-x-2">
                                 <CheckCircle className="h-4 w-4 text-green-500" />
-                                <span className="text-sm text-green-600 font-medium">Order completed successfully</span>
+                                <span className="text-sm text-green-600 font-medium">{tx.completedOk}</span>
                               </div>
                             </div>
                           </CardContent>
@@ -1764,7 +1919,7 @@ export default function OrdersPage() {
                 <Card className="bg-white border border-gray-200 shadow-sm">
                   <CardContent className="p-12 text-center">
                     <Package className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No orders available</h3>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">{tx.noOrdersAvailable}</h3>
                     <p className="text-gray-600">
                       Orders will appear here when customers place them
                     </p>
@@ -1778,11 +1933,11 @@ export default function OrdersPage() {
 
       {/* Order Details Modal */}
       {selectedOrder && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-40">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-zinc-950/60 p-4 backdrop-blur-[2px]">
+          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border border-border bg-card shadow-[0_28px_70px_-30px_rgba(0,0,0,0.6)]">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-gray-900">Order details</h2>
+                <h2 className="text-xl font-bold text-gray-900">{tx.orderDetails}</h2>
                 <Button 
                   onClick={() => setSelectedOrder(null)}
                   variant="ghost"
@@ -1812,26 +1967,26 @@ export default function OrdersPage() {
 
               {/* Customer Information */}
               <div className="mb-6">
-                <h4 className="font-semibold text-gray-900 mb-3">Customer information</h4>
+                <h4 className="font-semibold text-gray-900 mb-3">{tx.customerInformation}</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <p><span className="font-medium">Name:</span> {selectedOrder.customer_name}</p>
+                    <p><span className="font-medium">{tx.name}</span> {selectedOrder.customer_name}</p>
                     {selectedOrder.customer_phone && (
-                      <p><span className="font-medium">Phone:</span> {selectedOrder.customer_phone}</p>
+                      <p><span className="font-medium">{tx.phone}</span> {selectedOrder.customer_phone}</p>
                     )}
                     {selectedOrder.customer_email && (
-                      <p><span className="font-medium">Email:</span> {selectedOrder.customer_email}</p>
+                      <p><span className="font-medium">{tx.email}</span> {selectedOrder.customer_email}</p>
                     )}
                   </div>
                   <div className="space-y-2">
                     {selectedOrder.customer_table_number && (
-                      <p><span className="font-medium">Table:</span> {selectedOrder.customer_table_number}</p>
+                      <p><span className="font-medium">{tx.table}</span> {selectedOrder.customer_table_number}</p>
                     )}
                     {selectedOrder.customer_pickup_time && (
-                      <p><span className="font-medium">Pickup time:</span> {formatTime(selectedOrder.customer_pickup_time)}</p>
+                      <p><span className="font-medium">{tx.pickupTime}</span> {formatTime(selectedOrder.customer_pickup_time)}</p>
                     )}
                     {selectedOrder.customer_address && (
-                      <p><span className="font-medium">Address:</span> {selectedOrder.customer_address}</p>
+                      <p><span className="font-medium">{tx.address}</span> {selectedOrder.customer_address}</p>
                     )}
                   </div>
                 </div>
@@ -1839,7 +1994,7 @@ export default function OrdersPage() {
 
               {/* Order Items */}
               <div className="mb-6">
-                <h4 className="font-semibold text-gray-900 mb-3">Order items</h4>
+                <h4 className="font-semibold text-gray-900 mb-3">{tx.orderItems}</h4>
                 <div className="space-y-3">
                   {selectedOrder.order_items.map((item) => (
                     <div key={item.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -1863,25 +2018,25 @@ export default function OrdersPage() {
 
               {/* Order Summary */}
               <div className="mb-6">
-                <h4 className="font-semibold text-gray-900 mb-3">Order summary</h4>
+                <h4 className="font-semibold text-gray-900 mb-3">{tx.orderSummary}</h4>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span>Subtotal:</span>
+                    <span>{tx.subtotal}</span>
                     <span><FormattedPrice amount={selectedOrder.subtotal} restaurantId={restaurantId} /></span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Tax:</span>
+                    <span>{tx.tax}</span>
                     <span><FormattedPrice amount={selectedOrder.tax_amount} restaurantId={restaurantId} /></span>
                   </div>
                   {selectedOrder.delivery_fee > 0 && (
                     <div className="flex justify-between">
-                      <span>Delivery fee:</span>
+                      <span>{tx.deliveryFee}</span>
                       <span><FormattedPrice amount={selectedOrder.delivery_fee} restaurantId={restaurantId} /></span>
                     </div>
                   )}
                   <Separator />
                   <div className="flex justify-between font-semibold text-lg">
-                    <span>Total:</span>
+                    <span>{tx.total}</span>
                     <span><FormattedPrice amount={selectedOrder.total_amount} restaurantId={restaurantId} /></span>
                   </div>
                 </div>
@@ -1890,7 +2045,7 @@ export default function OrdersPage() {
               {/* Special Instructions */}
               {selectedOrder.customer_special_instructions && (
                 <div className="mb-6 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-                  <h4 className="font-semibold text-yellow-800 mb-2">Special instructions</h4>
+                  <h4 className="font-semibold text-yellow-800 mb-2">{tx.specialInstructions}</h4>
                   <p className="text-yellow-700">{selectedOrder.customer_special_instructions}</p>
                 </div>
               )}
@@ -1978,13 +2133,13 @@ export default function OrdersPage() {
 
       {/* Create Order Modal */}
       {showCreateOrder && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-start justify-center pt-20 pb-8">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[85vh] overflow-y-auto shadow-2xl transform transition-transform duration-300 ease-in-out">
+        <div className="fixed inset-0 z-40 flex items-start justify-center bg-zinc-950/60 pt-20 pb-8 backdrop-blur-[2px]">
+          <div className="w-full max-w-4xl max-h-[85vh] overflow-y-auto rounded-2xl border border-border bg-card shadow-[0_28px_70px_-30px_rgba(0,0,0,0.6)] transform transition-transform duration-300 ease-in-out">
             <div className="flex flex-col h-full">
               {/* Header */}
               <div className="flex items-center justify-between p-6 border-b border-gray-200">
                 <div className="flex items-center space-x-4">
-                  <h2 className="text-xl font-bold text-gray-900">Create New Order</h2>
+                  <h2 className="text-xl font-bold text-gray-900">{tx.createNewOrder}</h2>
                   {/* Step Indicator */}
                   <div className="flex items-center space-x-2">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
@@ -2027,13 +2182,13 @@ export default function OrdersPage() {
                   {currentStep === 1 && (
                     <Card className="bg-white border border-gray-200 shadow-sm">
                       <CardHeader>
-                        <CardTitle className="text-lg">Customer Information</CardTitle>
-                        <p className="text-sm text-gray-600">Enter customer details and order type</p>
+                        <CardTitle className="text-lg">{tx.customerInformation}</CardTitle>
+                        <p className="text-sm text-gray-600">{tx.enterCustomerDetails}</p>
                       </CardHeader>
                       <CardContent className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <label className="text-sm font-medium text-gray-700">Customer Name *</label>
+                            <label className="text-sm font-medium text-gray-700">{tx.customerNameReq}</label>
                             <Input
                               value={newOrder.customer_name}
                               onChange={(e) => setNewOrder(prev => ({ ...prev, customer_name: e.target.value }))}
@@ -2042,7 +2197,7 @@ export default function OrdersPage() {
                             />
                           </div>
                           <div>
-                            <label className="text-sm font-medium text-gray-700">Phone Number</label>
+                            <label className="text-sm font-medium text-gray-700">{tx.phoneNumber}</label>
                             <Input
                               value={newOrder.customer_phone}
                               onChange={(e) => setNewOrder(prev => ({ ...prev, customer_phone: e.target.value }))}
@@ -2051,7 +2206,7 @@ export default function OrdersPage() {
                             />
                           </div>
                           <div>
-                            <label className="text-sm font-medium text-gray-700">Email</label>
+                            <label className="text-sm font-medium text-gray-700">{tx.email}</label>
                             <Input
                               value={newOrder.customer_email}
                               onChange={(e) => setNewOrder(prev => ({ ...prev, customer_email: e.target.value }))}
@@ -2060,7 +2215,7 @@ export default function OrdersPage() {
                             />
                           </div>
                           <div>
-                            <label className="text-sm font-medium text-gray-700">Order Type *</label>
+                            <label className="text-sm font-medium text-gray-700">{tx.orderTypeReq}</label>
                             <Select 
                               value={newOrder.order_type} 
                               onValueChange={(value: any) => setNewOrder(prev => ({ ...prev, order_type: value }))}
@@ -2069,16 +2224,16 @@ export default function OrdersPage() {
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="pickup">Pickup</SelectItem>
-                                <SelectItem value="delivery">Delivery</SelectItem>
-                                <SelectItem value="table_service">Table Service</SelectItem>
-                                <SelectItem value="dine-in">Dine-in</SelectItem>
+                                <SelectItem value="pickup">{t("orders.typePickup")}</SelectItem>
+                                <SelectItem value="delivery">{t("orders.typeDelivery")}</SelectItem>
+                                <SelectItem value="table_service">{t("orders.typeTable")}</SelectItem>
+                                <SelectItem value="dine-in">{t("orders.typeDineIn")}</SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
                           {newOrder.order_type === 'table_service' || newOrder.order_type === 'dine-in' ? (
                             <div>
-                              <label className="text-sm font-medium text-gray-700">Table Number</label>
+                              <label className="text-sm font-medium text-gray-700">{tx.tableNumber}</label>
                               <Input
                                 value={newOrder.customer_table_number}
                                 onChange={(e) => setNewOrder(prev => ({ ...prev, customer_table_number: e.target.value }))}
@@ -2088,7 +2243,7 @@ export default function OrdersPage() {
                             </div>
                           ) : newOrder.order_type === 'pickup' ? (
                             <div>
-                              <label className="text-sm font-medium text-gray-700">Pickup Time</label>
+                              <label className="text-sm font-medium text-gray-700">{tx.pickupTime}</label>
                               <Input
                                 type="time"
                                 value={newOrder.customer_pickup_time}
@@ -2098,7 +2253,7 @@ export default function OrdersPage() {
                             </div>
                           ) : newOrder.order_type === 'delivery' ? (
                             <div>
-                              <label className="text-sm font-medium text-gray-700">Delivery Address</label>
+                              <label className="text-sm font-medium text-gray-700">{tx.deliveryAddress}</label>
                               <Input
                                 value={newOrder.customer_address}
                                 onChange={(e) => setNewOrder(prev => ({ ...prev, customer_address: e.target.value }))}
@@ -2109,7 +2264,7 @@ export default function OrdersPage() {
                           ) : null}
                         </div>
                         <div>
-                          <label className="text-sm font-medium text-gray-700">Special Instructions</label>
+                          <label className="text-sm font-medium text-gray-700">{tx.specialInstructions}</label>
                           <Input
                             value={newOrder.customer_special_instructions}
                             onChange={(e) => setNewOrder(prev => ({ ...prev, customer_special_instructions: e.target.value }))}
@@ -2127,8 +2282,8 @@ export default function OrdersPage() {
                       <CardHeader>
                         <div className="flex items-center justify-between">
                           <div>
-                            <CardTitle className="text-lg">Order Items</CardTitle>
-                            <p className="text-sm text-gray-600">Add items to the order</p>
+                            <CardTitle className="text-lg">{tx.orderItems}</CardTitle>
+                            <p className="text-sm text-gray-600">{tx.addItemsToOrder}</p>
                           </div>
                           <Button
                             onClick={addItemToOrder}
@@ -2144,8 +2299,8 @@ export default function OrdersPage() {
                         {newOrder.items.length === 0 ? (
                           <div className="text-center py-8 text-gray-500">
                             <Package className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                            <p>No items added yet</p>
-                            <p className="text-sm">Click "Add Item" to start building the order</p>
+                            <p>{tx.noItemsAdded}</p>
+                            <p className="text-sm">{tx.clickAddItem}</p>
                           </div>
                         ) : (
                           <div className="space-y-4">
@@ -2164,7 +2319,7 @@ export default function OrdersPage() {
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                   <div>
-                                    <label className="text-sm font-medium text-gray-700">Menu Item</label>
+                                    <label className="text-sm font-medium text-gray-700">{tx.menuItem}</label>
                                     <Select 
                                       value={item.menu_item_id} 
                                       onValueChange={(value) => updateOrderItem(index, 'menu_item_id', value)}
@@ -2182,7 +2337,7 @@ export default function OrdersPage() {
                                     </Select>
                                   </div>
                                   <div>
-                                    <label className="text-sm font-medium text-gray-700">Quantity</label>
+                                    <label className="text-sm font-medium text-gray-700">{tx.quantity}</label>
                                     <Input
                                       type="number"
                                       min="1"
@@ -2192,7 +2347,7 @@ export default function OrdersPage() {
                                     />
                                   </div>
                                   <div>
-                                    <label className="text-sm font-medium text-gray-700">Unit Price</label>
+                                    <label className="text-sm font-medium text-gray-700">{tx.unitPrice}</label>
                                     <Input
                                       type="number"
                                       step="0.01"
@@ -2204,7 +2359,7 @@ export default function OrdersPage() {
                                   </div>
                                 </div>
                                 <div className="mt-3">
-                                  <label className="text-sm font-medium text-gray-700">Special Instructions</label>
+                                  <label className="text-sm font-medium text-gray-700">{tx.specialInstructions}</label>
                                   <Input
                                     value={item.special_instructions}
                                     onChange={(e) => updateOrderItem(index, 'special_instructions', e.target.value)}
@@ -2230,34 +2385,34 @@ export default function OrdersPage() {
                     <div className="space-y-6">
                       <Card className="bg-white border border-gray-200 shadow-sm">
                         <CardHeader>
-                          <CardTitle className="text-lg">Order Summary</CardTitle>
-                          <p className="text-sm text-gray-600">Review and confirm the order</p>
+                          <CardTitle className="text-lg">{tx.orderSummary}</CardTitle>
+                          <p className="text-sm text-gray-600">{tx.reviewConfirm}</p>
                         </CardHeader>
                         <CardContent>
                           <div className="space-y-4">
                             {/* Customer Info Summary */}
                             <div className="border-b border-gray-200 pb-4">
-                              <h4 className="font-medium text-gray-900 mb-2">Customer Information</h4>
+                              <h4 className="font-medium text-gray-900 mb-2">{tx.customerInformation}</h4>
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-                                <div><span className="font-medium">Name:</span> {newOrder.customer_name}</div>
-                                <div><span className="font-medium">Phone:</span> {newOrder.customer_phone || 'N/A'}</div>
-                                <div><span className="font-medium">Email:</span> {newOrder.customer_email || 'N/A'}</div>
-                                <div><span className="font-medium">Order Type:</span> {newOrder.order_type}</div>
+                                <div><span className="font-medium">{tx.name}</span> {newOrder.customer_name}</div>
+                                <div><span className="font-medium">{tx.phone}</span> {newOrder.customer_phone || tx.na}</div>
+                                <div><span className="font-medium">{tx.email}</span> {newOrder.customer_email || tx.na}</div>
+                                <div><span className="font-medium">{tx.orderType}</span> {newOrder.order_type}</div>
                                 {newOrder.customer_table_number && (
-                                  <div><span className="font-medium">Table:</span> {newOrder.customer_table_number}</div>
+                                  <div><span className="font-medium">{tx.table}</span> {newOrder.customer_table_number}</div>
                                 )}
                                 {newOrder.customer_pickup_time && (
-                                  <div><span className="font-medium">Pickup Time:</span> {newOrder.customer_pickup_time}</div>
+                                  <div><span className="font-medium">{tx.pickupTime}</span> {newOrder.customer_pickup_time}</div>
                                 )}
                                 {newOrder.customer_address && (
-                                  <div><span className="font-medium">Address:</span> {newOrder.customer_address}</div>
+                                  <div><span className="font-medium">{tx.address}</span> {newOrder.customer_address}</div>
                                 )}
                               </div>
                             </div>
 
                             {/* Items Summary */}
                             <div>
-                              <h4 className="font-medium text-gray-900 mb-2">Order Items</h4>
+                              <h4 className="font-medium text-gray-900 mb-2">{tx.orderItems}</h4>
                               <div className="space-y-2">
                                 {newOrder.items.map((item, index) => (
                                   <div key={index} className="flex justify-between items-center py-2 border-b border-gray-100">
@@ -2279,22 +2434,22 @@ export default function OrdersPage() {
                             <div className="border-t border-gray-200 pt-4">
                               <div className="space-y-2">
                                 <div className="flex justify-between">
-                                  <span>Subtotal:</span>
+                                  <span>{tx.subtotal}</span>
                                   <span>${newOrder.items.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0).toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between">
-                                  <span>Tax (8%):</span>
+                                  <span>{tx.tax} (8%):</span>
                                   <span>${(newOrder.items.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0) * 0.08).toFixed(2)}</span>
                                 </div>
                                 {newOrder.order_type === 'delivery' && (
                                   <div className="flex justify-between">
-                                    <span>Delivery Fee:</span>
+                                    <span>{tx.deliveryFee}</span>
                                     <span>$5.00</span>
                                   </div>
                                 )}
                                 <Separator />
                                 <div className="flex justify-between font-semibold text-lg">
-                                  <span>Total:</span>
+                                  <span>{tx.total}</span>
                                   <span>${(newOrder.items.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0) * 1.08 + (newOrder.order_type === 'delivery' ? 5 : 0)).toFixed(2)}</span>
                                 </div>
                               </div>
@@ -2367,11 +2522,11 @@ export default function OrdersPage() {
 
       {/* Order Detail Modal */}
       {showOrderDetail && selectedOrder && !editingOrder && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 p-4 backdrop-blur-[2px]">
+          <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl border border-border bg-card shadow-[0_28px_70px_-30px_rgba(0,0,0,0.6)]">
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <div className="flex items-center space-x-4">
-                <h2 className="text-xl font-bold text-gray-900">Order Details</h2>
+                <h2 className="text-xl font-bold text-gray-900">{tx.orderDetails}</h2>
                 <Badge variant="outline" className={statusConfig[selectedOrder.status].color}>
                   {statusConfig[selectedOrder.status].label}
                 </Badge>
@@ -2394,22 +2549,22 @@ export default function OrdersPage() {
               {/* Order Information */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Information</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">{tx.orderInformation}</h3>
                   <div className="space-y-3">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Order Number:</span>
+                      <span className="text-gray-600">{tx.orderNumber}</span>
                       <span className="font-medium">#{selectedOrder.order_number}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Date:</span>
+                      <span className="text-gray-600">{tx.date}</span>
                       <span className="font-medium">{formatDate(selectedOrder.created_at)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Type:</span>
+                      <span className="text-gray-600">{tx.type}</span>
                       <span className="font-medium">{(orderTypeConfig[selectedOrder.order_type] || orderTypeConfig['pickup']).label}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Status:</span>
+                      <span className="text-gray-600">{tx.status}</span>
                       <Badge variant="outline" className={statusConfig[selectedOrder.status].color}>
                         {statusConfig[selectedOrder.status].label}
                       </Badge>
@@ -2418,33 +2573,33 @@ export default function OrdersPage() {
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Customer Information</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">{tx.customerInformation}</h3>
                   <div className="space-y-3">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Name:</span>
+                      <span className="text-gray-600">{tx.name}</span>
                       <span className="font-medium">{selectedOrder.customer_name}</span>
                     </div>
                     {selectedOrder.customer_phone && (
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Phone:</span>
+                        <span className="text-gray-600">{tx.phone}</span>
                         <span className="font-medium">{selectedOrder.customer_phone}</span>
                       </div>
                     )}
                     {selectedOrder.customer_email && (
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Email:</span>
+                        <span className="text-gray-600">{tx.email}</span>
                         <span className="font-medium">{selectedOrder.customer_email}</span>
                       </div>
                     )}
                     {selectedOrder.customer_table_number && (
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Table:</span>
+                        <span className="text-gray-600">{tx.table}</span>
                         <span className="font-medium">{selectedOrder.customer_table_number}</span>
                       </div>
                     )}
                     {selectedOrder.customer_address && (
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Address:</span>
+                        <span className="text-gray-600">{tx.address}</span>
                         <span className="font-medium">{selectedOrder.customer_address}</span>
                       </div>
                     )}
@@ -2454,7 +2609,7 @@ export default function OrdersPage() {
 
               {/* Order Items */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Items</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">{tx.orderItems}</h3>
                 <div className="space-y-3">
                   {selectedOrder.order_items.map((item) => (
                     <div key={item.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
@@ -2468,8 +2623,8 @@ export default function OrdersPage() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-medium">${item.total_price.toFixed(2)}</p>
-                        <p className="text-sm text-gray-500">${item.unit_price.toFixed(2)} each</p>
+                        <p className="font-medium"><FormattedPrice amount={item.total_price} restaurantId={restaurantId} /></p>
+                        <p className="text-sm text-gray-500"><FormattedPrice amount={item.unit_price} restaurantId={restaurantId} /> {tx.each}</p>
                       </div>
                     </div>
                   ))}
@@ -2479,7 +2634,7 @@ export default function OrdersPage() {
               {/* Special Instructions */}
               {selectedOrder.customer_special_instructions && (
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Special Instructions</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">{tx.specialInstructions}</h3>
                   <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
                     <p className="text-gray-700">{selectedOrder.customer_special_instructions}</p>
                   </div>
@@ -2488,25 +2643,25 @@ export default function OrdersPage() {
 
               {/* Order Summary */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">{tx.orderSummary}</h3>
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span>Subtotal:</span>
+                    <span>{tx.subtotal}</span>
                     <span><FormattedPrice amount={selectedOrder.subtotal} restaurantId={restaurantId} /></span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Tax:</span>
+                    <span>{tx.tax}</span>
                     <span><FormattedPrice amount={selectedOrder.tax_amount} restaurantId={restaurantId} /></span>
                   </div>
                   {selectedOrder.delivery_fee > 0 && (
                     <div className="flex justify-between">
-                      <span>Delivery Fee:</span>
+                      <span>{tx.deliveryFee}</span>
                       <span><FormattedPrice amount={selectedOrder.delivery_fee} restaurantId={restaurantId} /></span>
                     </div>
                   )}
                   <Separator />
                   <div className="flex justify-between font-semibold text-lg">
-                    <span>Total:</span>
+                    <span>{tx.total}</span>
                     <span><FormattedPrice amount={selectedOrder.total_amount} restaurantId={restaurantId} /></span>
                   </div>
                 </div>
@@ -2589,7 +2744,7 @@ export default function OrdersPage() {
 
                 <Button variant="outline" className="border-gray-300 hover:bg-gray-50 transition-all duration-200">
                   <MessageSquare className="h-4 w-4 mr-2" />
-                  Contact Customer
+                  {tx.contactCustomer}
                 </Button>
               </div>
             </div>
@@ -2599,11 +2754,11 @@ export default function OrdersPage() {
 
       {/* Order Edit Modal */}
       {showOrderDetail && editingOrder && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 p-4 backdrop-blur-[2px]">
+          <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl border border-border bg-card shadow-[0_28px_70px_-30px_rgba(0,0,0,0.6)]">
             <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <h2 className="text-xl font-bold text-gray-900">Edit Order</h2>
+                <h2 className="text-xl font-bold text-gray-900">{tx.editOrder}</h2>
                 <Badge variant="outline" className={statusConfig[editingOrder.status].color}>
                   {statusConfig[editingOrder.status].label}
                 </Badge>
@@ -2626,22 +2781,22 @@ export default function OrdersPage() {
               {/* Order Information */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Information</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">{tx.orderInformation}</h3>
                   <div className="space-y-3">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Order Number:</span>
+                      <span className="text-gray-600">{tx.orderNumber}</span>
                       <span className="font-medium">#{editingOrder.order_number}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Date:</span>
+                      <span className="text-gray-600">{tx.date}</span>
                       <span className="font-medium">{formatDate(editingOrder.created_at)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Type:</span>
+                      <span className="text-gray-600">{tx.type}</span>
                       <span className="font-medium">{(orderTypeConfig[editingOrder.order_type] || orderTypeConfig['pickup']).label}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Status:</span>
+                      <span className="text-gray-600">{tx.status}</span>
                       <Badge variant="outline" className={statusConfig[editingOrder.status].color}>
                         {statusConfig[editingOrder.status].label}
                       </Badge>
@@ -2650,33 +2805,33 @@ export default function OrdersPage() {
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Customer Information</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">{tx.customerInformation}</h3>
                   <div className="space-y-3">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Name:</span>
+                      <span className="text-gray-600">{tx.name}</span>
                       <span className="font-medium">{editingOrder.customer_name}</span>
                     </div>
                     {editingOrder.customer_phone && (
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Phone:</span>
+                        <span className="text-gray-600">{tx.phone}</span>
                         <span className="font-medium">{editingOrder.customer_phone}</span>
                       </div>
                     )}
                     {editingOrder.customer_email && (
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Email:</span>
+                        <span className="text-gray-600">{tx.email}</span>
                         <span className="font-medium">{editingOrder.customer_email}</span>
                       </div>
                     )}
                     {editingOrder.customer_table_number && (
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Table:</span>
+                        <span className="text-gray-600">{tx.table}</span>
                         <span className="font-medium">{editingOrder.customer_table_number}</span>
                       </div>
                     )}
                     {editingOrder.customer_address && (
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Address:</span>
+                        <span className="text-gray-600">{tx.address}</span>
                         <span className="font-medium">{editingOrder.customer_address}</span>
                       </div>
                     )}
@@ -2686,7 +2841,7 @@ export default function OrdersPage() {
 
               {/* Order Items */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Items</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">{tx.orderItems}</h3>
                 <div className="space-y-3">
                   {editingOrder.order_items.map((item) => (
                     <div key={item.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
@@ -2700,8 +2855,8 @@ export default function OrdersPage() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-medium">${item.total_price.toFixed(2)}</p>
-                        <p className="text-sm text-gray-500">${item.unit_price.toFixed(2)} each</p>
+                        <p className="font-medium"><FormattedPrice amount={item.total_price} restaurantId={restaurantId} /></p>
+                        <p className="text-sm text-gray-500"><FormattedPrice amount={item.unit_price} restaurantId={restaurantId} /> {tx.each}</p>
                       </div>
                     </div>
                   ))}
@@ -2711,7 +2866,7 @@ export default function OrdersPage() {
               {/* Special Instructions */}
               {editingOrder.customer_special_instructions && (
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Special Instructions</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">{tx.specialInstructions}</h3>
                   <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
                     <p className="text-gray-700">{editingOrder.customer_special_instructions}</p>
                   </div>
@@ -2720,25 +2875,25 @@ export default function OrdersPage() {
 
               {/* Order Summary */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">{tx.orderSummary}</h3>
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span>Subtotal:</span>
+                    <span>{tx.subtotal}</span>
                     <span>${editingOrder.subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Tax:</span>
+                    <span>{tx.tax}</span>
                     <span>${editingOrder.tax_amount.toFixed(2)}</span>
                   </div>
                   {editingOrder.delivery_fee > 0 && (
                     <div className="flex justify-between">
-                      <span>Delivery Fee:</span>
+                      <span>{tx.deliveryFee}</span>
                       <span>${editingOrder.delivery_fee.toFixed(2)}</span>
                     </div>
                   )}
                   <Separator />
                   <div className="flex justify-between font-semibold text-lg">
-                    <span>Total:</span>
+                    <span>{tx.total}</span>
                     <span><FormattedPrice amount={editingOrder.total_amount} restaurantId={restaurantId} /></span>
                   </div>
                 </div>
@@ -2820,7 +2975,7 @@ export default function OrdersPage() {
 
                 <Button variant="outline" className="border-gray-300 hover:bg-gray-50 transition-all duration-200">
                   <MessageSquare className="h-4 w-4 mr-2" />
-                  Contact Customer
+                  {tx.contactCustomer}
                 </Button>
               </div>
             </div>

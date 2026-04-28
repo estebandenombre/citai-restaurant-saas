@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { LucideIcon, Clock, TrendingUp, Users, ChefHat, ShoppingCart } from "lucide-react"
+import { LucideIcon, ShoppingCart, TrendingUp, Users } from "lucide-react"
 
 interface PageHeaderProps {
   title: string
@@ -38,89 +38,105 @@ export function PageHeader({
   stats
 }: PageHeaderProps) {
   return (
-    <div className={cn("bg-white rounded-lg border border-gray-100 p-6", className)}>
-      {/* Main header content */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          {/* Icon container */}
+    <div
+      className={cn(
+        "rounded-2xl border border-border/90 bg-card p-6 md:p-7 shadow-sm",
+        className
+      )}
+    >
+      <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex items-start gap-4">
           {Icon && (
-            <div className="flex items-center justify-center w-10 h-10 bg-purple-100 border border-purple-200 rounded-lg">
-              <Icon className="h-5 w-5 text-purple-600" />
+            <div
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border bg-muted/50 text-foreground"
+              aria-hidden
+            >
+              <Icon className="h-5 w-5" strokeWidth={1.5} />
             </div>
           )}
-          
-          <div>
-            <div className="flex items-center space-x-3">
-              <h1 className="text-2xl font-semibold text-gray-900">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="font-display text-2xl font-medium tracking-[-0.02em] text-foreground">
                 {title}
               </h1>
-              
               {badge && (
-                <Badge 
+                <Badge
                   variant={badge.variant || "secondary"}
-                  className={cn("text-xs font-medium", badge.className)}
+                  className={cn("text-[11px] font-mono font-normal normal-case tracking-[0.1em]", badge.className)}
                 >
                   {badge.text}
                 </Badge>
               )}
             </div>
-            
             {description && (
-              <p className="text-gray-500 text-sm">
+              <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed max-w-2xl">
                 {description}
               </p>
             )}
           </div>
         </div>
-        
+
         {action && (
-          <div className="flex items-center space-x-3">
-            <Button 
-              onClick={action.onClick}
-              variant="outline"
-              className="border-gray-300 text-gray-700 hover:bg-gray-50"
-            >
-              {action.icon && <action.icon className="w-4 h-4 mr-2" />}
-              {action.label}
-            </Button>
-          </div>
+          <Button
+            onClick={action.onClick}
+            variant={action.variant || "outline"}
+            className="shrink-0"
+          >
+            {action.icon && <action.icon className="h-4 w-4" />}
+            {action.label}
+          </Button>
         )}
       </div>
 
-      {/* Quick stats row */}
       {showStats && stats && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-6 border-t border-gray-100">
-          <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
-            <div className="flex items-center justify-center w-10 h-10 bg-green-100 rounded-lg">
-              <ShoppingCart className="w-5 h-5 text-green-600" />
+        <div className="mt-6 grid grid-cols-1 gap-4 border-t border-border/80 pt-6 md:grid-cols-3">
+          <div className="flex items-center gap-3 rounded-xl border border-border/80 bg-muted/30 p-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-card">
+              <ShoppingCart className="h-5 w-5 text-foreground/70" strokeWidth={1.5} />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-600">Today's Orders</p>
-              <p className="text-xl font-bold text-gray-900">{stats.orders || 0}</p>
+              <p className="text-[11px] font-mono uppercase tracking-[0.12em] text-muted-foreground">
+                Today&rsquo;s orders
+              </p>
+              <p className="text-xl font-medium tabular-nums tracking-tight text-foreground" data-slot="metric">
+                {stats.orders ?? 0}
+              </p>
             </div>
           </div>
-          
-          <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
-            <div className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-lg">
-              <TrendingUp className="w-5 h-5 text-blue-600" />
+          <div className="flex items-center gap-3 rounded-xl border border-border/80 bg-muted/30 p-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-card">
+              <TrendingUp className="h-5 w-5 text-foreground/70" strokeWidth={1.5} />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-600">Revenue</p>
-              <p className="text-xl font-bold text-gray-900">${stats.revenue?.toFixed(2) || "0.00"}</p>
+              <p className="text-[11px] font-mono uppercase tracking-[0.12em] text-muted-foreground">
+                Revenue
+              </p>
+              <p
+                className="text-xl font-medium tabular-nums tracking-tight text-foreground"
+                data-slot="metric"
+              >
+                ${stats.revenue?.toFixed(2) ?? "0.00"}
+              </p>
             </div>
           </div>
-          
-          <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
-            <div className="flex items-center justify-center w-10 h-10 bg-purple-100 rounded-lg">
-              <Users className="w-5 h-5 text-purple-600" />
+          <div className="flex items-center gap-3 rounded-xl border border-border/80 bg-muted/30 p-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-card">
+              <Users className="h-5 w-5 text-foreground/70" strokeWidth={1.5} />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-600">Active Staff</p>
-              <p className="text-xl font-bold text-gray-900">{stats.staff || 0}</p>
+              <p className="text-[11px] font-mono uppercase tracking-[0.12em] text-muted-foreground">
+                Active staff
+              </p>
+              <p
+                className="text-xl font-medium tabular-nums tracking-tight text-foreground"
+                data-slot="metric"
+              >
+                {stats.staff ?? 0}
+              </p>
             </div>
           </div>
         </div>
       )}
     </div>
   )
-} 
+}

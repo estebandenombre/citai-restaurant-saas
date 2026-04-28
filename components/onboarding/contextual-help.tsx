@@ -180,15 +180,15 @@ export default function ContextualHelp({ pageId, tips, onDismiss }: ContextualHe
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
-      <Card className="w-80 shadow-lg border-purple-200 bg-gradient-to-r from-purple-50 to-blue-50">
+      <Card className="w-80 border-border bg-card shadow-lg">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                <HelpCircle className="w-4 h-4 text-purple-600" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
+                <HelpCircle className="h-4 w-4 text-foreground" />
               </div>
               <div>
-                <CardTitle className="text-sm text-purple-900">{currentTip.title}</CardTitle>
+                <CardTitle className="text-sm">{currentTip.title}</CardTitle>
                 <Badge variant="secondary" className="text-xs">Consejo</Badge>
               </div>
             </div>
@@ -204,14 +204,12 @@ export default function ContextualHelp({ pageId, tips, onDismiss }: ContextualHe
         </CardHeader>
         
         <CardContent className="space-y-4">
-          <p className="text-sm text-purple-700 leading-relaxed">
-            {currentTip.description}
-          </p>
-          
+          <p className="text-sm leading-relaxed text-muted-foreground">{currentTip.description}</p>
+
           {currentTip.action && (
             <Button
               onClick={currentTip.action.onClick}
-              className="w-full text-purple-600 border-purple-300 hover:bg-purple-50"
+              className="w-full"
               variant="outline"
               size="sm"
             >
@@ -228,8 +226,8 @@ export default function ContextualHelp({ pageId, tips, onDismiss }: ContextualHe
                   className={cn(
                     "w-2 h-2 rounded-full transition-colors",
                     index === currentTipIndex
-                      ? "bg-purple-600"
-                      : "bg-gray-300"
+                      ? "bg-foreground"
+                      : "bg-muted-foreground/30"
                   )}
                 />
               ))}

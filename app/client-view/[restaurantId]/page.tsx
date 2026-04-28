@@ -55,10 +55,10 @@ interface Restaurant {
 }
 
 const orderTypeConfig = {
-  pickup: { label: 'Pickup', icon: ShoppingBag, color: 'text-blue-600' },
-  delivery: { label: 'Delivery', icon: Truck, color: 'text-green-600' },
-  table_service: { label: 'Table', icon: Table, color: 'text-purple-600' },
-  'dine-in': { label: 'Dine-in', icon: Table, color: 'text-purple-600' }
+  pickup: { label: "Pickup", icon: ShoppingBag, color: "text-foreground" },
+  delivery: { label: "Delivery", icon: Truck, color: "text-foreground" },
+  table_service: { label: "Table", icon: Table, color: "text-foreground" },
+  "dine-in": { label: "Dine-in", icon: Table, color: "text-foreground" }
 }
 
 export default function ClientViewPage({ params }: { params: Promise<{ restaurantId: string }> }) {
@@ -133,10 +133,10 @@ export default function ClientViewPage({ params }: { params: Promise<{ restauran
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-slate-50/60 to-zinc-50/80 flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading orders...</p>
+          <div className="mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-2 border-muted border-t-foreground" />
+          <p className="text-muted-foreground">Loading orders…</p>
         </div>
       </div>
     )
@@ -144,10 +144,10 @@ export default function ClientViewPage({ params }: { params: Promise<{ restauran
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-slate-50/60 to-zinc-50/80 flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center">
-          <p className="text-red-600 mb-4">Error loading orders</p>
-          <p className="text-gray-600">{error}</p>
+          <p className="mb-4 text-destructive">Error loading orders</p>
+          <p className="text-muted-foreground">{error}</p>
         </div>
       </div>
     )
@@ -155,20 +155,19 @@ export default function ClientViewPage({ params }: { params: Promise<{ restauran
 
   if (!restaurant) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-slate-50/60 to-zinc-50/80 flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center">
-          <p className="text-red-600 mb-4">Restaurant not found</p>
+          <p className="mb-4 text-destructive">Restaurant not found</p>
         </div>
       </div>
     )
   }
 
     return (
-    <div className="min-h-screen bg-white p-8">
-      {/* Header */}
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">{restaurant.name}</h1>
-        <p className="text-lg text-gray-600">Order Status</p>
+    <div className="min-h-screen bg-background p-8">
+      <div className="mb-12 text-center">
+        <h1 className="mb-2 text-4xl font-semibold text-foreground">{restaurant.name}</h1>
+        <p className="text-lg text-muted-foreground">Order status</p>
       </div>
 
       {/* Two Column Layout */}

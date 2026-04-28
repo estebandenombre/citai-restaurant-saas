@@ -43,6 +43,7 @@ import { supabase } from "@/lib/supabase"
 import { useToast } from "@/hooks/use-toast"
 import { PageHeader } from "@/components/ui/page-header"
 import { Loading } from "@/components/ui/loading"
+import { useI18n } from "@/components/i18n/i18n-provider"
 
 interface Reservation {
   id: string
@@ -81,6 +82,219 @@ const getTomorrowString = () => {
 }
 
 export default function ReservationsPage() {
+  const { locale } = useI18n()
+  const intlLocale = locale
+  const tx =
+    locale === "es-ES"
+      ? {
+          loading: "Cargando reservas...",
+          title: "Reservas",
+          subtitle: "Gestiona las reservas de tu restaurante",
+          create: "Nueva reserva",
+          errLoad: "Error al cargar reservas",
+          errUpdate: "Error al actualizar la reserva",
+          errMove: "Error al mover la reserva",
+          errCancel: "Error al cancelar la reserva",
+          errCreate: "Error al crear la reserva",
+          pleaseTry: "Intentalo de nuevo.",
+          updated: "Reserva actualizada",
+          moved: "Reserva movida",
+          cancelled: "Reserva cancelada",
+          cancelledDesc: "La reserva ha sido cancelada.",
+          created: "Reserva creada",
+          createdDesc: "La reserva se ha creado correctamente.",
+          statusChanged: "Estado cambiado a {status}",
+          movedTo: "Movida a {date} a las {time}",
+          status: {
+            pending: "Pendiente",
+            confirmed: "Confirmada",
+            cancelled: "Cancelada",
+            completed: "Completada",
+          },
+          stats: {
+            total: "Reservas totales",
+            pending: "Pendientes",
+            confirmed: "Confirmadas",
+          },
+          today: "Hoy",
+          allTimeReservations: "Reservas de siempre",
+          awaitingConfirmation: "Pendientes de confirmar",
+          confirmedReservations: "Reservas confirmadas",
+          reservationsForToday: "Reservas para hoy",
+          searchPlaceholder: "Buscar por nombre, email o telefono...",
+          foundMatches: "Encontradas {count} reserva(s) para \"{term}\"",
+          nameFilterPlaceholder: "Filtrar por nombre del cliente...",
+          filterByStatus: "Filtrar por estado",
+          allStatuses: "Todos los estados",
+          filterByDate: "Filtrar por fecha",
+          allDates: "Todas las fechas",
+          tomorrow: "Manana",
+          clearFilters: "Limpiar filtros",
+          view: { list: "Lista", calendar: "Calendario", timeline: "Timeline", planner: "Planificador" },
+          dayHeaders: ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"],
+          noReservationsFound: "No se encontraron reservas",
+          adjustFilters: "Prueba a ajustar los filtros",
+          noneYet: "Aun no hay reservas",
+          at: "a las",
+          people: "personas",
+          reservationsWord: "reservas",
+          prefers: "Prefiere",
+          viewDetails: "Ver detalles",
+          reservationDetails: "Detalles de la reserva",
+          reservationFor: "Reserva para {name}",
+          date: "Fecha",
+          time: "Hora",
+          partySize: "Tamano del grupo",
+          statusLabel: "Estado",
+          contactInfo: "Informacion de contacto",
+          specialRequests: "Peticiones especiales",
+          tablePreference: "Preferencia de mesa",
+          confirm: "Confirmar",
+          cancel: "Cancelar",
+          markComplete: "Marcar como completada",
+          move: "Mover",
+          calendarView: "Vista de calendario",
+          timelineView: "Vista timeline",
+          reservationPlanner: "Planificador de reservas",
+          weekOf: "Semana de {start} a {end}",
+          goToDate: "Ir a fecha:",
+          noReservations: "Sin reservas",
+          more: "mas",
+          match: "Coincide",
+          editReservation: "Editar reserva",
+          moveOrCancelFor: "Mover o cancelar reserva de {name}",
+          currentDate: "Fecha actual",
+          currentTime: "Hora actual",
+          newDate: "Nueva fecha",
+          selectNewDate: "Selecciona nueva fecha",
+          newTime: "Nueva hora",
+          selectNewTime: "Selecciona nueva hora",
+          moveReservation: "Mover reserva",
+          cancelReservation: "Cancelar reserva",
+          newReservationTitle: "Nueva reserva",
+          createNewReservation: "Crea una nueva reserva para tu restaurante",
+          customerName: "Nombre del cliente",
+          enterCustomerName: "Introduce nombre del cliente",
+          selectPartySize: "Selecciona tamano del grupo",
+          person: "persona",
+          phoneNumber: "Telefono",
+          enterPhoneNumber: "Introduce telefono",
+          emailOptional: "Email (opcional)",
+          enterEmailAddress: "Introduce email",
+          selectDate: "Selecciona fecha",
+          selectTime: "Selecciona hora",
+          tablePreferenceOptional: "Preferencia de mesa (opcional)",
+          tablePreferenceExample: "ej. ventana, terraza, zona tranquila",
+          specialRequestsOptional: "Peticiones especiales (opcional)",
+          specialRequestsExample: "Alergias o peticiones especiales",
+          createReservation: "Crear reserva",
+          restaurantNotFound: "Restaurante no encontrado.",
+        }
+      : {
+          loading: "Loading reservations...",
+          title: "Reservations",
+          subtitle: "Manage your restaurant reservations",
+          create: "New reservation",
+          errLoad: "Error loading reservations",
+          errUpdate: "Error updating reservation",
+          errMove: "Error moving reservation",
+          errCancel: "Error cancelling reservation",
+          errCreate: "Error creating reservation",
+          pleaseTry: "Please try again.",
+          updated: "Reservation updated",
+          moved: "Reservation moved",
+          cancelled: "Reservation cancelled",
+          cancelledDesc: "The reservation has been cancelled.",
+          created: "Reservation created",
+          createdDesc: "The reservation has been created successfully.",
+          statusChanged: "Status changed to {status}",
+          movedTo: "Moved to {date} at {time}",
+          status: {
+            pending: "Pending",
+            confirmed: "Confirmed",
+            cancelled: "Cancelled",
+            completed: "Completed",
+          },
+          stats: {
+            total: "Total Reservations",
+            pending: "Pending",
+            confirmed: "Confirmed",
+          },
+          today: "Today",
+          allTimeReservations: "All time reservations",
+          awaitingConfirmation: "Awaiting confirmation",
+          confirmedReservations: "Confirmed reservations",
+          reservationsForToday: "Reservations for today",
+          searchPlaceholder: "Search by name, email, or phone...",
+          foundMatches: "Found {count} reservation(s) matching \"{term}\"",
+          nameFilterPlaceholder: "Filter by customer name...",
+          filterByStatus: "Filter by status",
+          allStatuses: "All Statuses",
+          filterByDate: "Filter by date",
+          allDates: "All Dates",
+          tomorrow: "Tomorrow",
+          clearFilters: "Clear filters",
+          view: { list: "List", calendar: "Calendar", timeline: "Timeline", planner: "Planner" },
+          dayHeaders: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+          noReservationsFound: "No reservations found",
+          adjustFilters: "Try adjusting your filters",
+          noneYet: "No reservations have been made yet",
+          at: "at",
+          people: "people",
+          reservationsWord: "reservations",
+          prefers: "Prefers",
+          viewDetails: "View Details",
+          reservationDetails: "Reservation Details",
+          reservationFor: "Reservation for {name}",
+          date: "Date",
+          time: "Time",
+          partySize: "Party Size",
+          statusLabel: "Status",
+          contactInfo: "Contact Information",
+          specialRequests: "Special Requests",
+          tablePreference: "Table Preference",
+          confirm: "Confirm",
+          cancel: "Cancel",
+          markComplete: "Mark Complete",
+          move: "Move",
+          calendarView: "Calendar View",
+          timelineView: "Timeline View",
+          reservationPlanner: "Reservation Planner",
+          weekOf: "Week of {start} to {end}",
+          goToDate: "Go to date:",
+          noReservations: "No reservations",
+          more: "more",
+          match: "Match",
+          editReservation: "Edit Reservation",
+          moveOrCancelFor: "Move or cancel reservation for {name}",
+          currentDate: "Current Date",
+          currentTime: "Current Time",
+          newDate: "New Date",
+          selectNewDate: "Select new date",
+          newTime: "New Time",
+          selectNewTime: "Select new time",
+          moveReservation: "Move Reservation",
+          cancelReservation: "Cancel Reservation",
+          newReservationTitle: "New Reservation",
+          createNewReservation: "Create a new reservation for your restaurant",
+          customerName: "Customer Name",
+          enterCustomerName: "Enter customer name",
+          selectPartySize: "Select party size",
+          person: "person",
+          phoneNumber: "Phone Number",
+          enterPhoneNumber: "Enter phone number",
+          emailOptional: "Email (Optional)",
+          enterEmailAddress: "Enter email address",
+          selectDate: "Select date",
+          selectTime: "Select time",
+          tablePreferenceOptional: "Table Preference (Optional)",
+          tablePreferenceExample: "e.g., Window seat, outdoor, quiet area",
+          specialRequestsOptional: "Special Requests (Optional)",
+          specialRequestsExample: "Any special requests or dietary restrictions",
+          createReservation: "Create Reservation",
+          restaurantNotFound: "Restaurant not found.",
+        }
+
   const [reservations, setReservations] = useState<Reservation[]>([])
   const [loading, setLoading] = useState(true)
   const [restaurant, setRestaurant] = useState<any>(null)
@@ -132,8 +346,8 @@ export default function ReservationsPage() {
       if (error) {
         console.error("Error fetching reservations:", error)
         toast({
-          title: "Error loading reservations",
-          description: "Please try again.",
+          title: tx.errLoad,
+          description: tx.pleaseTry,
           variant: "destructive",
         })
         return
@@ -143,8 +357,8 @@ export default function ReservationsPage() {
     } catch (error) {
       console.error("Error fetching reservations:", error)
       toast({
-        title: "Error loading reservations",
-        description: "Please try again.",
+        title: tx.errLoad,
+        description: tx.pleaseTry,
         variant: "destructive",
       })
     } finally {
@@ -162,8 +376,8 @@ export default function ReservationsPage() {
       if (error) {
         console.error("Error updating reservation:", error)
         toast({
-          title: "Error updating reservation",
-          description: "Please try again.",
+          title: tx.errUpdate,
+          description: tx.pleaseTry,
           variant: "destructive",
         })
         return
@@ -179,14 +393,14 @@ export default function ReservationsPage() {
       )
 
       toast({
-        title: "Reservation updated",
-        description: `Status changed to ${newStatus}`,
+        title: tx.updated,
+        description: tx.statusChanged.replace("{status}", newStatus),
       })
     } catch (error) {
       console.error("Error updating reservation:", error)
       toast({
-        title: "Error updating reservation",
-        description: "Please try again.",
+        title: tx.errUpdate,
+        description: tx.pleaseTry,
         variant: "destructive",
       })
     }
@@ -205,8 +419,8 @@ export default function ReservationsPage() {
       if (error) {
         console.error("Error moving reservation:", error)
         toast({
-          title: "Error moving reservation",
-          description: "Please try again.",
+          title: tx.errMove,
+          description: tx.pleaseTry,
           variant: "destructive",
         })
         return
@@ -222,8 +436,10 @@ export default function ReservationsPage() {
       )
 
       toast({
-        title: "Reservation moved",
-        description: `Moved to ${formatDate(newDate)} at ${formatTime(newTime)}`,
+        title: tx.moved,
+        description: tx.movedTo
+          .replace("{date}", formatDate(newDate))
+          .replace("{time}", formatTime(newTime)),
       })
 
       setIsEditDialogOpen(false)
@@ -231,8 +447,8 @@ export default function ReservationsPage() {
     } catch (error) {
       console.error("Error moving reservation:", error)
       toast({
-        title: "Error moving reservation",
-        description: "Please try again.",
+        title: tx.errMove,
+        description: tx.pleaseTry,
         variant: "destructive",
       })
     }
@@ -248,8 +464,8 @@ export default function ReservationsPage() {
       if (error) {
         console.error("Error cancelling reservation:", error)
         toast({
-          title: "Error cancelling reservation",
-          description: "Please try again.",
+          title: tx.errCancel,
+          description: tx.pleaseTry,
           variant: "destructive",
         })
         return
@@ -265,8 +481,8 @@ export default function ReservationsPage() {
       )
 
       toast({
-        title: "Reservation cancelled",
-        description: "The reservation has been cancelled.",
+        title: tx.cancelled,
+        description: tx.cancelledDesc,
       })
 
       setIsEditDialogOpen(false)
@@ -274,8 +490,8 @@ export default function ReservationsPage() {
     } catch (error) {
       console.error("Error cancelling reservation:", error)
       toast({
-        title: "Error cancelling reservation",
-        description: "Please try again.",
+        title: tx.errCancel,
+        description: tx.pleaseTry,
         variant: "destructive",
       })
     }
@@ -287,7 +503,7 @@ export default function ReservationsPage() {
       if (!restaurantId) {
         toast({
           title: "Error",
-          description: "Restaurant not found.",
+          description: tx.restaurantNotFound,
           variant: "destructive",
         })
         return
@@ -312,8 +528,8 @@ export default function ReservationsPage() {
       if (error) {
         console.error("Error creating reservation:", error)
         toast({
-          title: "Error creating reservation",
-          description: "Please try again.",
+          title: tx.errCreate,
+          description: tx.pleaseTry,
           variant: "destructive",
         })
         return
@@ -325,8 +541,8 @@ export default function ReservationsPage() {
       }
 
       toast({
-        title: "Reservation created",
-        description: "The reservation has been created successfully.",
+        title: tx.created,
+        description: tx.createdDesc,
       })
 
       // Reset form and close dialog
@@ -344,8 +560,8 @@ export default function ReservationsPage() {
     } catch (error) {
       console.error("Error creating reservation:", error)
       toast({
-        title: "Error creating reservation",
-        description: "Please try again.",
+        title: tx.errCreate,
+        description: tx.pleaseTry,
         variant: "destructive",
       })
     }
@@ -353,10 +569,10 @@ export default function ReservationsPage() {
 
   const getStatusConfig = (status: string) => {
     const configs = {
-      pending: { label: "Pending", color: "bg-yellow-100 text-yellow-800 border-yellow-200", icon: AlertCircle },
-      confirmed: { label: "Confirmed", color: "bg-green-100 text-green-800 border-green-200", icon: CheckCircle },
-      cancelled: { label: "Cancelled", color: "bg-red-100 text-red-800 border-red-200", icon: XCircle },
-      completed: { label: "Completed", color: "bg-blue-100 text-blue-800 border-blue-200", icon: CheckCircle },
+      pending: { label: tx.status.pending, color: "bg-yellow-100 text-yellow-800 border-yellow-200", icon: AlertCircle },
+      confirmed: { label: tx.status.confirmed, color: "bg-green-100 text-green-800 border-green-200", icon: CheckCircle },
+      cancelled: { label: tx.status.cancelled, color: "bg-red-100 text-red-800 border-red-200", icon: XCircle },
+      completed: { label: tx.status.completed, color: "bg-blue-100 text-blue-800 border-blue-200", icon: CheckCircle },
     }
     return configs[status as keyof typeof configs] || configs.pending
   }
@@ -526,7 +742,7 @@ export default function ReservationsPage() {
       const date = new Date(today)
       date.setDate(date.getDate() + i)
       const dateString = formatDateToLocalString(date)
-      const displayDate = date.toLocaleDateString('en-US', { 
+      const displayDate = date.toLocaleDateString(intlLocale, {
         weekday: 'short', 
         month: 'short', 
         day: 'numeric' 
@@ -553,37 +769,32 @@ export default function ReservationsPage() {
       const today = formatDateToLocalString(selectedDate)
 
   if (loading) {
-    return <Loading text="Loading reservations..." />
+    return <Loading text={tx.loading} />
   }
 
   const stats = getStats()
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Minimalist Header */}
-      <div className="bg-white rounded-lg border-b border-gray-200 px-6 py-4">
-        
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <div className="rounded-lg border-b border-border bg-card px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="flex items-center justify-center w-10 h-10 bg-purple-50 border border-purple-100 rounded-lg">
-                <Calendar className="h-5 w-5 text-purple-600" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-muted">
+                <Calendar className="h-5 w-5 text-foreground" />
               </div>
               <div>
-                <h1 className="text-2xl font-semibold text-gray-900">
-                  Reservations
-                </h1>
-                <p className="text-gray-500 text-sm">
-                  Manage your restaurant reservations
-                </p>
+                <h1 className="text-2xl font-semibold text-foreground">{tx.title}</h1>
+                <p className="text-sm text-muted-foreground">{tx.subtitle}</p>
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              <Button 
+              <Button
                 onClick={() => setIsNewReservationOpen(true)}
-                className="bg-purple-600 hover:bg-purple-700 text-white text-sm px-4 py-2 rounded-lg shadow-sm"
+                className="text-sm"
               >
                 <Plus className="h-4 w-4 mr-2" />
-                New Reservation
+                {tx.create}
               </Button>
             </div>
           </div>
@@ -595,52 +806,52 @@ export default function ReservationsPage() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6 mt-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Reservations</CardTitle>
+              <CardTitle className="text-sm font-medium">{tx.stats.total}</CardTitle>
               <Calendar className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.total}</div>
               <p className="text-xs text-muted-foreground">
-                All time reservations
+                {tx.allTimeReservations}
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Pending</CardTitle>
+              <CardTitle className="text-sm font-medium">{tx.stats.pending}</CardTitle>
               <AlertCircle className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.pending}</div>
               <p className="text-xs text-muted-foreground">
-                Awaiting confirmation
+                {tx.awaitingConfirmation}
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Confirmed</CardTitle>
+              <CardTitle className="text-sm font-medium">{tx.stats.confirmed}</CardTitle>
               <CheckCircle className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.confirmed}</div>
               <p className="text-xs text-muted-foreground">
-                Confirmed reservations
+                {tx.confirmedReservations}
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Today</CardTitle>
+              <CardTitle className="text-sm font-medium">{tx.today}</CardTitle>
               <CalendarDays className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.today}</div>
               <p className="text-xs text-muted-foreground">
-                Reservations for today
+                {tx.reservationsForToday}
               </p>
             </CardContent>
           </Card>
@@ -654,7 +865,7 @@ export default function ReservationsPage() {
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <Input
-                    placeholder="Search by name, email, or phone..."
+                    placeholder={tx.searchPlaceholder}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10"
@@ -664,8 +875,9 @@ export default function ReservationsPage() {
                   <div className="mt-2 text-sm text-green-600 flex items-center gap-2">
                     <Search className="h-3 w-3" />
                     <span>
-                      Found {filteredReservations.length} reservation{filteredReservations.length !== 1 ? 's' : ''} 
-                      matching "{searchTerm}"
+                      {tx.foundMatches
+                        .replace("{count}", String(filteredReservations.length))
+                        .replace("{term}", searchTerm)}
                     </span>
                   </div>
                 )}
@@ -673,7 +885,7 @@ export default function ReservationsPage() {
               <div className="relative">
                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
-                  placeholder="Filter by customer name..."
+                  placeholder={tx.nameFilterPlaceholder}
                   value={nameFilter}
                   onChange={(e) => setNameFilter(e.target.value)}
                   className="pl-10 w-48"
@@ -681,24 +893,24 @@ export default function ReservationsPage() {
               </div>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Filter by status" />
+                  <SelectValue placeholder={tx.filterByStatus} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="confirmed">Confirmed</SelectItem>
-                  <SelectItem value="cancelled">Cancelled</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="all">{tx.allStatuses}</SelectItem>
+                  <SelectItem value="pending">{tx.status.pending}</SelectItem>
+                  <SelectItem value="confirmed">{tx.status.confirmed}</SelectItem>
+                  <SelectItem value="cancelled">{tx.status.cancelled}</SelectItem>
+                  <SelectItem value="completed">{tx.status.completed}</SelectItem>
                 </SelectContent>
               </Select>
               <Select value={dateFilter} onValueChange={setDateFilter}>
                 <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Filter by date" />
+                  <SelectValue placeholder={tx.filterByDate} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Dates</SelectItem>
-                  <SelectItem value="today">Today</SelectItem>
-                  <SelectItem value="tomorrow">Tomorrow</SelectItem>
+                  <SelectItem value="all">{tx.allDates}</SelectItem>
+                  <SelectItem value="today">{tx.today}</SelectItem>
+                  <SelectItem value="tomorrow">{tx.tomorrow}</SelectItem>
                 </SelectContent>
               </Select>
               {(searchTerm || nameFilter || statusFilter !== "all" || dateFilter !== "all") && (
@@ -709,7 +921,7 @@ export default function ReservationsPage() {
                   className="text-gray-600 hover:text-gray-800"
                 >
                   <Filter className="h-4 w-4 mr-2" />
-                  Clear filters
+                  {tx.clearFilters}
                 </Button>
               )}
             </div>
@@ -721,19 +933,19 @@ export default function ReservationsPage() {
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="list" className="flex items-center gap-2">
               <List className="h-4 w-4" />
-              List
+              {tx.view.list}
             </TabsTrigger>
             <TabsTrigger value="calendar" className="flex items-center gap-2">
               <CalendarIcon className="h-4 w-4" />
-              Calendar
+              {tx.view.calendar}
             </TabsTrigger>
             <TabsTrigger value="timeline" className="flex items-center gap-2">
               <Clock4 className="h-4 w-4" />
-              Timeline
+              {tx.view.timeline}
             </TabsTrigger>
             <TabsTrigger value="planner" className="flex items-center gap-2">
               <Grid3X3 className="h-4 w-4" />
-              Planner
+              {tx.view.planner}
             </TabsTrigger>
           </TabsList>
 
@@ -743,11 +955,11 @@ export default function ReservationsPage() {
               <Card>
                 <CardContent className="p-8 text-center">
                   <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No reservations found</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">{tx.noReservationsFound}</h3>
                   <p className="text-gray-500">
                     {searchTerm || nameFilter || statusFilter !== "all" || dateFilter !== "all" 
-                      ? "Try adjusting your filters" 
-                      : "No reservations have been made yet"}
+                      ? tx.adjustFilters
+                      : tx.noneYet}
                   </p>
                 </CardContent>
               </Card>
@@ -768,14 +980,14 @@ export default function ReservationsPage() {
                           <div>
                             <h3 className="font-medium">{reservation.customer_name}</h3>
                             <p className="text-sm text-gray-500">
-                              {formatDate(reservation.reservation_date)} at {formatTime(reservation.reservation_time)}
+                              {formatDate(reservation.reservation_date)} {tx.at} {formatTime(reservation.reservation_time)}
                             </p>
                           </div>
                         </div>
                         <div className="text-right">
                           <div className="flex items-center space-x-1 text-sm text-gray-500">
                             <Users className="h-4 w-4" />
-                            <span>{reservation.party_size} people</span>
+                            <span>{reservation.party_size} {tx.people}</span>
                           </div>
                         </div>
                       </div>
@@ -795,7 +1007,7 @@ export default function ReservationsPage() {
                           {reservation.table_preference && (
                             <div className="flex items-center space-x-2 text-sm">
                               <MapPin className="h-4 w-4 text-gray-400" />
-                              <span>Prefers: {reservation.table_preference}</span>
+                              <span>{tx.prefers}: {reservation.table_preference}</span>
                             </div>
                           )}
                         </div>
@@ -813,32 +1025,32 @@ export default function ReservationsPage() {
                         <Dialog>
                           <DialogTrigger asChild>
                             <Button variant="outline" size="sm">
-                              View Details
+                              {tx.viewDetails}
                             </Button>
                           </DialogTrigger>
-                          <DialogContent className="max-w-md">
+                          <DialogContent className="max-w-md rounded-2xl border-border bg-card shadow-[0_28px_70px_-30px_rgba(0,0,0,0.6)]">
                             <DialogHeader>
-                              <DialogTitle>Reservation Details</DialogTitle>
+                              <DialogTitle>{tx.reservationDetails}</DialogTitle>
                               <DialogDescription>
-                                Reservation for {reservation.customer_name}
+                                {tx.reservationFor.replace("{name}", reservation.customer_name)}
                               </DialogDescription>
                             </DialogHeader>
                             <div className="space-y-4">
                               <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                  <Label className="text-sm font-medium">Date</Label>
+                                  <Label className="text-sm font-medium">{tx.date}</Label>
                                   <p className="text-sm text-gray-600">{formatDate(reservation.reservation_date)}</p>
                                 </div>
                                 <div>
-                                  <Label className="text-sm font-medium">Time</Label>
+                                  <Label className="text-sm font-medium">{tx.time}</Label>
                                   <p className="text-sm text-gray-600">{formatTime(reservation.reservation_time)}</p>
                                 </div>
                                 <div>
-                                  <Label className="text-sm font-medium">Party Size</Label>
-                                  <p className="text-sm text-gray-600">{reservation.party_size} people</p>
+                                  <Label className="text-sm font-medium">{tx.partySize}</Label>
+                                  <p className="text-sm text-gray-600">{reservation.party_size} {tx.people}</p>
                                 </div>
                                 <div>
-                                  <Label className="text-sm font-medium">Status</Label>
+                                  <Label className="text-sm font-medium">{tx.statusLabel}</Label>
                                   <Badge className={statusConfig.color}>
                                     {statusConfig.label}
                                   </Badge>
@@ -846,7 +1058,7 @@ export default function ReservationsPage() {
                               </div>
                               <Separator />
                               <div>
-                                <Label className="text-sm font-medium">Contact Information</Label>
+                                <Label className="text-sm font-medium">{tx.contactInfo}</Label>
                                 <div className="mt-2 space-y-1">
                                   <p className="text-sm text-gray-600">{reservation.customer_name}</p>
                                   <p className="text-sm text-gray-600">{reservation.customer_phone}</p>
@@ -859,7 +1071,7 @@ export default function ReservationsPage() {
                                 <>
                                   <Separator />
                                   <div>
-                                    <Label className="text-sm font-medium">Special Requests</Label>
+                                    <Label className="text-sm font-medium">{tx.specialRequests}</Label>
                                     <p className="text-sm text-gray-600 mt-1">{reservation.special_requests}</p>
                                   </div>
                                 </>
@@ -868,7 +1080,7 @@ export default function ReservationsPage() {
                                 <>
                                   <Separator />
                                   <div>
-                                    <Label className="text-sm font-medium">Table Preference</Label>
+                                    <Label className="text-sm font-medium">{tx.tablePreference}</Label>
                                     <p className="text-sm text-gray-600 mt-1">{reservation.table_preference}</p>
                                   </div>
                                 </>
@@ -884,7 +1096,7 @@ export default function ReservationsPage() {
                               onClick={() => updateReservationStatus(reservation.id, 'confirmed')}
                               className="bg-green-600 hover:bg-green-700"
                             >
-                              Confirm
+                              {tx.confirm}
                             </Button>
                             <Button 
                               variant="outline" 
@@ -892,7 +1104,7 @@ export default function ReservationsPage() {
                               onClick={() => updateReservationStatus(reservation.id, 'cancelled')}
                               className="text-red-600 hover:text-red-700"
                             >
-                              Cancel
+                              {tx.cancel}
                             </Button>
                           </>
                         )}
@@ -903,7 +1115,7 @@ export default function ReservationsPage() {
                             onClick={() => updateReservationStatus(reservation.id, 'completed')}
                             className="bg-blue-600 hover:bg-blue-700"
                           >
-                            Mark Complete
+                            {tx.markComplete}
                           </Button>
                         )}
                       </div>
@@ -920,9 +1132,9 @@ export default function ReservationsPage() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-xl">Calendar View</CardTitle>
+                    <CardTitle className="text-xl">{tx.calendarView}</CardTitle>
                     <CardDescription>
-                      {selectedDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                      {selectedDate.toLocaleDateString(intlLocale, { month: 'long', year: 'numeric' })}
                     </CardDescription>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -930,7 +1142,7 @@ export default function ReservationsPage() {
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
                     <Button variant="outline" size="sm" onClick={goToToday}>
-                      Today
+                      {tx.today}
                     </Button>
                     <Button variant="outline" size="sm" onClick={goToNextMonth}>
                       <ChevronRight className="h-4 w-4" />
@@ -941,7 +1153,7 @@ export default function ReservationsPage() {
               <CardContent>
                 <div className="grid grid-cols-7 gap-1">
                   {/* Day headers */}
-                  {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                  {tx.dayHeaders.map((day) => (
                     <div key={day} className="p-2 text-center text-sm font-medium text-gray-500">
                       {day}
                     </div>
@@ -991,7 +1203,7 @@ export default function ReservationsPage() {
                           })}
                           {dayReservations.length > 2 && (
                             <div className="text-xs text-gray-500">
-                              +{dayReservations.length - 2} more
+                              +{dayReservations.length - 2} {tx.more}
                             </div>
                           )}
                         </div>
@@ -1009,9 +1221,11 @@ export default function ReservationsPage() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-xl">Timeline View</CardTitle>
+                    <CardTitle className="text-xl">{tx.timelineView}</CardTitle>
                     <CardDescription>
-                      Week of {generateTimelineData()[0].date} to {generateTimelineData()[6].date}
+                      {tx.weekOf
+                        .replace("{start}", generateTimelineData()[0].date)
+                        .replace("{end}", generateTimelineData()[6].date)}
                     </CardDescription>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -1019,7 +1233,7 @@ export default function ReservationsPage() {
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
                     <Button variant="outline" size="sm" onClick={goToToday}>
-                      Today
+                      {tx.today}
                     </Button>
                     <Button variant="outline" size="sm" onClick={goToNextDay}>
                       <ChevronRight className="h-4 w-4" />
@@ -1035,19 +1249,19 @@ export default function ReservationsPage() {
                         <div>
                           <h3 className="font-medium">{dayData.dayName}</h3>
                           <p className="text-sm text-gray-500">
-                            {new Date(dayData.date).toLocaleDateString('en-US', { 
+                            {new Date(dayData.date).toLocaleDateString(intlLocale, {
                               month: 'short', 
                               day: 'numeric' 
                             })}
                           </p>
                         </div>
                         <Badge variant="secondary">
-                          {dayData.reservations.length} reservations
+                          {dayData.reservations.length} {tx.reservationsWord}
                         </Badge>
                       </div>
                       
                       {dayData.reservations.length === 0 ? (
-                        <div className="text-sm text-gray-400 italic">No reservations</div>
+                        <div className="text-sm text-gray-400 italic">{tx.noReservations}</div>
                       ) : (
                         <div className="space-y-2">
                           {dayData.reservations.map((reservation) => {
@@ -1074,7 +1288,7 @@ export default function ReservationsPage() {
                                       {reservation.customer_name}
                                     </div>
                                     <div className="text-sm opacity-75">
-                                      {formatTime(reservation.reservation_time)} • {reservation.party_size} people
+                                      {formatTime(reservation.reservation_time)} • {reservation.party_size} {tx.people}
                                     </div>
                                   </div>
                                 </div>
@@ -1084,7 +1298,7 @@ export default function ReservationsPage() {
                                   </Badge>
                                   {isSearchMatch && (
                                     <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">
-                                      Match
+                                      {tx.match}
                                     </Badge>
                                   )}
                                   <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
@@ -1109,7 +1323,7 @@ export default function ReservationsPage() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-xl">Reservation Planner</CardTitle>
+                    <CardTitle className="text-xl">{tx.reservationPlanner}</CardTitle>
                     <CardDescription>
                       Visual planning for {formatDate(today)}
                     </CardDescription>
@@ -1119,14 +1333,14 @@ export default function ReservationsPage() {
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
                     <Button variant="outline" size="sm" onClick={goToToday}>
-                      Today
+                      {tx.today}
                     </Button>
                     <Button variant="outline" size="sm" onClick={goToNextDay}>
                       <ChevronRight className="h-4 w-4" />
                     </Button>
                     <div className="flex items-center space-x-2 ml-4">
                       <Label htmlFor="date-input" className="text-sm font-medium text-gray-700">
-                        Go to date:
+                        {tx.goToDate}
                       </Label>
                       <Input
                         id="date-input"
@@ -1154,7 +1368,7 @@ export default function ReservationsPage() {
                             </div>
                             <div className="flex-1">
                               {reservationsForTime.length === 0 ? (
-                                <div className="text-sm text-gray-400 italic">No reservations</div>
+                                <div className="text-sm text-gray-400 italic">{tx.noReservations}</div>
                               ) : (
                                 <div className="flex flex-wrap gap-2">
                                   {reservationsForTime.map((reservation) => {
@@ -1180,12 +1394,12 @@ export default function ReservationsPage() {
                                             {reservation.customer_name}
                                           </div>
                                           <div className="text-xs opacity-75">
-                                            {reservation.party_size} people
+                                            {reservation.party_size} {tx.people}
                                           </div>
                                         </div>
                                         {isSearchMatch && (
                                           <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">
-                                            Match
+                                            {tx.match}
                                           </Badge>
                                         )}
                                         <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
@@ -1212,29 +1426,29 @@ export default function ReservationsPage() {
       {/* Reservation Details Dialog */}
       {selectedReservation && (
         <Dialog open={!!selectedReservation} onOpenChange={() => setSelectedReservation(null)}>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-md rounded-2xl border-border bg-card shadow-[0_28px_70px_-30px_rgba(0,0,0,0.6)]">
             <DialogHeader>
-              <DialogTitle>Reservation Details</DialogTitle>
+              <DialogTitle>{tx.reservationDetails}</DialogTitle>
               <DialogDescription>
-                Reservation for {selectedReservation.customer_name}
+                {tx.reservationFor.replace("{name}", selectedReservation.customer_name)}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-sm font-medium">Date</Label>
+                  <Label className="text-sm font-medium">{tx.date}</Label>
                   <p className="text-sm text-gray-600">{formatDate(selectedReservation.reservation_date)}</p>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium">Time</Label>
+                  <Label className="text-sm font-medium">{tx.time}</Label>
                   <p className="text-sm text-gray-600">{formatTime(selectedReservation.reservation_time)}</p>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium">Party Size</Label>
-                  <p className="text-sm text-gray-600">{selectedReservation.party_size} people</p>
+                  <Label className="text-sm font-medium">{tx.partySize}</Label>
+                  <p className="text-sm text-gray-600">{selectedReservation.party_size} {tx.people}</p>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium">Status</Label>
+                  <Label className="text-sm font-medium">{tx.statusLabel}</Label>
                   <Badge className={getStatusConfig(selectedReservation.status).color}>
                     {getStatusConfig(selectedReservation.status).label}
                   </Badge>
@@ -1242,7 +1456,7 @@ export default function ReservationsPage() {
               </div>
               <Separator />
               <div>
-                <Label className="text-sm font-medium">Contact Information</Label>
+                <Label className="text-sm font-medium">{tx.contactInfo}</Label>
                 <div className="mt-2 space-y-1">
                   <p className="text-sm text-gray-600">{selectedReservation.customer_name}</p>
                   <p className="text-sm text-gray-600">{selectedReservation.customer_phone}</p>
@@ -1255,7 +1469,7 @@ export default function ReservationsPage() {
                 <>
                   <Separator />
                   <div>
-                    <Label className="text-sm font-medium">Special Requests</Label>
+                    <Label className="text-sm font-medium">{tx.specialRequests}</Label>
                     <p className="text-sm text-gray-600 mt-1">{selectedReservation.special_requests}</p>
                   </div>
                 </>
@@ -1264,7 +1478,7 @@ export default function ReservationsPage() {
                 <>
                   <Separator />
                   <div>
-                    <Label className="text-sm font-medium">Table Preference</Label>
+                    <Label className="text-sm font-medium">{tx.tablePreference}</Label>
                     <p className="text-sm text-gray-600 mt-1">{selectedReservation.table_preference}</p>
                   </div>
                 </>
@@ -1280,7 +1494,7 @@ export default function ReservationsPage() {
                       }}
                       className="bg-green-600 hover:bg-green-700"
                     >
-                      Confirm
+                      {tx.confirm}
                     </Button>
                     <Button 
                       variant="outline" 
@@ -1291,7 +1505,7 @@ export default function ReservationsPage() {
                       }}
                       className="text-red-600 hover:text-red-700"
                     >
-                      Cancel
+                      {tx.cancel}
                     </Button>
                   </>
                 )}
@@ -1306,7 +1520,7 @@ export default function ReservationsPage() {
                       }}
                       className="bg-blue-600 hover:bg-blue-700"
                     >
-                      Mark Complete
+                      {tx.markComplete}
                     </Button>
                     <Button 
                       variant="outline" 
@@ -1318,7 +1532,7 @@ export default function ReservationsPage() {
                       }}
                       className="bg-orange-600 hover:bg-orange-700 text-white"
                     >
-                      Move
+                      {tx.move}
                     </Button>
                   </>
                 )}
@@ -1334,7 +1548,7 @@ export default function ReservationsPage() {
                     }}
                     className="bg-orange-600 hover:bg-orange-700 text-white"
                   >
-                    Move
+                    {tx.move}
                   </Button>
                 )}
               </div>
@@ -1346,21 +1560,21 @@ export default function ReservationsPage() {
       {/* Edit Reservation Dialog */}
       {editingReservation && (
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-md rounded-2xl border-border bg-card shadow-[0_28px_70px_-30px_rgba(0,0,0,0.6)]">
             <DialogHeader>
-              <DialogTitle>Edit Reservation</DialogTitle>
+              <DialogTitle>{tx.editReservation}</DialogTitle>
               <DialogDescription>
-                Move or cancel reservation for {editingReservation.customer_name}
+                {tx.moveOrCancelFor.replace("{name}", editingReservation.customer_name)}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-sm font-medium">Current Date</Label>
+                  <Label className="text-sm font-medium">{tx.currentDate}</Label>
                   <p className="text-sm text-gray-600">{formatDate(editingReservation.reservation_date)}</p>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium">Current Time</Label>
+                  <Label className="text-sm font-medium">{tx.currentTime}</Label>
                   <p className="text-sm text-gray-600">{formatTime(editingReservation.reservation_time)}</p>
                 </div>
               </div>
@@ -1369,7 +1583,7 @@ export default function ReservationsPage() {
               
               <div className="space-y-4">
                 <div>
-                  <Label className="text-sm font-medium">New Date</Label>
+                  <Label className="text-sm font-medium">{tx.newDate}</Label>
                   <Select 
                     defaultValue={editingReservation.reservation_date}
                     onValueChange={(value) => {
@@ -1377,7 +1591,7 @@ export default function ReservationsPage() {
                     }}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select new date" />
+                      <SelectValue placeholder={tx.selectNewDate} />
                     </SelectTrigger>
                     <SelectContent>
                       {generateDateOptions().map((option) => (
@@ -1390,7 +1604,7 @@ export default function ReservationsPage() {
                 </div>
                 
                 <div>
-                  <Label className="text-sm font-medium">New Time</Label>
+                  <Label className="text-sm font-medium">{tx.newTime}</Label>
                   <Select 
                     defaultValue={editingReservation.reservation_time}
                     onValueChange={(value) => {
@@ -1398,7 +1612,7 @@ export default function ReservationsPage() {
                     }}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select new time" />
+                      <SelectValue placeholder={tx.selectNewTime} />
                     </SelectTrigger>
                     <SelectContent>
                       {generateTimeOptions().map((option) => (
@@ -1425,7 +1639,7 @@ export default function ReservationsPage() {
                   }}
                   className="bg-green-600 hover:bg-green-700"
                 >
-                  Move Reservation
+                  {tx.moveReservation}
                 </Button>
                 <Button 
                   variant="outline" 
@@ -1437,7 +1651,7 @@ export default function ReservationsPage() {
                   }}
                   className="text-red-600 hover:text-red-700"
                 >
-                  Cancel Reservation
+                  {tx.cancelReservation}
                 </Button>
                 <Button 
                   variant="outline" 
@@ -1447,7 +1661,7 @@ export default function ReservationsPage() {
                     setEditingReservation(null)
                   }}
                 >
-                  Cancel
+                  {tx.cancel}
                 </Button>
               </div>
             </div>
@@ -1457,38 +1671,38 @@ export default function ReservationsPage() {
 
       {/* New Reservation Dialog */}
       <Dialog open={isNewReservationOpen} onOpenChange={setIsNewReservationOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md rounded-2xl border-border bg-card shadow-[0_28px_70px_-30px_rgba(0,0,0,0.6)]">
           <DialogHeader>
-            <DialogTitle>New Reservation</DialogTitle>
+            <DialogTitle>{tx.newReservationTitle}</DialogTitle>
             <DialogDescription>
-              Create a new reservation for your restaurant
+              {tx.createNewReservation}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="customer_name" className="text-sm font-medium">Customer Name</Label>
+                <Label htmlFor="customer_name" className="text-sm font-medium">{tx.customerName}</Label>
                 <Input
                   id="customer_name"
                   value={newReservation.customer_name}
                   onChange={(e) => setNewReservation(prev => ({ ...prev, customer_name: e.target.value }))}
-                  placeholder="Enter customer name"
+                  placeholder={tx.enterCustomerName}
                   className="mt-1"
                 />
               </div>
               <div>
-                <Label htmlFor="party_size" className="text-sm font-medium">Party Size</Label>
+                <Label htmlFor="party_size" className="text-sm font-medium">{tx.partySize}</Label>
                 <Select 
                   value={newReservation.party_size.toString()} 
                   onValueChange={(value) => setNewReservation(prev => ({ ...prev, party_size: parseInt(value) }))}
                 >
                   <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Select party size" />
+                    <SelectValue placeholder={tx.selectPartySize} />
                   </SelectTrigger>
                   <SelectContent>
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((size) => (
                       <SelectItem key={size} value={size.toString()}>
-                        {size} {size === 1 ? 'person' : 'people'}
+                        {size} {size === 1 ? tx.person : tx.people}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -1498,23 +1712,23 @@ export default function ReservationsPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="customer_phone" className="text-sm font-medium">Phone Number</Label>
+                <Label htmlFor="customer_phone" className="text-sm font-medium">{tx.phoneNumber}</Label>
                 <Input
                   id="customer_phone"
                   value={newReservation.customer_phone}
                   onChange={(e) => setNewReservation(prev => ({ ...prev, customer_phone: e.target.value }))}
-                  placeholder="Enter phone number"
+                  placeholder={tx.enterPhoneNumber}
                   className="mt-1"
                 />
               </div>
               <div>
-                <Label htmlFor="customer_email" className="text-sm font-medium">Email (Optional)</Label>
+                <Label htmlFor="customer_email" className="text-sm font-medium">{tx.emailOptional}</Label>
                 <Input
                   id="customer_email"
                   type="email"
                   value={newReservation.customer_email}
                   onChange={(e) => setNewReservation(prev => ({ ...prev, customer_email: e.target.value }))}
-                  placeholder="Enter email address"
+                  placeholder={tx.enterEmailAddress}
                   className="mt-1"
                 />
               </div>
@@ -1522,13 +1736,13 @@ export default function ReservationsPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="reservation_date" className="text-sm font-medium">Date</Label>
+                <Label htmlFor="reservation_date" className="text-sm font-medium">{tx.date}</Label>
                 <Select 
                   value={newReservation.reservation_date} 
                   onValueChange={(value) => setNewReservation(prev => ({ ...prev, reservation_date: value }))}
                 >
                   <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Select date" />
+                    <SelectValue placeholder={tx.selectDate} />
                   </SelectTrigger>
                   <SelectContent>
                     {generateDateOptions().map((option) => (
@@ -1540,13 +1754,13 @@ export default function ReservationsPage() {
                 </Select>
               </div>
               <div>
-                <Label htmlFor="reservation_time" className="text-sm font-medium">Time</Label>
+                <Label htmlFor="reservation_time" className="text-sm font-medium">{tx.time}</Label>
                 <Select 
                   value={newReservation.reservation_time} 
                   onValueChange={(value) => setNewReservation(prev => ({ ...prev, reservation_time: value }))}
                 >
                   <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Select time" />
+                    <SelectValue placeholder={tx.selectTime} />
                   </SelectTrigger>
                   <SelectContent>
                     {generateTimeOptions().map((option) => (
@@ -1560,35 +1774,34 @@ export default function ReservationsPage() {
             </div>
 
             <div>
-              <Label htmlFor="table_preference" className="text-sm font-medium">Table Preference (Optional)</Label>
+              <Label htmlFor="table_preference" className="text-sm font-medium">{tx.tablePreferenceOptional}</Label>
               <Input
                 id="table_preference"
                 value={newReservation.table_preference}
                 onChange={(e) => setNewReservation(prev => ({ ...prev, table_preference: e.target.value }))}
-                placeholder="e.g., Window seat, outdoor, quiet area"
+                placeholder={tx.tablePreferenceExample}
                 className="mt-1"
               />
             </div>
 
             <div>
-              <Label htmlFor="special_requests" className="text-sm font-medium">Special Requests (Optional)</Label>
+              <Label htmlFor="special_requests" className="text-sm font-medium">{tx.specialRequestsOptional}</Label>
               <Textarea
                 id="special_requests"
                 value={newReservation.special_requests}
                 onChange={(e) => setNewReservation(prev => ({ ...prev, special_requests: e.target.value }))}
-                placeholder="Any special requests or dietary restrictions"
+                placeholder={tx.specialRequestsExample}
                 className="mt-1"
                 rows={3}
               />
             </div>
 
             <div className="flex gap-2 pt-4">
-              <Button 
+              <Button
                 onClick={createReservation}
                 disabled={!newReservation.customer_name || !newReservation.customer_phone}
-                className="bg-purple-600 hover:bg-purple-700"
               >
-                Create Reservation
+                {tx.createReservation}
               </Button>
               <Button 
                 variant="outline" 
@@ -1606,7 +1819,7 @@ export default function ReservationsPage() {
                   })
                 }}
               >
-                Cancel
+                {tx.cancel}
               </Button>
             </div>
           </div>

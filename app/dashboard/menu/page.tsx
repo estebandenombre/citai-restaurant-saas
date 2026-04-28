@@ -30,6 +30,7 @@ import { Loading } from "@/components/ui/loading"
 import { FormattedPrice } from "@/components/ui/formatted-price"
 import Image from "next/image"
 import AddMenuItemForm from "@/components/menu/add-menu-item-form"
+import { useI18n } from "@/components/i18n/i18n-provider"
 
 interface Category {
   id: string
@@ -59,6 +60,100 @@ interface MenuItem {
 }
 
 export default function MenuPage() {
+  const { locale } = useI18n()
+  const tx =
+    locale === "es-ES"
+      ? {
+          loading: "Cargando menu...",
+          stats: {
+            totalCategories: "Total categorias",
+            menuItems: "Items del menu",
+            featuredItems: "Items destacados",
+            highlighted: "Items destacados",
+            avgPrice: "Precio medio",
+            avgItemPrice: "Precio medio por item",
+          },
+          tabs: { byCategory: "Por categoria", allItems: "Todos los items" },
+          emptyCategoriesTitle: "Aun no hay categorias",
+          emptyCategoriesDesc: "Crea tu primera categoria para organizar el menu",
+          inactive: "Inactivo",
+          deleteCategory: "Eliminar categoria",
+          cancel: "Cancelar",
+          delete: "Eliminar",
+          featured: "Destacado",
+          unavailable: "No disponible",
+          deleteMenuItem: "Eliminar item del menu",
+          noItemsInCategory: "Aun no hay items en esta categoria",
+          uncategorizedItems: "Items sin categoria",
+          noMenuItemsYet: "Aun no hay items en el menu",
+          addFirstItem: "Anade tu primer item para empezar",
+          categoryName: "Nombre de categoria",
+          descriptionOptional: "Descripcion (opcional)",
+          available: "Disponible",
+          categoryLabel: "Categoria",
+          uncategorized: "Sin categoria",
+          addCategory: "Anadir categoria",
+          addItems: "Anadir items",
+          addItem: "Anadir item",
+          addMenuItem: "Anadir item del menu",
+          editCategory: "Editar categoria",
+          addNewCategory: "Anadir nueva categoria",
+          updateCategoryInfo: "Actualizar informacion de la categoria",
+          createCategoryHelp: "Crear una nueva categoria para los items del menu",
+          create: "Crear",
+          update: "Actualizar",
+          confirmDeleteCategory: 'Seguro que quieres eliminar "{name}"? Esto tambien eliminara todos los items de esta categoria.',
+          confirmDeleteItem: 'Seguro que quieres eliminar "{name}"?',
+          statsAvailable: "disponibles",
+          alertUpdated: "Item de menu actualizado correctamente",
+          alertUpdateError: "Error al actualizar el item de menu. Intentalo de nuevo.",
+        }
+      : {
+          loading: "Loading menu...",
+          stats: {
+            totalCategories: "Total Categories",
+            menuItems: "Menu Items",
+            featuredItems: "Featured Items",
+            highlighted: "Highlighted items",
+            avgPrice: "Avg. Price",
+            avgItemPrice: "Average item price",
+          },
+          tabs: { byCategory: "By Category", allItems: "All Items" },
+          emptyCategoriesTitle: "No categories yet",
+          emptyCategoriesDesc: "Create your first category to organize your menu items",
+          inactive: "Inactive",
+          deleteCategory: "Delete Category",
+          cancel: "Cancel",
+          delete: "Delete",
+          featured: "Featured",
+          unavailable: "Unavailable",
+          deleteMenuItem: "Delete Menu Item",
+          noItemsInCategory: "No items in this category yet",
+          uncategorizedItems: "Uncategorized Items",
+          noMenuItemsYet: "No menu items yet",
+          addFirstItem: "Add your first menu item to get started",
+          categoryName: "Category Name",
+          descriptionOptional: "Description (Optional)",
+          available: "Available",
+          categoryLabel: "Category",
+          uncategorized: "Uncategorized",
+          addCategory: "Add Category",
+          addItems: "Add Items",
+          addItem: "Add Item",
+          addMenuItem: "Add Menu Item",
+          editCategory: "Edit Category",
+          addNewCategory: "Add New Category",
+          updateCategoryInfo: "Update category information",
+          createCategoryHelp: "Create a new category for your menu items",
+          create: "Create",
+          update: "Update",
+          confirmDeleteCategory: 'Are you sure you want to delete "{name}"? This will also remove all menu items in this category.',
+          confirmDeleteItem: 'Are you sure you want to delete "{name}"?',
+          statsAvailable: "available",
+          alertUpdated: "Menu item updated successfully!",
+          alertUpdateError: "Error updating menu item. Please try again.",
+        }
+
   const [categories, setCategories] = useState<Category[]>([])
   const [menuItems, setMenuItems] = useState<MenuItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -247,10 +342,10 @@ export default function MenuPage() {
       setShowAddItemForm(false)
       
       // Show success message
-      alert("Menu item updated successfully!")
+      alert(tx.alertUpdated)
     } catch (error) {
       console.error("Error updating menu item:", error)
-      alert("Error updating menu item. Please try again.")
+      alert(tx.alertUpdateError)
     }
   }
 
@@ -367,7 +462,7 @@ export default function MenuPage() {
   }
 
   if (loading) {
-    return <Loading text="Loading menu..." />
+    return <Loading text={tx.loading} />
   }
 
   return (
@@ -395,14 +490,14 @@ export default function MenuPage() {
               className="border border-gray-200 rounded-lg"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Add Category
+              {tx.addCategory}
             </Button>
             <Button 
               onClick={() => openItemDialog()}
               className="bg-orange-600 hover:bg-orange-700 text-white text-sm px-4 py-2 rounded-lg shadow-sm"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Add Items
+              {tx.addItems}
             </Button>
           </div>
         </div>
@@ -412,47 +507,47 @@ export default function MenuPage() {
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Categories</CardTitle>
+            <CardTitle className="text-sm font-medium">{tx.stats.totalCategories}</CardTitle>
             <ChefHat className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{categories.length}</div>
-            <p className="text-xs text-muted-foreground">{categories.filter((c) => c.is_active).length} available</p>
+            <p className="text-xs text-muted-foreground">{categories.filter((c) => c.is_active).length} {tx.statsAvailable}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Menu Items</CardTitle>
+            <CardTitle className="text-sm font-medium">{tx.stats.menuItems}</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{menuItems.length}</div>
-            <p className="text-xs text-muted-foreground">{menuItems.filter((i) => i.is_available).length} available</p>
+            <p className="text-xs text-muted-foreground">{menuItems.filter((i) => i.is_available).length} {tx.statsAvailable}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Featured Items</CardTitle>
+            <CardTitle className="text-sm font-medium">{tx.stats.featuredItems}</CardTitle>
             <Star className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{menuItems.filter((i) => i.is_featured).length}</div>
-            <p className="text-xs text-muted-foreground">Highlighted items</p>
+            <p className="text-xs text-muted-foreground">{tx.stats.highlighted}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg. Price</CardTitle>
+            <CardTitle className="text-sm font-medium">{tx.stats.avgPrice}</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               <FormattedPrice amount={menuItems.length > 0 ? menuItems.reduce((sum, item) => sum + item.price, 0) / menuItems.length : 0} restaurantId={restaurantId || undefined} />
             </div>
-            <p className="text-xs text-muted-foreground">Average item price</p>
+            <p className="text-xs text-muted-foreground">{tx.stats.avgItemPrice}</p>
           </CardContent>
         </Card>
       </div>
@@ -460,8 +555,8 @@ export default function MenuPage() {
       {/* Menu Content */}
       <Tabs defaultValue="by-category" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="by-category">By Category</TabsTrigger>
-          <TabsTrigger value="all-items">All Items</TabsTrigger>
+          <TabsTrigger value="by-category">{tx.tabs.byCategory}</TabsTrigger>
+          <TabsTrigger value="all-items">{tx.tabs.allItems}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="by-category" className="space-y-4">
@@ -469,11 +564,11 @@ export default function MenuPage() {
             <Card>
               <CardContent className="text-center py-12">
                 <ChefHat className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">No categories yet</h3>
-                <p className="text-gray-500 mb-4">Create your first category to organize your menu items</p>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">{tx.emptyCategoriesTitle}</h3>
+                <p className="text-gray-500 mb-4">{tx.emptyCategoriesDesc}</p>
                 <Button onClick={() => openCategoryDialog()}>
                   <Plus className="mr-2 h-4 w-4" />
-                  Add Category
+                  {tx.addCategory}
                 </Button>
               </CardContent>
             </Card>
@@ -486,7 +581,7 @@ export default function MenuPage() {
                       <div>
                         <CardTitle className="flex items-center space-x-2">
                           <span>{category.name}</span>
-                          {!category.is_active && <Badge variant="secondary">Inactive</Badge>}
+                          {!category.is_active && <Badge variant="secondary">{tx.inactive}</Badge>}
                         </CardTitle>
                         {category.description && (
                           <p className="text-sm text-muted-foreground mt-1">{category.description}</p>
@@ -504,16 +599,15 @@ export default function MenuPage() {
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
-                              <AlertDialogTitle>Delete Category</AlertDialogTitle>
+                              <AlertDialogTitle>{tx.deleteCategory}</AlertDialogTitle>
                               <AlertDialogDescription>
-                                Are you sure you want to delete "{category.name}"? This will also remove all menu items
-                                in this category.
+                                {tx.confirmDeleteCategory.replace("{name}", category.name)}
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogCancel>{tx.cancel}</AlertDialogCancel>
                               <AlertDialogAction onClick={() => handleDeleteCategory(category.id)}>
-                                Delete
+                                {tx.delete}
                               </AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>
@@ -532,7 +626,7 @@ export default function MenuPage() {
                                 {item.is_featured && (
                                   <div className="flex items-center mt-1">
                                     <Star className="h-3 w-3 text-yellow-500 mr-1" />
-                                    <span className="text-xs text-yellow-600 font-medium">Featured</span>
+                                    <span className="text-xs text-yellow-600 font-medium">{tx.featured}</span>
                                   </div>
                                 )}
                               </div>
@@ -608,7 +702,7 @@ export default function MenuPage() {
                                 {/* Unavailable Badge */}
                                 {!item.is_available && (
                                   <div className="mt-2">
-                                    <Badge variant="secondary" className="text-xs">Unavailable</Badge>
+                                    <Badge variant="secondary" className="text-xs">{tx.unavailable}</Badge>
                                   </div>
                                 )}
                               </div>
@@ -626,15 +720,15 @@ export default function MenuPage() {
                                   </AlertDialogTrigger>
                                   <AlertDialogContent>
                                     <AlertDialogHeader>
-                                      <AlertDialogTitle>Delete Menu Item</AlertDialogTitle>
+                                      <AlertDialogTitle>{tx.deleteMenuItem}</AlertDialogTitle>
                                       <AlertDialogDescription>
-                                        Are you sure you want to delete "{item.name}"?
+                                        {tx.confirmDeleteItem.replace("{name}", item.name)}
                                       </AlertDialogDescription>
                                     </AlertDialogHeader>
                                     <AlertDialogFooter>
-                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                      <AlertDialogCancel>{tx.cancel}</AlertDialogCancel>
                                       <AlertDialogAction onClick={() => handleDeleteMenuItem(item.id)}>
-                                        Delete
+                                        {tx.delete}
                                       </AlertDialogAction>
                                     </AlertDialogFooter>
                                   </AlertDialogContent>
@@ -647,7 +741,7 @@ export default function MenuPage() {
                     </div>
                     {getItemsByCategory(category.id).length === 0 && (
                       <div className="text-center py-8 text-gray-500">
-                        <p>No items in this category yet</p>
+                        <p>{tx.noItemsInCategory}</p>
                         <Button
                           variant="outline"
                           size="sm"
@@ -655,7 +749,7 @@ export default function MenuPage() {
                           onClick={() => openItemDialog()}
                         >
                           <Plus className="mr-2 h-3 w-3" />
-                          Add Item
+                          {tx.addItem}
                         </Button>
                       </div>
                     )}
@@ -667,7 +761,7 @@ export default function MenuPage() {
               {getItemsByCategory(null).length > 0 && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Uncategorized Items</CardTitle>
+                    <CardTitle>{tx.uncategorizedItems}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -705,12 +799,12 @@ export default function MenuPage() {
                             </div>
                             <div className="flex justify-between items-center mb-2">
                               <div className="text-xs text-gray-500">
-                                Category: {categories.find((c) => c.id === item.category_id)?.name || "Uncategorized"}
+                                {tx.categoryLabel}: {categories.find((c) => c.id === item.category_id)?.name || tx.uncategorized}
                               </div>
                             </div>
                             <div className="flex justify-between items-center">
                               <div className="flex space-x-1">
-                                {!item.is_available && <Badge variant="secondary">Unavailable</Badge>}
+                                {!item.is_available && <Badge variant="secondary">{tx.unavailable}</Badge>}
                                 {item.dietary_info?.filter((info) => info !== 'none').map((info) => (
                                   <Badge key={info} variant="outline" className="text-xs">
                                     {info}
@@ -729,15 +823,15 @@ export default function MenuPage() {
                                   </AlertDialogTrigger>
                                   <AlertDialogContent>
                                     <AlertDialogHeader>
-                                      <AlertDialogTitle>Delete Menu Item</AlertDialogTitle>
+                                      <AlertDialogTitle>{tx.deleteMenuItem}</AlertDialogTitle>
                                       <AlertDialogDescription>
-                                        Are you sure you want to delete "{item.name}"?
+                                        {tx.confirmDeleteItem.replace("{name}", item.name)}
                                       </AlertDialogDescription>
                                     </AlertDialogHeader>
                                     <AlertDialogFooter>
-                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                      <AlertDialogCancel>{tx.cancel}</AlertDialogCancel>
                                       <AlertDialogAction onClick={() => handleDeleteMenuItem(item.id)}>
-                                        Delete
+                                        {tx.delete}
                                       </AlertDialogAction>
                                     </AlertDialogFooter>
                                   </AlertDialogContent>
@@ -760,11 +854,11 @@ export default function MenuPage() {
             <Card>
               <CardContent className="text-center py-12">
                 <ChefHat className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">No menu items yet</h3>
-                <p className="text-gray-500 mb-4">Add your first menu item to get started</p>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">{tx.noMenuItemsYet}</h3>
+                <p className="text-gray-500 mb-4">{tx.addFirstItem}</p>
                 <Button onClick={() => openItemDialog()}>
                   <Plus className="mr-2 h-4 w-4" />
-                  Add Menu Item
+                  {tx.addMenuItem}
                 </Button>
               </CardContent>
             </Card>
@@ -780,7 +874,7 @@ export default function MenuPage() {
                         {item.is_featured && (
                           <div className="flex items-center mt-1">
                             <Star className="h-3 w-3 text-yellow-500 mr-1" />
-                            <span className="text-xs text-yellow-600 font-medium">Featured</span>
+                            <span className="text-xs text-yellow-600 font-medium">{tx.featured}</span>
                           </div>
                         )}
                       </div>
@@ -835,7 +929,7 @@ export default function MenuPage() {
                     {/* Category */}
                     <div className="mb-3">
                       <div className="text-xs text-gray-500">
-                        Category: {categories.find((c) => c.id === item.category_id)?.name || "Uncategorized"}
+                        {tx.categoryLabel}: {categories.find((c) => c.id === item.category_id)?.name || tx.uncategorized}
                       </div>
                     </div>
                     <div className="flex justify-between items-start">
@@ -881,7 +975,7 @@ export default function MenuPage() {
                         {/* Unavailable Badge */}
                         {!item.is_available && (
                           <div className="mt-2">
-                            <Badge variant="secondary" className="text-xs">Unavailable</Badge>
+                            <Badge variant="secondary" className="text-xs">{tx.unavailable}</Badge>
                           </div>
                         )}
                       </div>
@@ -899,15 +993,15 @@ export default function MenuPage() {
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
-                              <AlertDialogTitle>Delete Menu Item</AlertDialogTitle>
+                              <AlertDialogTitle>{tx.deleteMenuItem}</AlertDialogTitle>
                               <AlertDialogDescription>
-                                Are you sure you want to delete "{item.name}"?
+                                {tx.confirmDeleteItem.replace("{name}", item.name)}
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogCancel>{tx.cancel}</AlertDialogCancel>
                               <AlertDialogAction onClick={() => handleDeleteMenuItem(item.id)}>
-                                Delete
+                                {tx.delete}
                               </AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>
@@ -924,16 +1018,16 @@ export default function MenuPage() {
 
       {/* Category Dialog */}
       <Dialog open={categoryDialogOpen} onOpenChange={setCategoryDialogOpen}>
-        <DialogContent>
+        <DialogContent className="rounded-2xl border-border bg-card shadow-[0_28px_70px_-30px_rgba(0,0,0,0.6)]">
           <DialogHeader>
-            <DialogTitle>{editingCategory ? "Edit Category" : "Add New Category"}</DialogTitle>
+            <DialogTitle>{editingCategory ? tx.editCategory : tx.addNewCategory}</DialogTitle>
             <DialogDescription>
-              {editingCategory ? "Update category information" : "Create a new category for your menu items"}
+              {editingCategory ? tx.updateCategoryInfo : tx.createCategoryHelp}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="category-name">Category Name</Label>
+              <Label htmlFor="category-name">{tx.categoryName}</Label>
               <Input
                 id="category-name"
                 value={categoryForm.name}
@@ -942,7 +1036,7 @@ export default function MenuPage() {
               />
             </div>
             <div>
-              <Label htmlFor="category-description">Description (Optional)</Label>
+              <Label htmlFor="category-description">{tx.descriptionOptional}</Label>
               <Textarea
                 id="category-description"
                 value={categoryForm.description}
@@ -956,14 +1050,14 @@ export default function MenuPage() {
                 checked={categoryForm.is_active}
                 onCheckedChange={(checked) => setCategoryForm({ ...categoryForm, is_active: checked })}
               />
-              <Label htmlFor="category-active">Available</Label>
+              <Label htmlFor="category-active">{tx.available}</Label>
             </div>
             <div className="flex justify-end space-x-2">
               <Button variant="outline" onClick={() => setCategoryDialogOpen(false)}>
-                Cancel
+                {tx.cancel}
               </Button>
               <Button onClick={editingCategory ? handleUpdateCategory : handleCreateCategory}>
-                {editingCategory ? "Update" : "Create"} Category
+                {editingCategory ? tx.update : tx.create} {tx.categoryLabel}
               </Button>
             </div>
           </div>
@@ -972,8 +1066,8 @@ export default function MenuPage() {
 
       {/* Add Menu Item Form */}
       {showAddItemForm && restaurantId && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg w-full max-w-6xl max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 p-4 backdrop-blur-[2px]">
+          <div className="w-full max-w-6xl max-h-[90vh] overflow-y-auto rounded-2xl border border-border bg-card shadow-[0_28px_70px_-30px_rgba(0,0,0,0.6)]">
             <AddMenuItemForm
               restaurantId={restaurantId}
               onSuccess={handleItemSuccess}

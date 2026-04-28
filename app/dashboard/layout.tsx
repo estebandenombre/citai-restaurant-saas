@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ThemeProvider } from "@/components/theme-provider"
 import { Sidebar } from "@/components/sidebar"
 import { AIChat } from "@/components/ai-chat/ai-chat"
 import { TrialExpiredBanner, TrialExpiredCard } from "@/components/subscription/trial-expired-banner"
@@ -47,13 +46,7 @@ export default function DashboardLayout({
 
   return (
     <AuthGuard>
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="light"
-        enableSystem
-        disableTransitionOnChange
-      >
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
+        <div className="app-surface min-h-screen">
           {/* Hide Tawk.to widget script */}
           <Script
             id="hide-tawk-widget"
@@ -83,7 +76,6 @@ export default function DashboardLayout({
           <MainContent sidebarCollapsed={sidebarCollapsed}>{children}</MainContent>
           <AIChat isOpen={aiChatOpen} onToggle={() => setAiChatOpen(!aiChatOpen)} />
         </div>
-      </ThemeProvider>
     </AuthGuard>
   )
 }
@@ -98,11 +90,11 @@ function MainContent({
   const { isTrialExpired, loading } = useSubscription()
   
   return (
-    <div className={`transition-all duration-300 ease-in-out min-h-screen ${
+    <div className={`min-h-screen transition-all duration-300 ease-in-out ${
       sidebarCollapsed ? 'ml-16' : 'ml-64'
     }`}>
       <main className="flex-1">
-        <div className="p-8">
+        <div className="p-4 md:p-6 lg:p-8 max-w-[1600px]">
           {/* Show trial expired card if trial has expired */}
           {!loading && isTrialExpired ? (
             <div className="max-w-2xl mx-auto mt-8">

@@ -26,6 +26,7 @@ import { getCurrentUserRestaurant } from "@/lib/auth-utils"
 import { Loading } from "@/components/ui/loading"
 import { PageHeader } from "@/components/ui/page-header"
 import { FormattedPrice } from "@/components/ui/formatted-price"
+import { useI18n } from "@/components/i18n/i18n-provider"
 
 interface InventoryItem {
   id: string
@@ -42,6 +43,135 @@ interface InventoryItem {
 }
 
 export default function InventoryPage() {
+  const { locale } = useI18n()
+  const tx =
+    locale === "es-ES"
+      ? {
+          loading: "Cargando inventario...",
+          title: "Inventario",
+          subtitle: "Controla y gestiona el inventario del restaurante",
+          addItem: "Anadir articulo",
+          totalItems: "Total articulos",
+          itemsInInventory: "Articulos en inventario",
+          lowStockAlerts: "Alertas de stock bajo",
+          needRestock: "Articulos para reponer",
+          outOfStock: "Sin stock",
+          outItems: "Articulos agotados",
+          totalValue: "Valor total",
+          currentValue: "Valor actual de inventario",
+          filters: "Filtros",
+          searchItems: "Buscar articulos",
+          searchPh: "Buscar por nombre o proveedor...",
+          stockStatus: "Estado de stock",
+          allItems: "Todos",
+          inStock: "En stock",
+          lowStock: "Stock bajo",
+          noItemsYet: "Todavia no hay articulos",
+          noItemsFound: "No se encontraron articulos",
+          addFirst: "Anade tu primer articulo para empezar",
+          adjustFilters: "Prueba a cambiar los filtros",
+          currentStock: "Stock actual",
+          minimumStock: "Stock minimo",
+          costPerUnit: "Coste por unidad",
+          supplier: "Proveedor",
+          notSet: "No definido",
+          notSpecified: "No especificado",
+          lastRestocked: "Ultima reposicion",
+          totalValueItem: "Valor total",
+          restock: "Reponer",
+          deleteTitle: "Eliminar articulo",
+          deleteDesc: "¿Seguro que quieres eliminar \"{name}\"? Esta accion no se puede deshacer.",
+          cancel: "Cancelar",
+          delete: "Eliminar",
+          editTitle: "Editar articulo de inventario",
+          addTitle: "Anadir nuevo articulo de inventario",
+          editDesc: "Actualiza la informacion del articulo",
+          addDesc: "Anade un nuevo articulo al inventario",
+          itemName: "Nombre del articulo",
+          unit: "Unidad",
+          kilograms: "Kilogramos (kg)",
+          grams: "Gramos (g)",
+          liters: "Litros (l)",
+          milliliters: "Mililitros (ml)",
+          pieces: "Piezas (pcs)",
+          boxes: "Cajas",
+          cans: "Latas",
+          bottles: "Botellas",
+          supplierName: "Nombre del proveedor",
+          update: "Actualizar",
+          add: "Anadir",
+          itemWord: "articulo",
+          restockTitle: "Reponer articulo",
+          quantityToAdd: "Cantidad a anadir",
+          notesOptional: "Notas (opcional)",
+          notesPlaceholder: "Cualquier nota adicional sobre esta reposicion",
+          newStockLevel: "Nuevo nivel de stock",
+          totalCost: "Coste total",
+          restockItem: "Reponer articulo",
+        }
+      : {
+          loading: "Loading inventory...",
+          title: "Inventory",
+          subtitle: "Monitor and manage your restaurant's inventory",
+          addItem: "Add Item",
+          totalItems: "Total Items",
+          itemsInInventory: "Items in inventory",
+          lowStockAlerts: "Low Stock Alerts",
+          needRestock: "Items need restocking",
+          outOfStock: "Out of Stock",
+          outItems: "Items completely out",
+          totalValue: "Total Value",
+          currentValue: "Current inventory value",
+          filters: "Filters",
+          searchItems: "Search Items",
+          searchPh: "Search by item name or supplier...",
+          stockStatus: "Stock Status",
+          allItems: "All Items",
+          inStock: "In Stock",
+          lowStock: "Low Stock",
+          noItemsYet: "No inventory items yet",
+          noItemsFound: "No items found",
+          addFirst: "Add your first inventory item to get started",
+          adjustFilters: "Try adjusting your filters",
+          currentStock: "Current Stock",
+          minimumStock: "Minimum Stock",
+          costPerUnit: "Cost per Unit",
+          supplier: "Supplier",
+          notSet: "Not set",
+          notSpecified: "Not specified",
+          lastRestocked: "Last restocked",
+          totalValueItem: "Total Value",
+          restock: "Restock",
+          deleteTitle: "Delete Inventory Item",
+          deleteDesc: "Are you sure you want to delete \"{name}\"? This action cannot be undone.",
+          cancel: "Cancel",
+          delete: "Delete",
+          editTitle: "Edit Inventory Item",
+          addTitle: "Add New Inventory Item",
+          editDesc: "Update inventory item information",
+          addDesc: "Add a new item to your inventory",
+          itemName: "Item Name",
+          unit: "Unit",
+          kilograms: "Kilograms (kg)",
+          grams: "Grams (g)",
+          liters: "Liters (l)",
+          milliliters: "Milliliters (ml)",
+          pieces: "Pieces (pcs)",
+          boxes: "Boxes",
+          cans: "Cans",
+          bottles: "Bottles",
+          supplierName: "Supplier name",
+          update: "Update",
+          add: "Add",
+          itemWord: "Item",
+          restockTitle: "Restock Item",
+          quantityToAdd: "Quantity to Add",
+          notesOptional: "Notes (Optional)",
+          notesPlaceholder: "Any additional notes about this restock",
+          newStockLevel: "New Stock Level",
+          totalCost: "Total Cost",
+          restockItem: "Restock Item",
+        }
   const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([])
   const [filteredItems, setFilteredItems] = useState<InventoryItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -295,11 +425,11 @@ export default function InventoryPage() {
 
   const getStockStatus = (item: InventoryItem) => {
     if (item.current_stock === 0) {
-      return { status: "out-of-stock", color: "bg-red-100 text-red-800", label: "Out of Stock" }
+      return { status: "out-of-stock", color: "bg-red-100 text-red-800", label: tx.outOfStock }
     } else if (item.current_stock <= item.minimum_stock) {
-      return { status: "low-stock", color: "bg-yellow-100 text-yellow-800", label: "Low Stock" }
+      return { status: "low-stock", color: "bg-yellow-100 text-yellow-800", label: tx.lowStock }
     } else {
-      return { status: "in-stock", color: "bg-green-100 text-green-800", label: "In Stock" }
+      return { status: "in-stock", color: "bg-green-100 text-green-800", label: tx.inStock }
     }
   }
 
@@ -318,7 +448,7 @@ export default function InventoryPage() {
   }
 
   if (loading) {
-    return <Loading text="Loading inventory..." />
+    return <Loading text={tx.loading} />
   }
 
   return (
@@ -332,10 +462,10 @@ export default function InventoryPage() {
             </div>
             <div>
               <h1 className="text-2xl font-semibold text-gray-900">
-                Inventory
+                {tx.title}
               </h1>
               <p className="text-gray-500 text-sm">
-                Monitor and manage your restaurant's inventory
+                {tx.subtitle}
               </p>
             </div>
           </div>
@@ -345,7 +475,7 @@ export default function InventoryPage() {
               className="bg-teal-600 hover:bg-teal-700 text-white text-sm px-4 py-2 rounded-lg shadow-sm"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Add Item
+              {tx.addItem}
             </Button>
           </div>
         </div>
@@ -355,47 +485,47 @@ export default function InventoryPage() {
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Items</CardTitle>
+            <CardTitle className="text-sm font-medium">{tx.totalItems}</CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{inventoryItems.length}</div>
-            <p className="text-xs text-muted-foreground">Items in inventory</p>
+            <p className="text-xs text-muted-foreground">{tx.itemsInInventory}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Low Stock Alerts</CardTitle>
+            <CardTitle className="text-sm font-medium">{tx.lowStockAlerts}</CardTitle>
             <AlertTriangle className="h-4 w-4 text-yellow-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-yellow-600">{getLowStockCount()}</div>
-            <p className="text-xs text-muted-foreground">Items need restocking</p>
+            <p className="text-xs text-muted-foreground">{tx.needRestock}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Out of Stock</CardTitle>
+            <CardTitle className="text-sm font-medium">{tx.outOfStock}</CardTitle>
             <AlertTriangle className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-red-600">{getOutOfStockCount()}</div>
-            <p className="text-xs text-muted-foreground">Items completely out</p>
+            <p className="text-xs text-muted-foreground">{tx.outItems}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Value</CardTitle>
+            <CardTitle className="text-sm font-medium">{tx.totalValue}</CardTitle>
             <DollarSign className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
               <FormattedPrice amount={getTotalValue()} restaurantId={restaurantId || undefined} />
             </div>
-            <p className="text-xs text-muted-foreground">Current inventory value</p>
+            <p className="text-xs text-muted-foreground">{tx.currentValue}</p>
           </CardContent>
         </Card>
       </div>
@@ -403,17 +533,17 @@ export default function InventoryPage() {
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Filters</CardTitle>
+          <CardTitle className="text-lg">{tx.filters}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
-              <Label htmlFor="search">Search Items</Label>
+              <Label htmlFor="search">{tx.searchItems}</Label>
               <div className="relative">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
                   id="search"
-                  placeholder="Search by item name or supplier..."
+                  placeholder={tx.searchPh}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -421,16 +551,16 @@ export default function InventoryPage() {
               </div>
             </div>
             <div className="w-full md:w-48">
-              <Label htmlFor="status">Stock Status</Label>
+              <Label htmlFor="status">{tx.stockStatus}</Label>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger>
-                  <SelectValue placeholder="All items" />
+                  <SelectValue placeholder={tx.allItems} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Items</SelectItem>
-                  <SelectItem value="in-stock">In Stock</SelectItem>
-                  <SelectItem value="low-stock">Low Stock</SelectItem>
-                  <SelectItem value="out-of-stock">Out of Stock</SelectItem>
+                  <SelectItem value="all">{tx.allItems}</SelectItem>
+                  <SelectItem value="in-stock">{tx.inStock}</SelectItem>
+                  <SelectItem value="low-stock">{tx.lowStock}</SelectItem>
+                  <SelectItem value="out-of-stock">{tx.outOfStock}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -445,17 +575,17 @@ export default function InventoryPage() {
             <CardContent className="text-center py-12">
               <Package className="h-12 w-12 mx-auto mb-4 text-gray-400" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                {inventoryItems.length === 0 ? "No inventory items yet" : "No items found"}
+                {inventoryItems.length === 0 ? tx.noItemsYet : tx.noItemsFound}
               </h3>
               <p className="text-gray-500 mb-4">
                 {inventoryItems.length === 0
-                  ? "Add your first inventory item to get started"
-                  : "Try adjusting your filters"}
+                  ? tx.addFirst
+                  : tx.adjustFilters}
               </p>
               {inventoryItems.length === 0 && (
                 <Button onClick={() => openItemDialog()}>
                   <Plus className="mr-2 h-4 w-4" />
-                  Add Item
+                  {tx.addItem}
                 </Button>
               )}
             </CardContent>
@@ -476,45 +606,45 @@ export default function InventoryPage() {
 
                         <div className="grid md:grid-cols-4 gap-4 text-sm text-gray-600">
                           <div>
-                            <span className="font-medium">Current Stock:</span>
+                            <span className="font-medium">{tx.currentStock}:</span>
                             <p className="text-lg font-bold text-gray-900">
                               {item.current_stock} {item.unit}
                             </p>
                           </div>
 
                           <div>
-                            <span className="font-medium">Minimum Stock:</span>
+                            <span className="font-medium">{tx.minimumStock}:</span>
                             <p>
                               {item.minimum_stock} {item.unit}
                             </p>
                           </div>
 
                           <div>
-                            <span className="font-medium">Cost per Unit:</span>
+                            <span className="font-medium">{tx.costPerUnit}:</span>
                             <p>
                               {item.cost_per_unit ? (
                                 <FormattedPrice amount={item.cost_per_unit} restaurantId={restaurantId || undefined} />
-                              ) : "Not set"}
+                              ) : tx.notSet}
                             </p>
                           </div>
 
                           <div>
-                            <span className="font-medium">Supplier:</span>
-                            <p>{item.supplier || "Not specified"}</p>
+                            <span className="font-medium">{tx.supplier}:</span>
+                            <p>{item.supplier || tx.notSpecified}</p>
                           </div>
                         </div>
 
                         {item.last_restocked && (
                           <div className="mt-2 text-xs text-gray-500">
                             <Calendar className="inline w-3 h-3 mr-1" />
-                            Last restocked: {new Date(item.last_restocked).toLocaleDateString()}
+                            {tx.lastRestocked}: {new Date(item.last_restocked).toLocaleDateString(locale === "es-ES" ? "es-ES" : "en-US")}
                           </div>
                         )}
 
                         {item.cost_per_unit && (
                           <div className="mt-2 text-sm">
                             <span className="font-medium text-green-600">
-                              Total Value: <FormattedPrice amount={item.current_stock * item.cost_per_unit} restaurantId={restaurantId || undefined} />
+                              {tx.totalValueItem}: <FormattedPrice amount={item.current_stock * item.cost_per_unit} restaurantId={restaurantId || undefined} />
                             </span>
                           </div>
                         )}
@@ -528,7 +658,7 @@ export default function InventoryPage() {
                           className="bg-transparent"
                         >
                           <RefreshCw className="h-4 w-4 mr-1" />
-                          Restock
+                          {tx.restock}
                         </Button>
 
                         <Button variant="outline" size="sm" onClick={() => openItemDialog(item)}>
@@ -543,14 +673,14 @@ export default function InventoryPage() {
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
-                              <AlertDialogTitle>Delete Inventory Item</AlertDialogTitle>
+                              <AlertDialogTitle>{tx.deleteTitle}</AlertDialogTitle>
                               <AlertDialogDescription>
-                                Are you sure you want to delete "{item.name}"? This action cannot be undone.
+                                {tx.deleteDesc.replace("{name}", item.name)}
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction onClick={() => handleDeleteItem(item.id)}>Delete</AlertDialogAction>
+                              <AlertDialogCancel>{tx.cancel}</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handleDeleteItem(item.id)}>{tx.delete}</AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>
                         </AlertDialog>
@@ -566,17 +696,17 @@ export default function InventoryPage() {
 
       {/* Add/Edit Item Dialog */}
       <Dialog open={itemDialogOpen} onOpenChange={setItemDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl rounded-2xl border-border bg-card shadow-[0_28px_70px_-30px_rgba(0,0,0,0.6)]">
           <DialogHeader>
-            <DialogTitle>{editingItem ? "Edit Inventory Item" : "Add New Inventory Item"}</DialogTitle>
+            <DialogTitle>{editingItem ? tx.editTitle : tx.addTitle}</DialogTitle>
             <DialogDescription>
-              {editingItem ? "Update inventory item information" : "Add a new item to your inventory"}
+              {editingItem ? tx.editDesc : tx.addDesc}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="item-name">Item Name</Label>
+                <Label htmlFor="item-name">{tx.itemName}</Label>
                 <Input
                   id="item-name"
                   value={itemForm.name}
@@ -585,20 +715,20 @@ export default function InventoryPage() {
                 />
               </div>
               <div>
-                <Label htmlFor="item-unit">Unit</Label>
+                <Label htmlFor="item-unit">{tx.unit}</Label>
                 <Select value={itemForm.unit} onValueChange={(value) => setItemForm({ ...itemForm, unit: value })}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="kg">Kilograms (kg)</SelectItem>
-                    <SelectItem value="g">Grams (g)</SelectItem>
-                    <SelectItem value="l">Liters (l)</SelectItem>
-                    <SelectItem value="ml">Milliliters (ml)</SelectItem>
-                    <SelectItem value="pcs">Pieces (pcs)</SelectItem>
-                    <SelectItem value="boxes">Boxes</SelectItem>
-                    <SelectItem value="cans">Cans</SelectItem>
-                    <SelectItem value="bottles">Bottles</SelectItem>
+                    <SelectItem value="kg">{tx.kilograms}</SelectItem>
+                    <SelectItem value="g">{tx.grams}</SelectItem>
+                    <SelectItem value="l">{tx.liters}</SelectItem>
+                    <SelectItem value="ml">{tx.milliliters}</SelectItem>
+                    <SelectItem value="pcs">{tx.pieces}</SelectItem>
+                    <SelectItem value="boxes">{tx.boxes}</SelectItem>
+                    <SelectItem value="cans">{tx.cans}</SelectItem>
+                    <SelectItem value="bottles">{tx.bottles}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -606,7 +736,7 @@ export default function InventoryPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="current-stock">Current Stock</Label>
+                <Label htmlFor="current-stock">{tx.currentStock}</Label>
                 <Input
                   id="current-stock"
                   type="number"
@@ -617,7 +747,7 @@ export default function InventoryPage() {
                 />
               </div>
               <div>
-                <Label htmlFor="minimum-stock">Minimum Stock</Label>
+                <Label htmlFor="minimum-stock">{tx.minimumStock}</Label>
                 <Input
                   id="minimum-stock"
                   type="number"
@@ -631,7 +761,7 @@ export default function InventoryPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="cost-per-unit">Cost per Unit ($)</Label>
+                <Label htmlFor="cost-per-unit">{tx.costPerUnit} ($)</Label>
                 <Input
                   id="cost-per-unit"
                   type="number"
@@ -642,12 +772,12 @@ export default function InventoryPage() {
                 />
               </div>
               <div>
-                <Label htmlFor="supplier">Supplier</Label>
+                <Label htmlFor="supplier">{tx.supplier}</Label>
                 <Input
                   id="supplier"
                   value={itemForm.supplier}
                   onChange={(e) => setItemForm({ ...itemForm, supplier: e.target.value })}
-                  placeholder="Supplier name"
+                  placeholder={tx.supplierName}
                 />
               </div>
             </div>
@@ -657,7 +787,7 @@ export default function InventoryPage() {
                 Cancel
               </Button>
               <Button onClick={editingItem ? handleUpdateItem : handleCreateItem}>
-                {editingItem ? "Update" : "Add"} Item
+                {editingItem ? tx.update : tx.add} {tx.itemWord}
               </Button>
             </div>
           </div>
@@ -666,16 +796,16 @@ export default function InventoryPage() {
 
       {/* Restock Dialog */}
       <Dialog open={restockDialogOpen} onOpenChange={setRestockDialogOpen}>
-        <DialogContent>
+        <DialogContent className="rounded-2xl border-border bg-card shadow-[0_28px_70px_-30px_rgba(0,0,0,0.6)]">
           <DialogHeader>
-            <DialogTitle>Restock Item</DialogTitle>
+            <DialogTitle>{tx.restockTitle}</DialogTitle>
             <DialogDescription>
               Add stock to "{restockingItem?.name}" - Current: {restockingItem?.current_stock} {restockingItem?.unit}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="restock-quantity">Quantity to Add</Label>
+              <Label htmlFor="restock-quantity">{tx.quantityToAdd}</Label>
               <Input
                 id="restock-quantity"
                 type="number"
@@ -687,7 +817,7 @@ export default function InventoryPage() {
             </div>
 
             <div>
-              <Label htmlFor="restock-cost">Cost per Unit ($)</Label>
+              <Label htmlFor="restock-cost">{tx.costPerUnit} ($)</Label>
               <Input
                 id="restock-cost"
                 type="number"
@@ -699,7 +829,7 @@ export default function InventoryPage() {
             </div>
 
             <div>
-              <Label htmlFor="restock-supplier">Supplier</Label>
+              <Label htmlFor="restock-supplier">{tx.supplier}</Label>
               <Input
                 id="restock-supplier"
                 value={restockForm.supplier}
@@ -709,24 +839,24 @@ export default function InventoryPage() {
             </div>
 
             <div>
-              <Label htmlFor="restock-notes">Notes (Optional)</Label>
+              <Label htmlFor="restock-notes">{tx.notesOptional}</Label>
               <Textarea
                 id="restock-notes"
                 value={restockForm.notes}
                 onChange={(e) => setRestockForm({ ...restockForm, notes: e.target.value })}
-                placeholder="Any additional notes about this restock"
+                placeholder={tx.notesPlaceholder}
               />
             </div>
 
             {restockForm.quantity && restockingItem && (
               <div className="p-3 bg-blue-50 rounded-lg">
                 <p className="text-sm text-blue-800">
-                  <strong>New Stock Level:</strong>{" "}
+                  <strong>{tx.newStockLevel}:</strong>{" "}
                   {restockingItem.current_stock + Number.parseFloat(restockForm.quantity)} {restockingItem.unit}
                 </p>
                 {restockForm.cost_per_unit && (
                   <p className="text-sm text-blue-800">
-                    <strong>Total Cost:</strong> $
+                    <strong>{tx.totalCost}:</strong> $
                     {(Number.parseFloat(restockForm.quantity) * Number.parseFloat(restockForm.cost_per_unit)).toFixed(
                       2,
                     )}
@@ -739,7 +869,7 @@ export default function InventoryPage() {
               <Button variant="outline" onClick={() => setRestockDialogOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleRestock}>Restock Item</Button>
+              <Button onClick={handleRestock}>{tx.restockItem}</Button>
             </div>
           </div>
         </DialogContent>

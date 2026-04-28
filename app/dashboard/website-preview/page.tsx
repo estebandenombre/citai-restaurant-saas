@@ -22,8 +22,66 @@ import { supabase } from "@/lib/supabase"
 import { getCurrentUserRestaurant } from "@/lib/auth-utils"
 import Link from "next/link"
 import QRCode from "qrcode"
+import { useI18n } from "@/components/i18n/i18n-provider"
 
 export default function WebsitePreviewPage() {
+  const { locale } = useI18n()
+  const tx =
+    locale === "es-ES"
+      ? {
+          copied: "URL copiada",
+          copiedDesc: "La URL se ha copiado al portapapeles",
+          copyFailed: "No se pudo copiar",
+          copyFailedDesc: "Copia la URL manualmente",
+          noWebsite: "No hay web disponible",
+          noWebsiteDesc: "Todavia no has configurado la web del restaurante.",
+          configure: "Configurar restaurante",
+          title: "Vista previa web",
+          subtitle: "Previsualiza y comparte la web de tu restaurante",
+          openWebsite: "Abrir web",
+          preview: "Vista previa",
+          websiteUrl: "URL del sitio web",
+          websiteUrlDesc: "Comparte este enlace con tus clientes",
+          visitWebsite: "Visitar web",
+          qrTitle: "Codigo QR",
+          qrDesc: "Escanea para visitar la web",
+          download: "Descargar",
+          generateQrHint: "Genera un codigo QR para compartir",
+          generateQr: "Generar codigo QR",
+          quickActions: "Acciones rapidas",
+          socialCopied: "Mensaje copiado",
+          socialCopiedDesc: "Listo para compartir en redes sociales",
+          socialCopy: "Copiar mensaje social",
+          printQr: "Imprimir codigo QR",
+          scanQrHint: "Escanea este codigo QR para visitar la web",
+        }
+      : {
+          copied: "URL copied",
+          copiedDesc: "Website URL has been copied to clipboard",
+          copyFailed: "Failed to copy",
+          copyFailedDesc: "Please copy the URL manually",
+          noWebsite: "No website available",
+          noWebsiteDesc: "Your restaurant website is not yet configured.",
+          configure: "Configure restaurant",
+          title: "Website preview",
+          subtitle: "Preview and share your restaurant website",
+          openWebsite: "Open website",
+          preview: "Preview",
+          websiteUrl: "Website URL",
+          websiteUrlDesc: "Share this link with your customers",
+          visitWebsite: "Visit website",
+          qrTitle: "QR code",
+          qrDesc: "Scan to visit your website",
+          download: "Download",
+          generateQrHint: "Generate QR code to share",
+          generateQr: "Generate QR code",
+          quickActions: "Quick actions",
+          socialCopied: "Message copied",
+          socialCopiedDesc: "Ready to share on social media",
+          socialCopy: "Copy social message",
+          printQr: "Print QR Code",
+          scanQrHint: "Scan this QR code to visit the website",
+        }
   const [restaurant, setRestaurant] = useState<any>(null)
   const [qrCodeUrl, setQrCodeUrl] = useState<string>("")
   const [copied, setCopied] = useState(false)
@@ -74,14 +132,14 @@ export default function WebsitePreviewPage() {
       await navigator.clipboard.writeText(websiteUrl)
       setCopied(true)
       toast({
-        title: "URL copied!",
-        description: "Website URL has been copied to clipboard",
+        title: tx.copied,
+        description: tx.copiedDesc,
       })
       setTimeout(() => setCopied(false), 2000)
     } catch (error) {
       toast({
-        title: "Failed to copy",
-        description: "Please copy the URL manually",
+        title: tx.copyFailed,
+        description: tx.copyFailedDesc,
         variant: "destructive",
       })
     }
@@ -138,7 +196,7 @@ export default function WebsitePreviewPage() {
         </head>
         <body>
           <button class="print-button" onclick="window.print()" style="position: fixed; top: 20px; right: 20px; background: #2563eb; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
-            🖨️ Print QR Code
+            🖨️ ${tx.printQr}
           </button>
           <div class="qr-container">
                          <div class="restaurant-name">${restaurant.restaurant.name}</div>
@@ -146,7 +204,7 @@ export default function WebsitePreviewPage() {
             <div class="qr-code">
               <img src="${qrCodeUrl}" alt="QR Code" style="max-width: 300px; height: auto;" />
             </div>
-            <p style="color: #666; font-size: 12px;">Scan this QR code to visit the website</p>
+            <p style="color: #666; font-size: 12px;">${tx.scanQrHint}</p>
           </div>
         </body>
         </html>
@@ -194,13 +252,11 @@ export default function WebsitePreviewPage() {
         <Card>
           <CardContent className="p-8 text-center">
             <Globe className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No Website Available</h3>
-            <p className="text-gray-500 mb-4">
-              Your restaurant website is not yet configured. Please set up your restaurant information first.
-            </p>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">{tx.noWebsite}</h3>
+            <p className="text-gray-500 mb-4">{tx.noWebsiteDesc}</p>
             <Link href="/dashboard/settings">
               <Button>
-                Configure Restaurant
+                {tx.configure}
               </Button>
             </Link>
           </CardContent>
@@ -216,15 +272,15 @@ export default function WebsitePreviewPage() {
         <div>
           <h1 className="text-2xl font-semibold text-gray-900 flex items-center">
             <Globe className="h-6 w-6 mr-2 text-blue-600" />
-            Website Preview
+            {tx.title}
           </h1>
           <p className="text-gray-500 text-sm">
-            Preview and share your restaurant website
+            {tx.subtitle}
           </p>
         </div>
         <Button onClick={openWebsite}>
           <ExternalLink className="h-4 w-4 mr-2" />
-          Open Website
+          {tx.openWebsite}
         </Button>
       </div>
 
@@ -237,7 +293,7 @@ export default function WebsitePreviewPage() {
                 <div className="flex items-center space-x-2">
                   <Badge variant="outline">
                     <Monitor className="h-3 w-3 mr-1" />
-                    Preview
+                    {tx.preview}
                   </Badge>
                   <div className="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
                     <Button
@@ -295,8 +351,8 @@ export default function WebsitePreviewPage() {
           {/* URL Section */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Website URL</CardTitle>
-              <CardDescription>Share this link with your customers</CardDescription>
+              <CardTitle className="text-lg">{tx.websiteUrl}</CardTitle>
+              <CardDescription>{tx.websiteUrlDesc}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex space-x-2">
@@ -323,7 +379,7 @@ export default function WebsitePreviewPage() {
                 className="w-full"
               >
                 <ExternalLink className="h-4 w-4 mr-2" />
-                Visit Website
+                {tx.visitWebsite}
               </Button>
             </CardContent>
           </Card>
@@ -331,8 +387,8 @@ export default function WebsitePreviewPage() {
           {/* QR Code Section */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">QR Code</CardTitle>
-              <CardDescription>Scan to visit your website</CardDescription>
+              <CardTitle className="text-lg">{tx.qrTitle}</CardTitle>
+              <CardDescription>{tx.qrDesc}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {qrCodeUrl ? (
@@ -364,19 +420,19 @@ export default function WebsitePreviewPage() {
                       }}
                     >
                       <Download className="h-4 w-4 mr-2" />
-                      Download
+                      {tx.download}
                     </Button>
                   </div>
                 </div>
               ) : (
                 <div className="text-center py-8">
                   <QrCode className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                  <p className="text-sm text-gray-500 mb-4">Generate QR code to share</p>
+                  <p className="text-sm text-gray-500 mb-4">{tx.generateQrHint}</p>
                   <Button
                     onClick={generateQRCode}
                   >
                     <QrCode className="h-4 w-4 mr-2" />
-                    Generate QR Code
+                    {tx.generateQr}
                   </Button>
                 </div>
               )}
@@ -386,7 +442,7 @@ export default function WebsitePreviewPage() {
           {/* Quick Actions */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Quick Actions</CardTitle>
+              <CardTitle className="text-lg">{tx.quickActions}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               {/* Copy URL & Print QR button temporarily disabled
@@ -410,14 +466,14 @@ export default function WebsitePreviewPage() {
                                      const text = `Check out ${restaurant.restaurant.name}'s website: ${websiteUrl}`
                   navigator.clipboard.writeText(text)
                   toast({
-                    title: "Message copied!",
-                    description: "Ready to share on social media",
+                    title: tx.socialCopied,
+                    description: tx.socialCopiedDesc,
                   })
                 }}
                 className="w-full"
               >
                 <Globe className="h-4 w-4 mr-2" />
-                Copy Social Message
+                {tx.socialCopy}
               </Button>
             </CardContent>
           </Card>

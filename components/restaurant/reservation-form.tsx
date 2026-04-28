@@ -21,6 +21,7 @@ import {
   MapPin,
   MessageSquare,
 } from "lucide-react"
+import { useI18n } from "@/components/i18n/i18n-provider"
 
 interface ReservationFormProps {
   restaurantId: string
@@ -39,6 +40,75 @@ interface ReservationData {
 }
 
 export default function ReservationForm({ restaurantId, restaurantName }: ReservationFormProps) {
+  const { locale } = useI18n()
+  const tx =
+    locale === "es-ES"
+      ? {
+          failedCreate: "No se pudo crear la reserva",
+          submittedTitle: "Reserva enviada",
+          submittedDesc: "Gracias por tu solicitud. Confirmaremos la reserva en breve.",
+          makeAnother: "Hacer otra reserva",
+          bookTable: "Reservar mesa",
+          reserveAt: "Reserva tu mesa en",
+          yourDetails: "Tus datos",
+          fullName: "Nombre completo*",
+          phone: "Telefono*",
+          emailOptional: "Email (opcional)",
+          reservationDetails: "Detalles de la reserva",
+          partySize: "Tamano del grupo*",
+          selectPartySize: "Selecciona tamano del grupo",
+          person: "persona",
+          people: "personas",
+          date: "Fecha*",
+          selectDate: "Selecciona fecha",
+          time: "Hora*",
+          selectTime: "Selecciona hora",
+          preferences: "Preferencias",
+          tablePreference: "Preferencia de mesa",
+          anyTable: "Cualquier mesa",
+          window: "Junto a ventana",
+          outdoor: "Terraza",
+          quiet: "Zona tranquila",
+          bar: "Barra",
+          specialRequests: "Peticiones especiales",
+          specialRequestsPlaceholder: "Alergias o peticiones especiales...",
+          submitting: "Enviando...",
+          requestReservation: "Solicitar reserva",
+          requiredNote: "* Campos obligatorios. Confirmaremos tu reserva en 24 horas.",
+        }
+      : {
+          failedCreate: "Failed to create reservation",
+          submittedTitle: "Reservation Submitted!",
+          submittedDesc: "Thank you for your reservation request. We'll confirm your booking shortly.",
+          makeAnother: "Make Another Reservation",
+          bookTable: "Book a Table",
+          reserveAt: "Reserve your table at",
+          yourDetails: "Your Details",
+          fullName: "Full name*",
+          phone: "Phone*",
+          emailOptional: "Email (optional)",
+          reservationDetails: "Reservation Details",
+          partySize: "Party Size*",
+          selectPartySize: "Select party size",
+          person: "person",
+          people: "people",
+          date: "Date*",
+          selectDate: "Select date",
+          time: "Time*",
+          selectTime: "Select time",
+          preferences: "Preferences",
+          tablePreference: "Table Preference",
+          anyTable: "Any table is fine",
+          window: "Window seat",
+          outdoor: "Outdoor seating",
+          quiet: "Quiet area",
+          bar: "Bar seating",
+          specialRequests: "Special Requests",
+          specialRequestsPlaceholder: "Any special requests or dietary requirements...",
+          submitting: "Submitting...",
+          requestReservation: "Request Reservation",
+          requiredNote: "* Required fields. We'll confirm your reservation within 24 hours.",
+        }
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [error, setError] = useState("")
@@ -103,13 +173,13 @@ export default function ReservationForm({ restaurantId, restaurantName }: Reserv
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to create reservation')
+        throw new Error(errorData.error || tx.failedCreate)
       }
 
       setIsSubmitted(true)
     } catch (error: any) {
       console.error('Error creating reservation:', error)
-      setError(error.message || 'Failed to create reservation')
+      setError(error.message || tx.failedCreate)
     } finally {
       setIsSubmitting(false)
     }
@@ -124,9 +194,9 @@ export default function ReservationForm({ restaurantId, restaurantName }: Reserv
       <Card className="w-full max-w-md mx-auto">
         <CardContent className="p-6 text-center">
           <CheckCircle className="h-12 w-12 text-green-600 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">Reservation Submitted!</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">{tx.submittedTitle}</h3>
           <p className="text-gray-600 mb-4">
-            Thank you for your reservation request. We'll confirm your booking shortly.
+            {tx.submittedDesc}
           </p>
           <Button 
             onClick={() => {
@@ -144,7 +214,7 @@ export default function ReservationForm({ restaurantId, restaurantName }: Reserv
             }}
             className="w-full"
           >
-            Make Another Reservation
+            {tx.makeAnother}
           </Button>
         </CardContent>
       </Card>
@@ -156,10 +226,10 @@ export default function ReservationForm({ restaurantId, restaurantName }: Reserv
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center space-x-2 text-2xl font-bold text-slate-900">
           <Calendar className="h-6 w-6 text-blue-600" />
-          <span>Book a Table</span>
+          <span>{tx.bookTable}</span>
         </CardTitle>
         <CardDescription className="text-base text-slate-600 mt-2">
-          Reserve your table at <span className="font-semibold text-slate-900">{restaurantName}</span>
+          {tx.reserveAt} <span className="font-semibold text-slate-900">{restaurantName}</span>
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -167,7 +237,7 @@ export default function ReservationForm({ restaurantId, restaurantName }: Reserv
           {/* Datos personales */}
           <div className="rounded-2xl bg-slate-50/80 border border-slate-100 p-6 space-y-4 shadow-sm">
             <h3 className="text-lg font-semibold text-slate-800 mb-2 flex items-center gap-2">
-              <User className="h-5 w-5 text-blue-500" /> Your Details
+              <User className="h-5 w-5 text-blue-500" /> {tx.yourDetails}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="relative">
@@ -175,7 +245,7 @@ export default function ReservationForm({ restaurantId, restaurantName }: Reserv
                   id="customerName"
                   value={formData.customerName}
                   onChange={(e) => handleInputChange('customerName', e.target.value)}
-                  placeholder="Full name*"
+                  placeholder={tx.fullName}
                   required
                   className="pl-10 h-12 text-base"
                 />
@@ -187,7 +257,7 @@ export default function ReservationForm({ restaurantId, restaurantName }: Reserv
                   type="tel"
                   value={formData.customerPhone}
                   onChange={(e) => handleInputChange('customerPhone', e.target.value)}
-                  placeholder="Phone*"
+                  placeholder={tx.phone}
                   required
                   className="pl-10 h-12 text-base"
                 />
@@ -199,7 +269,7 @@ export default function ReservationForm({ restaurantId, restaurantName }: Reserv
                   type="email"
                   value={formData.customerEmail}
                   onChange={(e) => handleInputChange('customerEmail', e.target.value)}
-                  placeholder="Email (optional)"
+                  placeholder={tx.emailOptional}
                   className="pl-10 h-12 text-base"
                 />
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
@@ -210,42 +280,42 @@ export default function ReservationForm({ restaurantId, restaurantName }: Reserv
           {/* Detalles de reserva */}
           <div className="rounded-2xl bg-slate-50/80 border border-slate-100 p-6 space-y-4 shadow-sm">
             <h3 className="text-lg font-semibold text-slate-800 mb-2 flex items-center gap-2">
-              <Clock className="h-5 w-5 text-blue-500" /> Reservation Details
+              <Clock className="h-5 w-5 text-blue-500" /> {tx.reservationDetails}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <Label className="mb-1 block text-slate-700">Party Size*</Label>
+                <Label className="mb-1 block text-slate-700">{tx.partySize}</Label>
                 <Select
                   value={formData.partySize.toString()}
                   onValueChange={(value) => handleInputChange('partySize', parseInt(value))}
                 >
                   <SelectTrigger className="h-12 text-base">
-                    <SelectValue placeholder="Select party size" />
+                    <SelectValue placeholder={tx.selectPartySize} />
                   </SelectTrigger>
                   <SelectContent>
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(size => (
                       <SelectItem key={size} value={size.toString()}>
-                        {size} {size === 1 ? 'person' : 'people'}
+                        {size} {size === 1 ? tx.person : tx.people}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <Label className="mb-1 block text-slate-700">Date*</Label>
+                <Label className="mb-1 block text-slate-700">{tx.date}</Label>
                 <Select
                   value={formData.reservationDate}
                   onValueChange={(value) => handleInputChange('reservationDate', value)}
                 >
                   <SelectTrigger className="h-12 text-base">
-                    <SelectValue placeholder="Select date" />
+                    <SelectValue placeholder={tx.selectDate} />
                   </SelectTrigger>
                   <SelectContent>
                     {generateDateSlots().map(date => {
                       const displayDate = new Date(date)
                       return (
                         <SelectItem key={date} value={date}>
-                          {displayDate.toLocaleDateString('en-US', { 
+                          {displayDate.toLocaleDateString(locale, {
                             weekday: 'short', 
                             month: 'short', 
                             day: 'numeric' 
@@ -257,13 +327,13 @@ export default function ReservationForm({ restaurantId, restaurantName }: Reserv
                 </Select>
               </div>
               <div>
-                <Label className="mb-1 block text-slate-700">Time*</Label>
+                <Label className="mb-1 block text-slate-700">{tx.time}</Label>
                 <Select
                   value={formData.reservationTime}
                   onValueChange={(value) => handleInputChange('reservationTime', value)}
                 >
                   <SelectTrigger className="h-12 text-base">
-                    <SelectValue placeholder="Select time" />
+                    <SelectValue placeholder={tx.selectTime} />
                   </SelectTrigger>
                   <SelectContent>
                     {generateTimeSlots().map(time => {
@@ -288,34 +358,34 @@ export default function ReservationForm({ restaurantId, restaurantName }: Reserv
           {/* Preferencias */}
           <div className="rounded-2xl bg-slate-50/80 border border-slate-100 p-6 space-y-4 shadow-sm">
             <h3 className="text-lg font-semibold text-slate-800 mb-2 flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-blue-500" /> Preferences
+              <MapPin className="h-5 w-5 text-blue-500" /> {tx.preferences}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label className="mb-1 block text-slate-700">Table Preference</Label>
+                <Label className="mb-1 block text-slate-700">{tx.tablePreference}</Label>
                 <Select
                   value={formData.tablePreference}
                   onValueChange={(value) => handleInputChange('tablePreference', value)}
                 >
                   <SelectTrigger className="h-12 text-base">
-                    <SelectValue placeholder="Any table is fine" />
+                    <SelectValue placeholder={tx.anyTable} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="any">Any table is fine</SelectItem>
-                    <SelectItem value="window">Window seat</SelectItem>
-                    <SelectItem value="outdoor">Outdoor seating</SelectItem>
-                    <SelectItem value="quiet">Quiet area</SelectItem>
-                    <SelectItem value="bar">Bar seating</SelectItem>
+                    <SelectItem value="any">{tx.anyTable}</SelectItem>
+                    <SelectItem value="window">{tx.window}</SelectItem>
+                    <SelectItem value="outdoor">{tx.outdoor}</SelectItem>
+                    <SelectItem value="quiet">{tx.quiet}</SelectItem>
+                    <SelectItem value="bar">{tx.bar}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <Label className="mb-1 block text-slate-700">Special Requests</Label>
+                <Label className="mb-1 block text-slate-700">{tx.specialRequests}</Label>
                 <Textarea
                   id="specialRequests"
                   value={formData.specialRequests}
                   onChange={(e) => handleInputChange('specialRequests', e.target.value)}
-                  placeholder="Any special requests or dietary requirements..."
+                  placeholder={tx.specialRequestsPlaceholder}
                   rows={3}
                   className="h-12 text-base"
                 />
@@ -338,14 +408,14 @@ export default function ReservationForm({ restaurantId, restaurantName }: Reserv
             disabled={isSubmitting}
           >
             {isSubmitting ? (
-              <span className="flex items-center justify-center gap-2"><Clock className="h-5 w-5 animate-spin" /> Submitting...</span>
+              <span className="flex items-center justify-center gap-2"><Clock className="h-5 w-5 animate-spin" /> {tx.submitting}</span>
             ) : (
-              <span className="flex items-center justify-center gap-2"><CheckCircle className="h-5 w-5" /> Request Reservation</span>
+              <span className="flex items-center justify-center gap-2"><CheckCircle className="h-5 w-5" /> {tx.requestReservation}</span>
             )}
           </Button>
 
           <p className="text-xs text-gray-500 text-center mt-2">
-            * Required fields. We'll confirm your reservation within 24 hours.
+            {tx.requiredNote}
           </p>
         </form>
       </CardContent>

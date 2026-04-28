@@ -7,8 +7,67 @@ import { Button } from '@/components/ui/button'
 import { Clock, CheckCircle, XCircle, AlertCircle, Mail } from 'lucide-react'
 import { UpgradeRequestService, UpgradeRequest } from '@/lib/upgrade-request-service'
 import { useToast } from '@/hooks/use-toast'
+import { useI18n } from '@/components/i18n/i18n-provider'
 
 export default function UpgradeRequestsPage() {
+  const { locale } = useI18n()
+  const tx =
+    locale === 'es-ES'
+      ? {
+          title: 'Solicitudes de upgrade',
+          errTitle: 'Error',
+          errLoad: 'No se han podido cargar las solicitudes.',
+          status: {
+            pending: 'Pendiente',
+            approved: 'Aprobada',
+            rejected: 'Rechazada',
+            completed: 'Completada',
+            unknown: 'Desconocido',
+          },
+          emptyTitle: 'Sin solicitudes de upgrade',
+          emptyBody: 'Todavia no has enviado ninguna solicitud.',
+          viewPlans: 'Ver planes',
+          upgradeTo: 'Upgrade a',
+          requestedOn: 'Solicitada el',
+          currentPlan: 'Plan actual',
+          requestedPlan: 'Plan solicitado',
+          noPlan: 'Sin plan',
+          message: 'Mensaje',
+          adminResponse: 'Respuesta de admin',
+          processedOn: 'Procesada el',
+          pendingMsg: 'Tu solicitud esta en revision. Te contactaremos en menos de 24 horas.',
+          approvedMsg: 'Tu solicitud ha sido aprobada. El plan se actualizara en breve.',
+          rejectedMsg: 'Tu solicitud ha sido rechazada. Contacta con soporte para mas informacion.',
+          completedMsg: 'Tu plan se ha actualizado correctamente.',
+        }
+      : {
+          title: 'Upgrade Requests',
+          errTitle: 'Error',
+          errLoad: 'Failed to load upgrade requests.',
+          status: {
+            pending: 'Pending',
+            approved: 'Approved',
+            rejected: 'Rejected',
+            completed: 'Completed',
+            unknown: 'Unknown',
+          },
+          emptyTitle: 'No upgrade requests',
+          emptyBody: "You haven't submitted any upgrade requests yet.",
+          viewPlans: 'View Plans',
+          upgradeTo: 'Upgrade to',
+          requestedOn: 'Requested on',
+          currentPlan: 'Current plan',
+          requestedPlan: 'Requested plan',
+          noPlan: 'No plan',
+          message: 'Message',
+          adminResponse: 'Admin response',
+          processedOn: 'Processed on',
+          pendingMsg: "Your request is being reviewed. We'll contact you within 24 hours.",
+          approvedMsg: 'Your request has been approved! Your plan will be updated shortly.',
+          rejectedMsg: 'Your request has been rejected. Please contact support for more information.',
+          completedMsg: 'Your plan has been successfully upgraded!',
+        }
+
   const [requests, setRequests] = useState<UpgradeRequest[]>([])
   const [loading, setLoading] = useState(true)
   const { toast } = useToast()
@@ -25,8 +84,8 @@ export default function UpgradeRequestsPage() {
     } catch (error) {
       console.error('Error loading upgrade requests:', error)
       toast({
-        title: "Error",
-        description: "Failed to load upgrade requests.",
+        title: tx.errTitle,
+        description: tx.errLoad,
         variant: "destructive",
       })
     } finally {
@@ -52,20 +111,20 @@ export default function UpgradeRequestsPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'pending':
-        return <Badge variant="secondary">Pending</Badge>
+        return <Badge variant="secondary">{tx.status.pending}</Badge>
       case 'approved':
-        return <Badge variant="default" className="bg-green-500">Approved</Badge>
+        return <Badge variant="default" className="bg-green-500">{tx.status.approved}</Badge>
       case 'rejected':
-        return <Badge variant="destructive">Rejected</Badge>
+        return <Badge variant="destructive">{tx.status.rejected}</Badge>
       case 'completed':
-        return <Badge variant="default" className="bg-blue-500">Completed</Badge>
+        return <Badge variant="default" className="bg-blue-500">{tx.status.completed}</Badge>
       default:
-        return <Badge variant="outline">Unknown</Badge>
+        return <Badge variant="outline">{tx.status.unknown}</Badge>
     }
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return new Date(dateString).toLocaleDateString(locale === 'es-ES' ? 'es-ES' : 'en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
@@ -79,7 +138,7 @@ export default function UpgradeRequestsPage() {
       <div className="space-y-6">
         <div className="flex items-center gap-2">
           <Mail className="h-6 w-6" />
-          <h1 className="text-2xl font-bold">Upgrade Requests</h1>
+          <h1 className="text-2xl font-bold">{tx.title}</h1>
         </div>
         <div className="grid gap-4">
           {[...Array(3)].map((_, i) => (
@@ -105,7 +164,7 @@ export default function UpgradeRequestsPage() {
     <div className="space-y-6">
       <div className="flex items-center gap-2">
         <Mail className="h-6 w-6" />
-        <h1 className="text-2xl font-bold">Upgrade Requests</h1>
+        <h1 className="text-2xl font-bold">{tx.title}</h1>
       </div>
 
       {requests.length === 0 ? (
@@ -113,12 +172,10 @@ export default function UpgradeRequestsPage() {
           <CardContent className="pt-6">
             <div className="text-center py-8">
               <Mail className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No upgrade requests</h3>
-              <p className="text-gray-500 mb-4">
-                You haven't submitted any upgrade requests yet.
-              </p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">{tx.emptyTitle}</h3>
+              <p className="text-gray-500 mb-4">{tx.emptyBody}</p>
               <Button onClick={() => window.location.href = '/pricing'}>
-                View Plans
+                {tx.viewPlans}
               </Button>
             </div>
           </CardContent>
@@ -132,37 +189,37 @@ export default function UpgradeRequestsPage() {
                   <div className="flex items-center gap-2">
                     {getStatusIcon(request.status)}
                     <CardTitle className="text-lg">
-                      Upgrade to {request.requested_plan}
+                      {tx.upgradeTo} {request.requested_plan}
                     </CardTitle>
                   </div>
                   {getStatusBadge(request.status)}
                 </div>
                 <CardDescription>
-                  Requested on {formatDate(request.created_at)}
+                  {tx.requestedOn} {formatDate(request.created_at)}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Current Plan</p>
-                    <p className="text-sm">{request.current_plan || 'No plan'}</p>
+                    <p className="text-sm font-medium text-gray-500">{tx.currentPlan}</p>
+                    <p className="text-sm">{request.current_plan || tx.noPlan}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Requested Plan</p>
+                    <p className="text-sm font-medium text-gray-500">{tx.requestedPlan}</p>
                     <p className="text-sm font-medium">{request.requested_plan}</p>
                   </div>
                 </div>
 
                 {request.message && (
                   <div>
-                    <p className="text-sm font-medium text-gray-500 mb-1">Message</p>
+                    <p className="text-sm font-medium text-gray-500 mb-1">{tx.message}</p>
                     <p className="text-sm bg-gray-50 p-3 rounded-md">{request.message}</p>
                   </div>
                 )}
 
                 {request.admin_notes && (
                   <div>
-                    <p className="text-sm font-medium text-gray-500 mb-1">Admin Response</p>
+                    <p className="text-sm font-medium text-gray-500 mb-1">{tx.adminResponse}</p>
                     <p className="text-sm bg-blue-50 p-3 rounded-md border-l-4 border-blue-200">
                       {request.admin_notes}
                     </p>
@@ -171,14 +228,14 @@ export default function UpgradeRequestsPage() {
 
                 {request.processed_at && (
                   <div className="text-xs text-gray-500">
-                    Processed on {formatDate(request.processed_at)}
+                    {tx.processedOn} {formatDate(request.processed_at)}
                   </div>
                 )}
 
                 {request.status === 'pending' && (
                   <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
                     <p className="text-sm text-yellow-800">
-                      Your request is being reviewed. We'll contact you within 24 hours.
+                      {tx.pendingMsg}
                     </p>
                   </div>
                 )}
@@ -186,7 +243,7 @@ export default function UpgradeRequestsPage() {
                 {request.status === 'approved' && (
                   <div className="bg-green-50 border border-green-200 rounded-md p-3">
                     <p className="text-sm text-green-800">
-                      Your request has been approved! Your plan will be updated shortly.
+                      {tx.approvedMsg}
                     </p>
                   </div>
                 )}
@@ -194,7 +251,7 @@ export default function UpgradeRequestsPage() {
                 {request.status === 'rejected' && (
                   <div className="bg-red-50 border border-red-200 rounded-md p-3">
                     <p className="text-sm text-red-800">
-                      Your request has been rejected. Please contact support for more information.
+                      {tx.rejectedMsg}
                     </p>
                   </div>
                 )}
@@ -202,7 +259,7 @@ export default function UpgradeRequestsPage() {
                 {request.status === 'completed' && (
                   <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
                     <p className="text-sm text-blue-800">
-                      Your plan has been successfully upgraded!
+                      {tx.completedMsg}
                     </p>
                   </div>
                 )}

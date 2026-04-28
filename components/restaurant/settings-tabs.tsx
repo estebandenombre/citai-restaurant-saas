@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Switch } from "@/components/ui/switch"
@@ -35,9 +34,9 @@ import {
   Bell,
   Shield,
 } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
 import { RestaurantConfig } from "./restaurant-config"
 import { ImageConfig } from "./image-config"
+import { useI18n } from "@/components/i18n/i18n-provider"
 
 interface OrderSettings {
   order_enabled: boolean
@@ -88,7 +87,7 @@ export function SettingsTabs({
   saving,
   onSave
 }: SettingsTabsProps) {
-  const { toast } = useToast()
+  const { t } = useI18n()
 
   // Helper function to get active order types count
   const getActiveOrderTypes = () => {
@@ -117,7 +116,7 @@ export function SettingsTabs({
         <TabsList className="grid w-full grid-cols-5 h-14">
           <TabsTrigger value="general" className="flex flex-col items-center gap-1 py-2">
             <Building2 className="h-5 w-5" />
-            <span className="text-xs">General</span>
+            <span className="text-xs">{t("settings.tabs.general")}</span>
           </TabsTrigger>
           <TabsTrigger value="orders" className="flex flex-col items-center gap-1 py-2">
             <div className="relative">
@@ -128,7 +127,7 @@ export function SettingsTabs({
                 </Badge>
               )}
             </div>
-            <span className="text-xs">Orders</span>
+            <span className="text-xs">{t("settings.tabs.orders")}</span>
           </TabsTrigger>
           <TabsTrigger value="customers" className="flex flex-col items-center gap-1 py-2">
             <div className="relative">
@@ -139,11 +138,11 @@ export function SettingsTabs({
                 </Badge>
               )}
             </div>
-            <span className="text-xs">Customers</span>
+            <span className="text-xs">{t("settings.tabs.customers")}</span>
           </TabsTrigger>
           <TabsTrigger value="appearance" className="flex flex-col items-center gap-1 py-2">
             <Palette className="h-5 w-5" />
-            <span className="text-xs">Appearance</span>
+            <span className="text-xs">{t("settings.tabs.appearance")}</span>
           </TabsTrigger>
         </TabsList>
 
@@ -153,43 +152,45 @@ export function SettingsTabs({
             <RestaurantConfig />
             
             {/* Quick Stats Card */}
-            <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
+            <Card className="border-border bg-card">
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2 text-blue-900">
+                <CardTitle className="flex items-center space-x-2">
                   <Settings className="h-5 w-5" />
-                  <span>Quick Overview</span>
+                  <span>{t("settings.quickOverview")}</span>
                 </CardTitle>
-                <CardDescription className="text-blue-700">
-                  Current configuration summary
-                </CardDescription>
+                <CardDescription>{t("settings.quickSummary")}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center p-3 bg-white rounded-lg border border-blue-200">
-                    <div className="text-2xl font-bold text-blue-600">{getActiveOrderTypes()}</div>
-                    <div className="text-sm text-blue-700">Order Types</div>
+                  <div className="rounded-lg border border-border bg-muted/30 p-3 text-center">
+                    <div className="font-mono text-2xl font-semibold tabular-nums text-foreground">
+                      {getActiveOrderTypes()}
+                    </div>
+                    <div className="text-sm text-muted-foreground">Order types</div>
                   </div>
-                  <div className="text-center p-3 bg-white rounded-lg border border-blue-200">
-                    <div className="text-2xl font-bold text-blue-600">{getRequiredFieldsCount()}</div>
-                    <div className="text-sm text-blue-700">Required Fields</div>
+                  <div className="rounded-lg border border-border bg-muted/30 p-3 text-center">
+                    <div className="font-mono text-2xl font-semibold tabular-nums text-foreground">
+                      {getRequiredFieldsCount()}
+                    </div>
+                    <div className="text-sm text-muted-foreground">Required fields</div>
                   </div>
                 </div>
-                
+
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-blue-700">Orders Enabled</span>
+                    <span className="text-muted-foreground">Orders enabled</span>
                     <Badge variant={settings.order_enabled ? "default" : "secondary"}>
                       {settings.order_enabled ? "Active" : "Disabled"}
                     </Badge>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-blue-700">Email Confirmations</span>
+                    <span className="text-muted-foreground">Email confirmations</span>
                     <Badge variant={settings.send_confirmation_email ? "default" : "secondary"}>
                       {settings.send_confirmation_email ? "Enabled" : "Disabled"}
                     </Badge>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-blue-700">Tax Collection</span>
+                    <span className="text-muted-foreground">Tax collection</span>
                     <Badge variant={settings.tax_enabled ? "default" : "secondary"}>
                       {settings.tax_enabled ? "Enabled" : "Disabled"}
                     </Badge>
@@ -215,7 +216,7 @@ export function SettingsTabs({
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 p-3">
                   <div className="space-y-1">
                     <Label className="text-base font-medium">Enable Orders</Label>
                     <p className="text-sm text-slate-500">Allow customers to place orders</p>
@@ -229,7 +230,7 @@ export function SettingsTabs({
                 <Separator />
 
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
+                  <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 p-3">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <Package className="h-4 w-4 text-green-600" />
@@ -244,7 +245,7 @@ export function SettingsTabs({
                     />
                   </div>
 
-                  <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 p-3">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <Truck className="h-4 w-4 text-blue-600" />
@@ -259,13 +260,13 @@ export function SettingsTabs({
                     />
                   </div>
 
-                  <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg border border-purple-200">
+                  <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 p-3">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <Table className="h-4 w-4 text-purple-600" />
-                        <Label className="text-base font-medium">Table Service</Label>
+                        <Table className="h-4 w-4 text-foreground" />
+                        <Label className="text-base font-medium">Table service</Label>
                       </div>
-                      <p className="text-sm text-slate-500">Waiters serve at tables</p>
+                      <p className="text-sm text-muted-foreground">Waiters serve at tables</p>
                     </div>
                     <Switch
                       checked={settings.table_service_enabled}
@@ -289,7 +290,7 @@ export function SettingsTabs({
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-200">
+                <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 p-3">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-orange-600" />
@@ -304,10 +305,10 @@ export function SettingsTabs({
                   />
                 </div>
 
-                <div className="flex items-center justify-between p-3 bg-indigo-50 rounded-lg border border-indigo-200">
+                <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 p-3">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-indigo-600" />
+                      <FileText className="h-4 w-4 text-foreground" />
                       <Label className="text-base font-medium">Special Instructions</Label>
                     </div>
                     <p className="text-sm text-slate-500">Allow customers to add notes</p>
@@ -321,7 +322,7 @@ export function SettingsTabs({
 
                 {/* Pickup Time Settings */}
                 {settings.pickup_enabled && (
-                  <div className="p-4 bg-green-50 rounded-lg border border-green-200 space-y-3">
+                  <div className="space-y-3 rounded-lg border border-border bg-muted/30 p-4">
                     <div className="flex items-center gap-2">
                       <Clock className="h-4 w-4 text-green-600" />
                       <Label className="text-sm font-medium text-green-800">Pickup Time Settings</Label>
@@ -370,7 +371,7 @@ export function SettingsTabs({
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 p-3">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <User className="h-4 w-4 text-blue-600" />
@@ -384,7 +385,7 @@ export function SettingsTabs({
                     />
                   </div>
 
-                  <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
+                  <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 p-3">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <Phone className="h-4 w-4 text-green-600" />
@@ -398,10 +399,10 @@ export function SettingsTabs({
                     />
                   </div>
 
-                  <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg border border-purple-200">
+                  <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 p-3">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <Mail className="h-4 w-4 text-purple-600" />
+                        <Mail className="h-4 w-4 text-foreground" />
                         <Label className="text-base font-medium">Email</Label>
                         {settings.require_email && settings.send_confirmation_email && (
                           <Badge variant="secondary" className="text-xs">
@@ -428,13 +429,13 @@ export function SettingsTabs({
 
                   {/* Email confirmation option - only show when email is enabled */}
                   {settings.require_email && (
-                    <div className="flex items-center justify-between pl-6 border-l-2 border-purple-200 bg-purple-50 p-3 rounded-r-lg animate-in slide-in-from-left-2 duration-300">
+                    <div className="flex animate-in slide-in-from-left-2 items-center justify-between rounded-r-lg border-l-2 border-border bg-muted/40 p-3 pl-6 duration-300">
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
-                          <Send className="h-4 w-4 text-purple-600" />
-                          <Label className="text-sm font-medium text-purple-900">Send confirmation email</Label>
+                          <Send className="h-4 w-4 text-foreground" />
+                          <Label className="text-sm font-medium">Send confirmation email</Label>
                         </div>
-                        <p className="text-xs text-purple-700">
+                        <p className="text-xs text-muted-foreground">
                           {settings.send_confirmation_email 
                             ? "Automatic email when order is created" 
                             : "Customers will provide email but no confirmation will be sent"
@@ -448,7 +449,7 @@ export function SettingsTabs({
                     </div>
                   )}
 
-                  <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-200">
+                  <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 p-3">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <Table className="h-4 w-4 text-orange-600" />
@@ -463,7 +464,7 @@ export function SettingsTabs({
                     />
                   </div>
 
-                  <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
+                  <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 p-3">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <Calendar className="h-4 w-4 text-green-600" />
@@ -478,7 +479,7 @@ export function SettingsTabs({
                     />
                   </div>
 
-                  <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 p-3">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <MapPin className="h-4 w-4 text-blue-600" />
@@ -493,13 +494,13 @@ export function SettingsTabs({
                     />
                   </div>
 
-                  <div className="flex items-center justify-between p-3 bg-indigo-50 rounded-lg border border-indigo-200">
+                  <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 p-3">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <FileText className="h-4 w-4 text-indigo-600" />
-                        <Label className="text-base font-medium">Special Instructions</Label>
+                        <FileText className="h-4 w-4 text-foreground" />
+                        <Label className="text-base font-medium">Special instructions</Label>
                       </div>
-                      <p className="text-sm text-slate-500">Additional notes</p>
+                      <p className="text-sm text-muted-foreground">Additional notes</p>
                     </div>
                     <Switch
                       checked={settings.allow_special_instructions}
@@ -522,7 +523,7 @@ export function SettingsTabs({
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg border border-red-200">
+                <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 p-3">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <Shield className="h-4 w-4 text-red-600" />
@@ -618,16 +619,16 @@ export function SettingsTabs({
               coverImageUrl={coverImageUrl}
               onLogoChange={onLogoChange}
               onCoverImageChange={onCoverImageChange}
-              restaurantId={restaurant.id}
+              restaurantId={restaurant?.id}
             />
           )}
         </TabsContent>
       </Tabs>
 
       {/* Save Button - Fixed at bottom */}
-      <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 -mx-6 mt-6 shadow-lg">
+      <div className="sticky bottom-0 -mx-6 mt-6 border-t border-border bg-card p-4 shadow-sm">
         <div className="flex justify-between items-center">
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-muted-foreground">
             {saving ? "Saving changes..." : "Unsaved changes"}
           </div>
           <div className="flex gap-3">
@@ -640,7 +641,7 @@ export function SettingsTabs({
               className="flex items-center gap-2"
             >
               <Save className="h-4 w-4" />
-              {saving ? "Saving..." : "Save Settings"}
+              {saving ? t("settings.saving") : t("settings.saveCta")}
             </Button>
           </div>
         </div>

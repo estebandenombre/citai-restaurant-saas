@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { ShoppingCart, Plus, Minus, Clock, Star } from "lucide-react"
 import { FormattedPrice } from "@/components/ui/formatted-price"
 import { CroppedDishImage } from "@/components/ui/cropped-image"
+import { useI18n } from "@/components/i18n/i18n-provider"
 interface MenuItemProps {
   item: {
     id: string
@@ -28,6 +29,23 @@ interface MenuItemProps {
 }
 
 export default function MenuItem({ item, restaurantId }: MenuItemProps) {
+  const { locale } = useI18n()
+  const tx =
+    locale === "es-ES"
+      ? {
+          featured: "Destacado",
+          dietaryInformation: "Informacion dietetica:",
+          allergens: "Alergenos:",
+          addToCart: "Anadir al carrito",
+          specialInstructions: "Instrucciones especiales (opcional)",
+        }
+      : {
+          featured: "Featured",
+          dietaryInformation: "Dietary Information:",
+          allergens: "Allergens:",
+          addToCart: "Add to Cart",
+          specialInstructions: "Special instructions (optional)",
+        }
   const [quantity, setQuantity] = useState(1)
   const [specialInstructions, setSpecialInstructions] = useState('')
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -88,7 +106,7 @@ export default function MenuItem({ item, restaurantId }: MenuItemProps) {
             <div className="absolute top-3 left-3 z-10">
               <Badge className="bg-yellow-500 text-white border-0 shadow-sm">
                 <Star className="w-3 h-3 mr-1" />
-                Featured
+                {tx.featured}
               </Badge>
             </div>
           )}
@@ -122,7 +140,7 @@ export default function MenuItem({ item, restaurantId }: MenuItemProps) {
           {/* Dietary Badges - Show All */}
           {item.dietary_info && item.dietary_info.filter((info: string) => info !== 'none').length > 0 && (
             <div>
-              <div className="text-xs font-medium text-slate-600 mb-1">Dietary Information:</div>
+              <div className="text-xs font-medium text-slate-600 mb-1">{tx.dietaryInformation}</div>
               <div className="flex flex-wrap gap-1">
                 {item.dietary_info
                   .filter((info: string) => info !== 'none')
@@ -142,7 +160,7 @@ export default function MenuItem({ item, restaurantId }: MenuItemProps) {
           {/* Allergens - Show All */}
           {item.allergens && item.allergens.filter((allergen: string) => allergen !== 'none').length > 0 && (
             <div>
-              <div className="text-xs font-medium text-slate-600 mb-1">Allergens:</div>
+              <div className="text-xs font-medium text-slate-600 mb-1">{tx.allergens}</div>
               <div className="flex flex-wrap gap-1">
                 {item.allergens
                   .filter((allergen: string) => allergen !== 'none')
@@ -169,7 +187,7 @@ export default function MenuItem({ item, restaurantId }: MenuItemProps) {
           className="w-full bg-slate-900 hover:bg-slate-800 text-white border-0 shadow-sm transition-all duration-200 hover:shadow-md font-medium py-2.5 rounded-lg"
         >
           <ShoppingCart className="w-4 h-4 mr-2" />
-          Add to Cart
+          {tx.addToCart}
         </Button>
       </div>
 
@@ -177,7 +195,7 @@ export default function MenuItem({ item, restaurantId }: MenuItemProps) {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-lg font-semibold">Add to Cart</DialogTitle>
+            <DialogTitle className="text-lg font-semibold">{tx.addToCart}</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
@@ -205,7 +223,7 @@ export default function MenuItem({ item, restaurantId }: MenuItemProps) {
               {/* Complete Dietary Information */}
               {item.dietary_info && item.dietary_info.filter((info: string) => info !== 'none').length > 0 && (
                 <div className="mt-3 text-left">
-                  <div className="text-xs font-medium text-slate-600 mb-1">Dietary Information:</div>
+                  <div className="text-xs font-medium text-slate-600 mb-1">{tx.dietaryInformation}</div>
                   <div className="flex flex-wrap gap-1">
                     {item.dietary_info
                       .filter((info: string) => info !== 'none')
@@ -225,7 +243,7 @@ export default function MenuItem({ item, restaurantId }: MenuItemProps) {
               {/* Complete Allergens Information */}
               {item.allergens && item.allergens.filter((allergen: string) => allergen !== 'none').length > 0 && (
                 <div className="mt-3 text-left">
-                  <div className="text-xs font-medium text-slate-600 mb-1">Allergens:</div>
+                  <div className="text-xs font-medium text-slate-600 mb-1">{tx.allergens}</div>
                   <div className="flex flex-wrap gap-1">
                     {item.allergens
                       .filter((allergen: string) => allergen !== 'none')
@@ -270,7 +288,7 @@ export default function MenuItem({ item, restaurantId }: MenuItemProps) {
               <Textarea
                 value={specialInstructions}
                 onChange={(e) => setSpecialInstructions(e.target.value)}
-                placeholder="Special instructions (optional)"
+                placeholder={tx.specialInstructions}
                 className="text-sm"
                 rows={2}
               />

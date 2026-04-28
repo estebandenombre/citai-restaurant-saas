@@ -31,7 +31,7 @@ import { getCurrentUserRestaurant } from "@/lib/auth-utils"
 import { supabase } from "@/lib/supabase"
 import { Skeleton } from "@/components/ui/skeleton"
 import { PageHeader } from "@/components/ui/page-header"
-
+import { useI18n } from "@/components/i18n/i18n-provider"
 
 interface OrderSettings {
   order_enabled: boolean
@@ -60,8 +60,10 @@ interface OrderSettings {
 }
 
 export default function SettingsPage() {
+  const { t } = useI18n()
   const [saving, setSaving] = useState(false)
   const [restaurant, setRestaurant] = useState<any>(null)
+  const [restaurantId, setRestaurantId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [useDatabase, setUseDatabase] = useState(false)
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
@@ -105,6 +107,7 @@ export default function SettingsPage() {
         
         if (restaurantData && restaurantId) {
           setRestaurant(restaurantData)
+          setRestaurantId(restaurantId)
           console.log('Restaurant found:', restaurantData)
           
           // Try to load settings from database first
@@ -116,10 +119,10 @@ export default function SettingsPage() {
 
           if (!dbError && dbSettings) {
             console.log('Settings loaded from database:', dbSettings)
-            setSettings({
-              ...settings,
-              ...dbSettings
-            })
+            setSettings((prev) => ({
+              ...prev,
+              ...dbSettings,
+            }))
             setUseDatabase(true)
           } else {
             console.log('No database settings found, checking localStorage')
@@ -163,43 +166,49 @@ export default function SettingsPage() {
   const handleSave = async () => {
     setSaving(true)
     try {
-      if (restaurant && typeof restaurant === 'object' && 'id' in restaurant) {
-        console.log('Saving settings to database for restaurant:', restaurant.id)
+      if (restaurantId) {
+        console.log('Saving settings to database for restaurant:', restaurantId)
         console.log('Settings to save:', settings)
         console.log('Restaurant object:', restaurant)
         
-        // Prepare data for database
-        const dataToSave = {
-          restaurant_id: restaurant.id,
+        // Save settings robustly (works whether a row already exists or not).
+        const payload = {
           ...settings,
           updated_at: new Date().toISOString(),
         }
-        console.log('Data to save:', dataToSave)
-        
-        // Save to database
-        const { data, error } = await supabase
+        const { data: existingRows, error: existingError } = await supabase
           .from("order_settings")
-          .upsert(dataToSave)
-          .select()
+          .select("id")
+          .eq("restaurant_id", restaurantId)
+          .limit(1)
 
-        console.log('Database save result:', { data, error })
+        if (existingError) {
+          throw existingError
+        }
 
-        if (error) {
-          console.error('Database save error:', error)
-          console.error('Error details:', {
-            message: error.message,
-            details: error.details,
-            hint: error.hint,
-            code: error.code
-          })
-          throw error
+        if (existingRows && existingRows.length > 0) {
+          const { error: updateError } = await supabase
+            .from("order_settings")
+            .update(payload)
+            .eq("id", existingRows[0].id)
+
+          if (updateError) throw updateError
+        } else {
+          const { error: insertError } = await supabase
+            .from("order_settings")
+            .insert({
+              restaurant_id: restaurantId,
+              ...payload,
+            })
+
+          if (insertError) throw insertError
         }
 
         console.log('Settings saved successfully to database')
         setUseDatabase(true)
         toast({
-          title: "Settings saved successfully",
-          description: "Your order settings have been updated in the database.",
+          title: t("settings.saveSuccessDb"),
+          description: t("settings.saveSuccessDbDesc"),
         })
       } else {
         console.log('No restaurant ID, saving to localStorage')
@@ -213,9 +222,10 @@ export default function SettingsPage() {
       }
     } catch (error) {
       console.error("Error saving settings:", error)
+      const message = error instanceof Error ? error.message : t("settings.saveErrorDesc")
       toast({
-        title: "Error saving settings",
-        description: "Please try again.",
+        title: t("settings.saveError"),
+        description: `${t("settings.saveErrorDesc")} ${message}`,
         variant: "destructive",
       })
     } finally {
@@ -254,9 +264,9 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-background">
         {/* Header */}
-        <div className="bg-white border-b border-gray-200 px-6 py-4">
+        <div className="bg-card border-b border-border px-6 py-4">
           <div className="flex items-center space-x-3">
             <Skeleton className="h-8 w-8 rounded" />
             <div>
@@ -281,11 +291,11 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
       <PageHeader
-        title="Settings"
-        description="Configure your restaurant settings and order preferences"
+        title={t("settings.pageTitle")}
+        description={t("settings.pageDescription")}
         icon={Settings}
       />
 

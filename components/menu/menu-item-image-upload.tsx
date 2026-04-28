@@ -17,6 +17,7 @@ import { useToast } from '@/hooks/use-toast'
 import { ImageCropper } from '@/components/ui/image-cropper'
 import Image from 'next/image'
 import { uploadImage, createImagePreview, validateImage } from '@/lib/image-upload'
+import { useI18n } from '@/components/i18n/i18n-provider'
 
 interface MenuItemImageUploadProps {
   imageUrl: string | null
@@ -35,6 +36,7 @@ export function MenuItemImageUpload({
   cropData,
   onCropDataChange
 }: MenuItemImageUploadProps) {
+  const { locale } = useI18n()
   const [uploading, setUploading] = useState(false)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [imageUrlInput, setImageUrlInput] = useState(imageUrl || '')
@@ -42,6 +44,30 @@ export function MenuItemImageUpload({
   
   const fileRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
+  const tx =
+    locale === "es-ES"
+      ? {
+          dishImage: "Imagen del plato",
+          uploadImage: "Subir imagen",
+          change: "Cambiar",
+          crop: "Recortar",
+          remove: "Eliminar",
+          recommended: "Recomendado: 400x300px",
+          externalUrl: "O usar URL externa",
+          directLinkPlaceholder: "Introduce un enlace directo a la imagen del plato",
+          applyUrl: "Aplicar URL",
+        }
+      : {
+          dishImage: "Dish Image",
+          uploadImage: "Upload Image",
+          change: "Change",
+          crop: "Crop",
+          remove: "Remove",
+          recommended: "Recommended: 400x300px",
+          externalUrl: "Or use external URL",
+          directLinkPlaceholder: "Enter a direct link to your dish image",
+          applyUrl: "Apply URL",
+        }
 
   // Sincronizar imageUrlInput cuando cambie imageUrl
   useEffect(() => {
@@ -177,14 +203,14 @@ export function MenuItemImageUpload({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <Label className="text-base font-medium">Dish Image</Label>
-        <Badge variant="secondary">Recommended: 400x300px</Badge>
+        <Label className="text-base font-medium">{tx.dishImage}</Label>
+        <Badge variant="secondary">{tx.recommended}</Badge>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Image Upload */}
         <div className="space-y-3">
-          <Label>Upload Image</Label>
+          <Label>{tx.uploadImage}</Label>
           <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
             {currentImageUrl ? (
               <div className="space-y-3">
@@ -222,7 +248,7 @@ export function MenuItemImageUpload({
                     ) : (
                       <Upload className="h-4 w-4" />
                     )}
-                    Change
+                    {tx.change}
                   </Button>
                   <Button
                     size="sm"
@@ -231,7 +257,7 @@ export function MenuItemImageUpload({
                     disabled={uploading || !currentImageUrl}
                   >
                     <Crop className="h-4 w-4" />
-                    Crop
+                    {tx.crop}
                   </Button>
                   <Button
                     size="sm"
@@ -240,7 +266,7 @@ export function MenuItemImageUpload({
                     disabled={uploading}
                   >
                     <Trash2 className="h-4 w-4" />
-                    Remove
+                    {tx.remove}
                   </Button>
                 </div>
               </div>
@@ -261,7 +287,7 @@ export function MenuItemImageUpload({
                     ) : (
                       <Upload className="h-4 w-4" />
                     )}
-                    Upload Image
+                    {tx.uploadImage}
                   </Button>
                 </div>
                 <p className="text-sm text-gray-500">
@@ -289,10 +315,10 @@ export function MenuItemImageUpload({
 
         {/* Image URL */}
         <div className="space-y-3">
-          <Label>Or use external URL</Label>
+          <Label>{tx.externalUrl}</Label>
           <div className="flex space-x-2">
             <Input
-              placeholder="https://example.com/dish-image.jpg"
+              placeholder={tx.directLinkPlaceholder}
               value={imageUrlInput}
               onChange={(e) => setImageUrlInput(e.target.value)}
             />
@@ -301,11 +327,11 @@ export function MenuItemImageUpload({
               onClick={handleImageUrlChange}
               disabled={!imageUrlInput.trim()}
             >
-              Save
+              {tx.applyUrl}
             </Button>
           </div>
           <p className="text-xs text-gray-500">
-            Enter a direct link to your dish image
+            {tx.directLinkPlaceholder}
           </p>
         </div>
       </div>

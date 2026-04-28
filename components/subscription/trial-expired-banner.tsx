@@ -27,37 +27,33 @@ export function TrialExpiredBanner({ onDismiss }: TrialExpiredBannerProps) {
   if (!isVisible) return null
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-red-500 to-orange-500 text-white p-4 shadow-lg">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <AlertTriangle className="h-6 w-6 text-white" />
-            <div>
-              <h3 className="font-semibold text-lg">Your Free Trial Has Expired</h3>
-              <p className="text-sm opacity-90">
-                Upgrade to continue using all features and unlock premium capabilities
-              </p>
-            </div>
+    <div className="fixed left-0 right-0 top-0 z-50 border-b border-border bg-zinc-950 px-4 py-3.5 text-zinc-50 shadow-sm">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <AlertTriangle className="h-5 w-5 shrink-0 text-amber-400" />
+          <div className="min-w-0">
+            <h3 className="font-medium leading-tight">Trial ended</h3>
+            <p className="text-sm text-zinc-400">Choose a plan to keep every feature.</p>
           </div>
-          <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleUpgrade}
-              className="bg-white text-red-600 hover:bg-gray-100 border-white"
-            >
-              <Crown className="h-4 w-4 mr-2" />
-              View Plans
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleDismiss}
-              className="text-white hover:bg-white/10"
-            >
-              Dismiss
-            </Button>
-          </div>
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={handleUpgrade}
+            className="bg-zinc-100 text-zinc-950 hover:bg-white"
+          >
+            <Crown className="mr-1.5 h-4 w-4" />
+            View plans
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleDismiss}
+            className="text-zinc-300 hover:bg-white/10 hover:text-white"
+          >
+            Dismiss
+          </Button>
         </div>
       </div>
     </div>
@@ -72,43 +68,38 @@ export function TrialExpiredCard() {
   }
 
   return (
-    <Card className="border-red-200 bg-red-50">
+    <Card className="border-border/90 bg-card">
       <CardHeader className="text-center">
-        <div className="mx-auto w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4">
-          <AlertTriangle className="h-6 w-6 text-red-600" />
+        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-border bg-muted">
+          <AlertTriangle className="h-6 w-6 text-foreground" />
         </div>
-        <CardTitle className="text-red-800">Trial Period Expired</CardTitle>
-        <CardDescription className="text-red-600">
-          Your 14-day free trial has ended. Upgrade to continue using all features.
+        <CardTitle className="font-display text-2xl font-medium tracking-[-0.02em]">Trial period ended</CardTitle>
+        <CardDescription>
+          Your trial is over. Pick a plan to keep full access to the workspace.
         </CardDescription>
       </CardHeader>
-      <CardContent className="text-center space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-          <div className="flex items-center gap-2 justify-center">
-            <Zap className="h-4 w-4 text-blue-500" />
-            <span>Advanced Analytics</span>
+      <CardContent className="space-y-4 text-center">
+        <div className="grid grid-cols-1 gap-3 text-sm text-muted-foreground md:grid-cols-3">
+          <div className="flex items-center justify-center gap-2">
+            <Zap className="h-4 w-4 text-foreground/60" />
+            <span>Analytics</span>
           </div>
-          <div className="flex items-center gap-2 justify-center">
-            <Crown className="h-4 w-4 text-yellow-500" />
-            <span>AI Chat Assistant</span>
+          <div className="flex items-center justify-center gap-2">
+            <Crown className="h-4 w-4 text-foreground/60" />
+            <span>AI assistant</span>
           </div>
-          <div className="flex items-center gap-2 justify-center">
-            <Clock className="h-4 w-4 text-green-500" />
-            <span>Priority Support</span>
+          <div className="flex items-center justify-center gap-2">
+            <Clock className="h-4 w-4 text-foreground/60" />
+            <span>Support</span>
           </div>
         </div>
-        
+
         <div className="space-y-2">
-          <Button 
-            onClick={handleUpgrade}
-            className="w-full bg-red-600 hover:bg-red-700"
-          >
-            <Crown className="h-4 w-4 mr-2" />
-            View Subscription Plans
+          <Button onClick={handleUpgrade} className="w-full">
+            <Crown className="mr-2 h-4 w-4" />
+            View plans
           </Button>
-          <p className="text-xs text-red-600">
-            Contact support at info@tably.digital for assistance
-          </p>
+          <p className="text-xs text-muted-foreground">help@tably.digital</p>
         </div>
       </CardContent>
     </Card>

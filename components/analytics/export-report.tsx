@@ -79,20 +79,19 @@ export function ExportReport({ onExport }: ExportReportProps) {
   const daysSelected = differenceInDays(dateRange.to, dateRange.from) + 1
 
   return (
-    <Card className="relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-50 opacity-50"></div>
-      <CardHeader className="relative">
+    <Card className="border-border">
+      <CardHeader>
         <CardTitle className="flex items-center space-x-2">
-          <div className="p-2 bg-blue-100 rounded-lg">
-            <BarChart3 className="h-5 w-5 text-blue-600" />
+          <div className="rounded-lg bg-muted p-2">
+            <BarChart3 className="h-5 w-5" />
           </div>
-          <span>Export Report</span>
+          <span>Export report</span>
         </CardTitle>
         <CardDescription>
           Generate comprehensive analytics reports with customizable options
         </CardDescription>
       </CardHeader>
-      <CardContent className="relative space-y-6">
+      <CardContent className="space-y-6">
         {/* Format Selection */}
         <div className="space-y-3">
           <label className="text-sm font-medium flex items-center space-x-2">
@@ -362,40 +361,35 @@ interface QuickExportProps {
 
 export function QuickExport({ onQuickExport }: QuickExportProps) {
   const quickPeriods = [
-    { 
-      label: "Today", 
-      value: "today", 
+    {
+      label: "Today",
+      value: "today",
       icon: Clock,
-      description: "Current day data",
-      color: "bg-green-100 text-green-700 border-green-200"
+      description: "Current day data"
     },
-    { 
-      label: "This Week", 
-      value: "week", 
+    {
+      label: "This week",
+      value: "week",
       icon: TrendingUp,
-      description: "Last 7 days",
-      color: "bg-blue-100 text-blue-700 border-blue-200"
+      description: "Last 7 days"
     },
-    { 
-      label: "This Month", 
-      value: "month", 
+    {
+      label: "This month",
+      value: "month",
       icon: CalendarIcon,
-      description: "Current month",
-      color: "bg-purple-100 text-purple-700 border-purple-200"
+      description: "Current month"
     },
-    { 
-      label: "Last 30 Days", 
-      value: "30d", 
+    {
+      label: "Last 30 days",
+      value: "30d",
       icon: BarChart3,
-      description: "Past 30 days",
-      color: "bg-orange-100 text-orange-700 border-orange-200"
+      description: "Past 30 days"
     },
-    { 
-      label: "Last 90 Days", 
-      value: "90d", 
+    {
+      label: "Last 90 days",
+      value: "90d",
       icon: FileText,
-      description: "Quarterly data",
-      color: "bg-indigo-100 text-indigo-700 border-indigo-200"
+      description: "Quarterly data"
     }
   ]
 
@@ -416,14 +410,11 @@ export function QuickExport({ onQuickExport }: QuickExportProps) {
             <Button
               key={period.value}
               variant="outline"
-              className={cn(
-                "h-auto p-4 justify-start",
-                period.color
-              )}
+              className="h-auto justify-start border-border bg-muted/30 p-4 text-foreground hover:bg-muted/50"
               onClick={() => onQuickExport(period.value)}
             >
-              <div className="flex items-center space-x-3 w-full">
-                <div className="p-2 bg-white/50 rounded-lg">
+              <div className="flex w-full items-center space-x-3">
+                <div className="rounded-lg bg-background p-2">
                   <period.icon className="h-4 w-4" />
                 </div>
                 <div className="flex-1 text-left">
@@ -436,9 +427,9 @@ export function QuickExport({ onQuickExport }: QuickExportProps) {
           ))}
         </div>
         
-        <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded-lg">
-          <p className="font-medium mb-1">💡 Tip:</p>
-          <p>Quick exports use default settings and include all standard analytics data for the selected period.</p>
+        <div className="rounded-lg border border-border bg-muted/30 p-3 text-xs text-muted-foreground">
+          <p className="mb-1 font-medium">Tip</p>
+          <p>Quick exports use default settings and include standard analytics for the selected period.</p>
         </div>
       </CardContent>
     </Card>

@@ -45,7 +45,7 @@ export default function PromoPage() {
       title: '¿Tus reportes financieros toman horas o días?',
       subtitle: 'Copias manuales de datos, fórmulas rotas y pérdida de tiempo en cierres están afectando tu rentabilidad.',
       image: '/placeholder.jpg',
-      color: 'from-red-500 to-orange-500',
+      color: 'from-stone-800 to-zinc-900',
       icon: <Clock className="w-16 h-16" />,
       badge: '⚠️ Problema Crítico'
     },
@@ -54,7 +54,7 @@ export default function PromoPage() {
       title: 'Con Tably todo cambia',
       subtitle: 'La plataforma que conecta, modela y automatiza tus datos financieros',
       image: '/tably_logo_completo.png',
-      color: 'from-purple-500 to-pink-500',
+      color: 'from-neutral-900 to-stone-950',
       icon: null,
       badge: '✨ La Solución'
     },
@@ -72,7 +72,7 @@ export default function PromoPage() {
       title: 'Conecta tus fuentes',
       subtitle: 'Integra todas tus bases de datos y APIs en minutos. Sin código, sin complicaciones.',
       image: '/placeholder.jpg',
-      color: 'from-blue-500 to-cyan-500',
+      color: 'from-zinc-800 to-neutral-900',
       icon: <Database className="w-16 h-16" />,
       badge: '🔗 Paso 1'
     },
@@ -81,7 +81,7 @@ export default function PromoPage() {
       title: 'Modela sin errores',
       subtitle: 'Construye modelos complejos con validación automática. Visual, intuitivo y poderoso.',
       image: '/placeholder.jpg',
-      color: 'from-green-500 to-emerald-500',
+      color: 'from-stone-800 to-zinc-900',
       icon: <BarChart3 className="w-16 h-16" />,
       badge: '📊 Paso 2'
     },
@@ -90,7 +90,7 @@ export default function PromoPage() {
       title: 'Automatiza procesos',
       subtitle: 'Reduce el trabajo manual en un 80%. Dashboards que se actualizan automáticamente.',
       image: '/placeholder.jpg',
-      color: 'from-indigo-500 to-purple-500',
+      color: 'from-stone-900 to-zinc-950',
       icon: <Settings className="w-16 h-16" />,
       badge: '⚡ Paso 3'
     },
@@ -99,7 +99,7 @@ export default function PromoPage() {
       title: 'Lo que dicen nuestros clientes',
       subtitle: '+120 equipos financieros en 14 países confían en Tably',
       image: '/placeholder.jpg',
-      color: 'from-yellow-500 to-orange-500',
+      color: 'from-zinc-800 to-stone-900',
       icon: <Star className="w-16 h-16" />,
       badge: '⭐ Testimonios'
     },
@@ -108,7 +108,7 @@ export default function PromoPage() {
       title: 'Haz que tus datos trabajen por ti',
       subtitle: 'Únete a cientos de equipos financieros que ya optimizaron sus operaciones con Tably',
       image: '/placeholder.jpg',
-      color: 'from-[#6C63FF] to-[#5A52FF]',
+      color: 'from-zinc-950 to-black',
       icon: <ArrowRight className="w-16 h-16" />,
       badge: '🚀 Comienza Ahora'
     }
@@ -247,7 +247,7 @@ export default function PromoPage() {
       {/* Progress Bar */}
       <div className="fixed top-0 left-0 w-full h-1 bg-white/20 z-50">
         <div 
-          className="h-full bg-gradient-to-r from-[#6C63FF] to-[#5A52FF] transition-all duration-300"
+          className="h-full bg-foreground transition-all duration-300"
           style={{ width: `${((currentSlide + 1) / slides.length) * 100}%` }}
         />
       </div>
@@ -396,13 +396,20 @@ export default function PromoPage() {
               <div className="slide-content">
                 <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6 mb-12">
                   <Link href="/auth/register">
-                    <Button size="lg" className="bg-white text-[#6C63FF] hover:bg-gray-100 px-8 py-3 text-lg font-semibold">
+                    <Button
+                      size="lg"
+                      className="bg-white px-8 py-3 text-lg font-semibold text-stone-950 hover:bg-stone-100"
+                    >
                       Probar Tably Gratis
                       <ArrowRight className="ml-2 w-5 h-5" />
                     </Button>
                   </Link>
                   <Link href="/dashboard">
-                    <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-[#6C63FF] px-8 py-3 text-lg font-semibold">
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="border-white px-8 py-3 text-lg font-semibold text-white hover:bg-white hover:text-stone-950"
+                    >
                       Solicitar Demo Personalizada
                     </Button>
                   </Link>

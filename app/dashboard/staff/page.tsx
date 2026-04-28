@@ -44,6 +44,7 @@ import { getCurrentUserRestaurant } from "@/lib/auth-utils"
 import { Loading } from "@/components/ui/loading"
 import { PageHeader } from "@/components/ui/page-header"
 import { FormattedPrice } from "@/components/ui/formatted-price"
+import { useI18n } from "@/components/i18n/i18n-provider"
 
 interface StaffMember {
   id: string
@@ -78,6 +79,184 @@ interface Shift {
 }
 
 export default function StaffPage() {
+  const { locale } = useI18n()
+  const tx =
+    locale === "es-ES"
+      ? {
+          loading: "Cargando equipo...",
+          title: "Equipo",
+          subtitle: "Gestiona el personal y sus turnos",
+          addStaff: "Anadir personal",
+          addShift: "Anadir turno",
+          stats: {
+            total: "Total personal",
+            management: "Direccion",
+            upcoming: "Turnos programados",
+            avgRate: "Media por hora",
+            members: "miembros del equipo",
+            managers: "managers y owners",
+            scheduled: "turnos programados",
+            perHour: "por hora",
+          },
+          role: { owner: "Owner", manager: "Manager", staff: "Staff" },
+          shiftStatus: {
+            scheduled: "Programado",
+            started: "Iniciado",
+            break: "En descanso",
+            completed: "Completado",
+            cancelled: "Cancelado",
+          },
+          tabs: { staff: "Personal", shifts: "Turnos y horarios" },
+          filters: "Filtros",
+          searchStaff: "Buscar personal",
+          searchPlaceholder: "Buscar por nombre, email o puesto...",
+          roleFilter: "Filtro de rol",
+          allRoles: "Todos los roles",
+          emptyStaffTitleNone: "Aun no hay personal",
+          emptyStaffTitleFiltered: "No se encontro personal",
+          emptyStaffDescNone: "Anade tu primer miembro del equipo para empezar",
+          emptyStaffDescFiltered: "Prueba a ajustar los filtros",
+          noPosition: "Sin puesto especificado",
+          inactive: "Inactivo",
+          perHour: "/hora",
+          hired: "Contratado",
+          deleteStaffTitle: "Eliminar miembro del equipo",
+          deleteStaffDesc: "Seguro que quieres eliminar a {name}? Esta accion no se puede deshacer.",
+          delete: "Eliminar",
+          cancel: "Cancelar",
+          scheduleCalendar: "Calendario de turnos",
+          today: "Hoy",
+          shiftsFor: "Turnos para {date}",
+          noShiftsScheduled: "No hay turnos programados",
+          noShiftsForDate: "No hay turnos para esta fecha",
+          breakDuration: "Descanso: {minutes} minutos",
+          cost: "Coste",
+          deleteShiftTitle: "Eliminar turno",
+          deleteShiftDesc: "Seguro que quieres eliminar este turno? Esta accion no se puede deshacer.",
+          recentShifts: "Turnos recientes y proximos",
+          noShiftsYet: "Aun no hay turnos",
+          addFirstShift: "Anade tu primer turno para empezar",
+          editStaff: "Editar miembro del equipo",
+          addNewStaff: "Anadir nuevo miembro del equipo",
+          updateStaffInfo: "Actualiza la informacion del miembro del equipo",
+          addStaffToTeam: "Anade un nuevo miembro a tu equipo",
+          firstName: "Nombre",
+          lastName: "Apellido",
+          email: "Email",
+          phoneOptional: "Telefono (opcional)",
+          roleLabel: "Rol",
+          positionOptional: "Puesto (opcional)",
+          positionExample: "ej. Chef, Camarero, Bartender",
+          hourlyRateOptional: "Tarifa por hora ($) (opcional)",
+          hireDateOptional: "Fecha de contratacion (opcional)",
+          pickDate: "Selecciona una fecha",
+          notesOptional: "Notas (opcional)",
+          notesExample: "Cualquier nota adicional",
+          teamMember: "Miembro del equipo",
+          update: "Actualizar",
+          add: "Anadir",
+          addNewShift: "Anadir nuevo turno",
+          scheduleNewShift: "Programa un nuevo turno para un miembro del equipo",
+          staffMember: "Miembro del equipo",
+          selectStaffMember: "Selecciona miembro del equipo",
+          shiftDate: "Fecha del turno",
+          startTime: "Hora de inicio",
+          endTime: "Hora de fin",
+          breakDurationLabel: "Duracion del descanso (minutos)",
+          hourlyRateOptionalShort: "Tarifa por hora ($) (opcional)",
+          useStaffDefault: "Usar tarifa por defecto",
+          status: "Estado",
+          shiftDuration: "Duracion del turno",
+          estimatedCost: "Coste estimado",
+        }
+      : {
+          loading: "Loading team...",
+          title: "Staff",
+          subtitle: "Manage your team and shift schedule",
+          addStaff: "Add Staff",
+          addShift: "Add Shift",
+          stats: {
+            total: "Total Staff",
+            management: "Management",
+            upcoming: "Upcoming Shifts",
+            avgRate: "Avg. Hourly Rate",
+            members: "team members",
+            managers: "Managers & owners",
+            scheduled: "Scheduled shifts",
+            perHour: "Per hour",
+          },
+          role: { owner: "Owner", manager: "Manager", staff: "Staff" },
+          shiftStatus: {
+            scheduled: "Scheduled",
+            started: "Started",
+            break: "On Break",
+            completed: "Completed",
+            cancelled: "Cancelled",
+          },
+          tabs: { staff: "Staff Members", shifts: "Shifts & Schedule" },
+          filters: "Filters",
+          searchStaff: "Search Staff",
+          searchPlaceholder: "Search by name, email, or position...",
+          roleFilter: "Role Filter",
+          allRoles: "All Roles",
+          emptyStaffTitleNone: "No staff members yet",
+          emptyStaffTitleFiltered: "No staff members found",
+          emptyStaffDescNone: "Add your first staff member to get started",
+          emptyStaffDescFiltered: "Try adjusting your filters",
+          noPosition: "No position specified",
+          inactive: "Inactive",
+          perHour: "/hour",
+          hired: "Hired",
+          deleteStaffTitle: "Delete Staff Member",
+          deleteStaffDesc: "Are you sure you want to delete {name}? This action cannot be undone.",
+          delete: "Delete",
+          cancel: "Cancel",
+          scheduleCalendar: "Schedule Calendar",
+          today: "Today",
+          shiftsFor: "Shifts for {date}",
+          noShiftsScheduled: "No shifts scheduled",
+          noShiftsForDate: "No shifts are scheduled for this date",
+          breakDuration: "Break: {minutes} minutes",
+          cost: "Cost",
+          deleteShiftTitle: "Delete Shift",
+          deleteShiftDesc: "Are you sure you want to delete this shift? This action cannot be undone.",
+          recentShifts: "Recent & Upcoming Shifts",
+          noShiftsYet: "No shifts yet",
+          addFirstShift: "Add your first shift to get started",
+          editStaff: "Edit Staff Member",
+          addNewStaff: "Add New Staff Member",
+          updateStaffInfo: "Update staff member information",
+          addStaffToTeam: "Add a new staff member to your team",
+          firstName: "First Name",
+          lastName: "Last Name",
+          email: "Email",
+          phoneOptional: "Phone (Optional)",
+          roleLabel: "Role",
+          positionOptional: "Position (Optional)",
+          positionExample: "e.g., Chef, Server, Bartender",
+          hourlyRateOptional: "Hourly Rate ($) (Optional)",
+          hireDateOptional: "Hire Date (Optional)",
+          pickDate: "Pick a date",
+          notesOptional: "Notes (Optional)",
+          notesExample: "Any additional notes",
+          teamMember: "Team Member",
+          update: "Update",
+          add: "Add",
+          addNewShift: "Add New Shift",
+          scheduleNewShift: "Schedule a new shift for a staff member",
+          staffMember: "Staff Member",
+          selectStaffMember: "Select staff member",
+          shiftDate: "Shift Date",
+          startTime: "Start Time",
+          endTime: "End Time",
+          breakDurationLabel: "Break Duration (minutes)",
+          hourlyRateOptionalShort: "Hourly Rate ($) (Optional)",
+          useStaffDefault: "Use staff default",
+          status: "Status",
+          shiftDuration: "Shift Duration",
+          estimatedCost: "Estimated Cost",
+        }
+
   const [staffMembers, setStaffMembers] = useState<StaffMember[]>([])
   const [shifts, setShifts] = useState<Shift[]>([])
   const [filteredStaff, setFilteredStaff] = useState<StaffMember[]>([])
@@ -399,13 +578,13 @@ export default function StaffPage() {
   const getRoleColor = (role: string) => {
     switch (role) {
       case "owner":
-        return "bg-purple-100 text-purple-800"
+        return "bg-foreground/10 text-foreground"
       case "manager":
-        return "bg-blue-100 text-blue-800"
+        return "bg-muted text-foreground"
       case "staff":
-        return "bg-green-100 text-green-800"
+        return "bg-muted/60 text-foreground"
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-muted/40 text-muted-foreground"
     }
   }
 
@@ -424,6 +603,22 @@ export default function StaffPage() {
       default:
         return "bg-gray-100 text-gray-800"
     }
+  }
+
+  const getRoleLabel = (role: string) => {
+    if (role === "owner") return tx.role.owner
+    if (role === "manager") return tx.role.manager
+    if (role === "staff") return tx.role.staff
+    return role
+  }
+
+  const getShiftStatusLabel = (status: string) => {
+    if (status === "scheduled") return tx.shiftStatus.scheduled
+    if (status === "started") return tx.shiftStatus.started
+    if (status === "break") return tx.shiftStatus.break
+    if (status === "completed") return tx.shiftStatus.completed
+    if (status === "cancelled") return tx.shiftStatus.cancelled
+    return status
   }
 
   const calculateShiftHours = (startTime: string, endTime: string, breakDuration: number) => {
@@ -478,7 +673,7 @@ export default function StaffPage() {
   }
 
   if (loading) {
-    return <Loading text="Loading team..." />
+    return <Loading text={tx.loading} />
   }
 
   return (
@@ -492,10 +687,10 @@ export default function StaffPage() {
             </div>
             <div>
               <h1 className="text-2xl font-semibold text-gray-900">
-                Team
+                {tx.title}
               </h1>
               <p className="text-gray-500 text-sm">
-                Manage your restaurant team and schedules
+                {tx.subtitle}
               </p>
             </div>
           </div>
@@ -506,14 +701,14 @@ export default function StaffPage() {
               className="border border-gray-200 rounded-lg"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Add Shift
+              {tx.addShift}
             </Button>
             <Button 
               onClick={() => openStaffDialog()}
               className="bg-violet-600 hover:bg-violet-700 text-white text-sm px-4 py-2 rounded-lg shadow-sm"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Add Staff
+              {tx.addStaff}
             </Button>
           </div>
         </div>
@@ -523,47 +718,47 @@ export default function StaffPage() {
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Staff</CardTitle>
+            <CardTitle className="text-sm font-medium">{tx.stats.total}</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{getTotalStaffCount()}</div>
-            <p className="text-xs text-muted-foreground">{getActiveStaffCount()} team members</p>
+            <p className="text-xs text-muted-foreground">{getActiveStaffCount()} {tx.stats.members}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Management</CardTitle>
+            <CardTitle className="text-sm font-medium">{tx.stats.management}</CardTitle>
             <User className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-600">{getManagerCount()}</div>
-            <p className="text-xs text-muted-foreground">Managers & owners</p>
+            <p className="text-xs text-muted-foreground">{tx.stats.managers}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Upcoming Shifts</CardTitle>
+            <CardTitle className="text-sm font-medium">{tx.stats.upcoming}</CardTitle>
             <CalendarDays className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
               {shifts.filter((shift) => shift.status === "scheduled").length}
             </div>
-            <p className="text-xs text-muted-foreground">Scheduled shifts</p>
+            <p className="text-xs text-muted-foreground">{tx.stats.scheduled}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg. Hourly Rate</CardTitle>
+            <CardTitle className="text-sm font-medium">{tx.stats.avgRate}</CardTitle>
             <DollarSign className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">${getAverageHourlyRate()}</div>
-            <p className="text-xs text-muted-foreground">Per hour</p>
+            <p className="text-xs text-muted-foreground">{tx.stats.perHour}</p>
           </CardContent>
         </Card>
       </div>
@@ -571,8 +766,8 @@ export default function StaffPage() {
       {/* Tabs for Staff and Shifts */}
       <Tabs defaultValue="staff" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="staff">Staff Members</TabsTrigger>
-          <TabsTrigger value="shifts">Shifts & Schedule</TabsTrigger>
+          <TabsTrigger value="staff">{tx.tabs.staff}</TabsTrigger>
+          <TabsTrigger value="shifts">{tx.tabs.shifts}</TabsTrigger>
         </TabsList>
 
         {/* Staff Tab */}
@@ -580,17 +775,17 @@ export default function StaffPage() {
           {/* Filters */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Filters</CardTitle>
+              <CardTitle className="text-lg">{tx.filters}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex flex-col md:flex-row gap-4">
                 <div className="flex-1">
-                  <Label htmlFor="search">Search Staff</Label>
+                  <Label htmlFor="search">{tx.searchStaff}</Label>
                   <div className="relative">
                     <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <Input
                       id="search"
-                      placeholder="Search by name, email, or position..."
+                      placeholder={tx.searchPlaceholder}
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       className="pl-10"
@@ -598,16 +793,16 @@ export default function StaffPage() {
                   </div>
                 </div>
                 <div className="w-full md:w-48">
-                  <Label htmlFor="role">Role Filter</Label>
+                  <Label htmlFor="role">{tx.roleFilter}</Label>
                   <Select value={roleFilter} onValueChange={setRoleFilter}>
                     <SelectTrigger>
-                      <SelectValue placeholder="All roles" />
+                      <SelectValue placeholder={tx.allRoles} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Roles</SelectItem>
-                      <SelectItem value="owner">Owner</SelectItem>
-                      <SelectItem value="manager">Manager</SelectItem>
-                      <SelectItem value="staff">Staff</SelectItem>
+                      <SelectItem value="all">{tx.allRoles}</SelectItem>
+                      <SelectItem value="owner">{tx.role.owner}</SelectItem>
+                      <SelectItem value="manager">{tx.role.manager}</SelectItem>
+                      <SelectItem value="staff">{tx.role.staff}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -622,17 +817,17 @@ export default function StaffPage() {
                 <CardContent className="text-center py-12">
                   <Users className="h-12 w-12 mx-auto mb-4 text-gray-400" />
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    {staffMembers.length === 0 ? "No staff members yet" : "No staff members found"}
+                    {staffMembers.length === 0 ? tx.emptyStaffTitleNone : tx.emptyStaffTitleFiltered}
                   </h3>
                   <p className="text-gray-500 mb-4">
                     {staffMembers.length === 0
-                      ? "Add your first staff member to get started"
-                      : "Try adjusting your filters"}
+                      ? tx.emptyStaffDescNone
+                      : tx.emptyStaffDescFiltered}
                   </p>
                   {staffMembers.length === 0 && (
                     <Button onClick={() => openStaffDialog()}>
                       <Plus className="mr-2 h-4 w-4" />
-                      Add Staff Member
+                      {tx.addStaff}
                     </Button>
                   )}
                 </CardContent>
@@ -649,11 +844,11 @@ export default function StaffPage() {
                               <h3 className="text-lg font-semibold">
                                 {staff.first_name} {staff.last_name}
                               </h3>
-                              <p className="text-sm text-gray-500">{staff.position || "No position specified"}</p>
+                              <p className="text-sm text-gray-500">{staff.position || tx.noPosition}</p>
                             </div>
                             <div className="flex space-x-2">
-                              <Badge className={getRoleColor(staff.role)}>{staff.role}</Badge>
-                              {!staff.is_active && <Badge variant="secondary">Inactive</Badge>}
+                              <Badge className={getRoleColor(staff.role)}>{getRoleLabel(staff.role)}</Badge>
+                              {!staff.is_active && <Badge variant="secondary">{tx.inactive}</Badge>}
                             </div>
                           </div>
 
@@ -674,7 +869,7 @@ export default function StaffPage() {
                               <div className="flex items-center space-x-2">
                                 <DollarSign className="h-4 w-4 text-gray-400" />
                                 <span>
-                                  <FormattedPrice amount={staff.hourly_rate} restaurantId={restaurantId || undefined} />/hour
+                                  <FormattedPrice amount={staff.hourly_rate} restaurantId={restaurantId || undefined} />{tx.perHour}
                                 </span>
                               </div>
                             )}
@@ -683,7 +878,7 @@ export default function StaffPage() {
                           {staff.hire_date && (
                             <div className="mt-2 text-xs text-gray-500">
                               <CalendarDays className="inline w-3 h-3 mr-1" />
-                              Hired: {new Date(staff.hire_date).toLocaleDateString()}
+                              {tx.hired}: {new Date(staff.hire_date).toLocaleDateString(locale)}
                             </div>
                           )}
 
@@ -707,16 +902,15 @@ export default function StaffPage() {
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
-                                <AlertDialogTitle>Delete Staff Member</AlertDialogTitle>
+                                <AlertDialogTitle>{tx.deleteStaffTitle}</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  Are you sure you want to delete {staff.first_name} {staff.last_name}? This action
-                                  cannot be undone.
+                                  {tx.deleteStaffDesc.replace("{name}", `${staff.first_name} ${staff.last_name}`)}
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogCancel>{tx.cancel}</AlertDialogCancel>
                                 <AlertDialogAction onClick={() => handleDeleteStaff(staff.id)}>
-                                  Delete
+                                  {tx.delete}
                                 </AlertDialogAction>
                               </AlertDialogFooter>
                             </AlertDialogContent>
@@ -737,7 +931,7 @@ export default function StaffPage() {
             {/* Calendar */}
             <Card className="md:col-span-1">
               <CardHeader>
-                <CardTitle className="text-lg">Schedule Calendar</CardTitle>
+                <CardTitle className="text-lg">{tx.scheduleCalendar}</CardTitle>
               </CardHeader>
               <CardContent>
                 <Calendar
@@ -749,7 +943,7 @@ export default function StaffPage() {
                 <div className="mt-4">
                   <Button className="w-full" onClick={() => setShiftDialogOpen(true)}>
                     <Plus className="mr-2 h-4 w-4" />
-                    Add Shift
+                    {tx.addShift}
                   </Button>
                 </div>
               </CardContent>
@@ -759,18 +953,18 @@ export default function StaffPage() {
             <Card className="md:col-span-2">
               <CardHeader>
                 <CardTitle className="text-lg">
-                  Shifts for {selectedDate ? format(selectedDate, "MMMM d, yyyy") : "Today"}
+                  {tx.shiftsFor.replace("{date}", selectedDate ? format(selectedDate, "MMMM d, yyyy") : tx.today)}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {selectedDate && getShiftsForDate(format(selectedDate, "yyyy-MM-dd")).length === 0 ? (
                   <div className="text-center py-8">
                     <Clock className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No shifts scheduled</h3>
-                    <p className="text-gray-500 mb-4">No shifts are scheduled for this date</p>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{tx.noShiftsScheduled}</h3>
+                    <p className="text-gray-500 mb-4">{tx.noShiftsForDate}</p>
                     <Button onClick={() => setShiftDialogOpen(true)}>
                       <Plus className="mr-2 h-4 w-4" />
-                      Add Shift
+                      {tx.addShift}
                     </Button>
                   </div>
                 ) : (
@@ -785,7 +979,7 @@ export default function StaffPage() {
                                   <h4 className="font-semibold">
                                     {shift.staff?.first_name} {shift.staff?.last_name}
                                   </h4>
-                                  <Badge className={getShiftStatusColor(shift.status)}>{shift.status}</Badge>
+                                  <Badge className={getShiftStatusColor(shift.status)}>{getShiftStatusLabel(shift.status)}</Badge>
                                 </div>
                                 <div className="text-sm text-gray-600 mt-1">
                                   <Clock className="inline w-3 h-3 mr-1" />
@@ -793,11 +987,11 @@ export default function StaffPage() {
                                   {calculateShiftHours(shift.start_time, shift.end_time, shift.break_duration)})
                                 </div>
                                 {shift.break_duration > 0 && (
-                                  <div className="text-xs text-gray-500">Break: {shift.break_duration} minutes</div>
+                                  <div className="text-xs text-gray-500">{tx.breakDuration.replace("{minutes}", String(shift.break_duration))}</div>
                                 )}
                                 {shift.hourly_rate && (
                                   <div className="text-xs text-gray-500">
-                                    Cost: $
+                                    {tx.cost}: $
                                     {calculateShiftCost(
                                       shift.start_time,
                                       shift.end_time,
@@ -816,11 +1010,11 @@ export default function StaffPage() {
                                     <SelectValue />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    <SelectItem value="scheduled">Scheduled</SelectItem>
-                                    <SelectItem value="started">Started</SelectItem>
-                                    <SelectItem value="break">On Break</SelectItem>
-                                    <SelectItem value="completed">Completed</SelectItem>
-                                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                                    <SelectItem value="scheduled">{tx.shiftStatus.scheduled}</SelectItem>
+                                    <SelectItem value="started">{tx.shiftStatus.started}</SelectItem>
+                                    <SelectItem value="break">{tx.shiftStatus.break}</SelectItem>
+                                    <SelectItem value="completed">{tx.shiftStatus.completed}</SelectItem>
+                                    <SelectItem value="cancelled">{tx.shiftStatus.cancelled}</SelectItem>
                                   </SelectContent>
                                 </Select>
                                 <AlertDialog>
@@ -831,15 +1025,15 @@ export default function StaffPage() {
                                   </AlertDialogTrigger>
                                   <AlertDialogContent>
                                     <AlertDialogHeader>
-                                      <AlertDialogTitle>Delete Shift</AlertDialogTitle>
+                                      <AlertDialogTitle>{tx.deleteShiftTitle}</AlertDialogTitle>
                                       <AlertDialogDescription>
-                                        Are you sure you want to delete this shift? This action cannot be undone.
+                                        {tx.deleteShiftDesc}
                                       </AlertDialogDescription>
                                     </AlertDialogHeader>
                                     <AlertDialogFooter>
-                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                      <AlertDialogCancel>{tx.cancel}</AlertDialogCancel>
                                       <AlertDialogAction onClick={() => handleDeleteShift(shift.id)}>
-                                        Delete
+                                        {tx.delete}
                                       </AlertDialogAction>
                                     </AlertDialogFooter>
                                   </AlertDialogContent>
@@ -858,17 +1052,17 @@ export default function StaffPage() {
           {/* Recent Shifts */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Recent & Upcoming Shifts</CardTitle>
+              <CardTitle className="text-lg">{tx.recentShifts}</CardTitle>
             </CardHeader>
             <CardContent>
               {shifts.length === 0 ? (
                 <div className="text-center py-8">
                   <ClipboardList className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No shifts yet</h3>
-                  <p className="text-gray-500 mb-4">Add your first shift to get started</p>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{tx.noShiftsYet}</h3>
+                  <p className="text-gray-500 mb-4">{tx.addFirstShift}</p>
                   <Button onClick={() => setShiftDialogOpen(true)}>
                     <Plus className="mr-2 h-4 w-4" />
-                    Add Shift
+                    {tx.addShift}
                   </Button>
                 </div>
               ) : (
@@ -880,7 +1074,7 @@ export default function StaffPage() {
                           <h4 className="font-medium">
                             {shift.staff?.first_name} {shift.staff?.last_name}
                           </h4>
-                          <Badge className={getShiftStatusColor(shift.status)}>{shift.status}</Badge>
+                          <Badge className={getShiftStatusColor(shift.status)}>{getShiftStatusLabel(shift.status)}</Badge>
                         </div>
                         <div className="text-sm text-gray-600">
                           {new Date(shift.shift_date).toLocaleDateString()} • {shift.start_time} - {shift.end_time}
@@ -913,85 +1107,85 @@ export default function StaffPage() {
 
       {/* Add/Edit Staff Dialog */}
       <Dialog open={staffDialogOpen} onOpenChange={setStaffDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl rounded-2xl border-border bg-card shadow-[0_28px_70px_-30px_rgba(0,0,0,0.6)]">
           <DialogHeader>
-            <DialogTitle>{editingStaff ? "Edit Staff Member" : "Add New Staff Member"}</DialogTitle>
+            <DialogTitle>{editingStaff ? tx.editStaff : tx.addNewStaff}</DialogTitle>
             <DialogDescription>
-              {editingStaff ? "Update staff member information" : "Add a new staff member to your team"}
+              {editingStaff ? tx.updateStaffInfo : tx.addStaffToTeam}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="first-name">First Name</Label>
+                <Label htmlFor="first-name">{tx.firstName}</Label>
                 <Input
                   id="first-name"
                   value={staffForm.first_name}
                   onChange={(e) => setStaffForm({ ...staffForm, first_name: e.target.value })}
-                  placeholder="First name"
+                  placeholder={tx.firstName}
                 />
               </div>
               <div>
-                <Label htmlFor="last-name">Last Name</Label>
+                <Label htmlFor="last-name">{tx.lastName}</Label>
                 <Input
                   id="last-name"
                   value={staffForm.last_name}
                   onChange={(e) => setStaffForm({ ...staffForm, last_name: e.target.value })}
-                  placeholder="Last name"
+                  placeholder={tx.lastName}
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{tx.email}</Label>
                 <Input
                   id="email"
                   type="email"
                   value={staffForm.email}
                   onChange={(e) => setStaffForm({ ...staffForm, email: e.target.value })}
-                  placeholder="Email address"
+                  placeholder={tx.email}
                 />
               </div>
               <div>
-                <Label htmlFor="phone">Phone (Optional)</Label>
+                <Label htmlFor="phone">{tx.phoneOptional}</Label>
                 <Input
                   id="phone"
                   value={staffForm.phone}
                   onChange={(e) => setStaffForm({ ...staffForm, phone: e.target.value })}
-                  placeholder="Phone number"
+                  placeholder={tx.phoneOptional}
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="role">Role</Label>
+                <Label htmlFor="role">{tx.roleLabel}</Label>
                 <Select value={staffForm.role} onValueChange={(value) => setStaffForm({ ...staffForm, role: value })}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="owner">Owner</SelectItem>
-                    <SelectItem value="manager">Manager</SelectItem>
-                    <SelectItem value="staff">Staff</SelectItem>
+                    <SelectItem value="owner">{tx.role.owner}</SelectItem>
+                    <SelectItem value="manager">{tx.role.manager}</SelectItem>
+                    <SelectItem value="staff">{tx.role.staff}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <Label htmlFor="position">Position (Optional)</Label>
+                <Label htmlFor="position">{tx.positionOptional}</Label>
                 <Input
                   id="position"
                   value={staffForm.position}
                   onChange={(e) => setStaffForm({ ...staffForm, position: e.target.value })}
-                  placeholder="e.g., Chef, Server, Bartender"
+                  placeholder={tx.positionExample}
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="hourly-rate">Hourly Rate ($) (Optional)</Label>
+                <Label htmlFor="hourly-rate">{tx.hourlyRateOptional}</Label>
                 <Input
                   id="hourly-rate"
                   type="number"
@@ -1002,7 +1196,7 @@ export default function StaffPage() {
                 />
               </div>
               <div>
-                <Label htmlFor="hire-date">Hire Date (Optional)</Label>
+                <Label htmlFor="hire-date">{tx.hireDateOptional}</Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -1013,7 +1207,7 @@ export default function StaffPage() {
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {staffForm.hire_date ? format(new Date(staffForm.hire_date), "PPP") : "Pick a date"}
+                      {staffForm.hire_date ? format(new Date(staffForm.hire_date), "PPP") : tx.pickDate}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0">
@@ -1031,12 +1225,12 @@ export default function StaffPage() {
             </div>
 
             <div>
-              <Label htmlFor="notes">Notes (Optional)</Label>
+              <Label htmlFor="notes">{tx.notesOptional}</Label>
               <Input
                 id="notes"
                 value={staffForm.notes}
                 onChange={(e) => setStaffForm({ ...staffForm, notes: e.target.value })}
-                placeholder="Any additional notes"
+                placeholder={tx.notesExample}
               />
             </div>
 
@@ -1048,15 +1242,15 @@ export default function StaffPage() {
                 onChange={(e) => setStaffForm({ ...staffForm, is_active: e.target.checked })}
                 className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              <Label htmlFor="is-active">Team Member</Label>
+              <Label htmlFor="is-active">{tx.teamMember}</Label>
             </div>
 
             <div className="flex justify-end space-x-2">
               <Button variant="outline" onClick={() => setStaffDialogOpen(false)}>
-                Cancel
+                {tx.cancel}
               </Button>
               <Button onClick={editingStaff ? handleUpdateStaff : handleCreateStaff}>
-                {editingStaff ? "Update" : "Add"} Staff Member
+                {editingStaff ? tx.update : tx.add} {tx.tabs.staff}
               </Button>
             </div>
           </div>
@@ -1065,20 +1259,20 @@ export default function StaffPage() {
 
       {/* Add Shift Dialog */}
       <Dialog open={shiftDialogOpen} onOpenChange={setShiftDialogOpen}>
-        <DialogContent>
+        <DialogContent className="rounded-2xl border-border bg-card shadow-[0_28px_70px_-30px_rgba(0,0,0,0.6)]">
           <DialogHeader>
-            <DialogTitle>Add New Shift</DialogTitle>
-            <DialogDescription>Schedule a new shift for a staff member</DialogDescription>
+            <DialogTitle>{tx.addNewShift}</DialogTitle>
+            <DialogDescription>{tx.scheduleNewShift}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="staff-member">Staff Member</Label>
+              <Label htmlFor="staff-member">{tx.staffMember}</Label>
               <Select
                 value={shiftForm.user_id}
                 onValueChange={(value) => setShiftForm({ ...shiftForm, user_id: value })}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select staff member" />
+                  <SelectValue placeholder={tx.selectStaffMember} />
                 </SelectTrigger>
                 <SelectContent>
                   {staffMembers
@@ -1093,12 +1287,12 @@ export default function StaffPage() {
             </div>
 
             <div>
-              <Label htmlFor="shift-date">Shift Date</Label>
+              <Label htmlFor="shift-date">{tx.shiftDate}</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="w-full justify-start text-left font-normal bg-transparent">
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {shiftForm.shift_date ? format(new Date(shiftForm.shift_date), "PPP") : "Pick a date"}
+                    {shiftForm.shift_date ? format(new Date(shiftForm.shift_date), "PPP") : tx.pickDate}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0">
@@ -1116,7 +1310,7 @@ export default function StaffPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="start-time">Start Time</Label>
+                <Label htmlFor="start-time">{tx.startTime}</Label>
                 <Input
                   id="start-time"
                   type="time"
@@ -1125,7 +1319,7 @@ export default function StaffPage() {
                 />
               </div>
               <div>
-                <Label htmlFor="end-time">End Time</Label>
+                <Label htmlFor="end-time">{tx.endTime}</Label>
                 <Input
                   id="end-time"
                   type="time"
@@ -1137,7 +1331,7 @@ export default function StaffPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="break-duration">Break Duration (minutes)</Label>
+                <Label htmlFor="break-duration">{tx.breakDurationLabel}</Label>
                 <Input
                   id="break-duration"
                   type="number"
@@ -1146,30 +1340,30 @@ export default function StaffPage() {
                 />
               </div>
               <div>
-                <Label htmlFor="hourly-rate">Hourly Rate ($) (Optional)</Label>
+                <Label htmlFor="hourly-rate">{tx.hourlyRateOptionalShort}</Label>
                 <Input
                   id="hourly-rate"
                   type="number"
                   step="0.01"
                   value={shiftForm.hourly_rate}
                   onChange={(e) => setShiftForm({ ...shiftForm, hourly_rate: e.target.value })}
-                  placeholder="Use staff default"
+                  placeholder={tx.useStaffDefault}
                 />
               </div>
             </div>
 
             <div>
-              <Label htmlFor="status">Status</Label>
+              <Label htmlFor="status">{tx.status}</Label>
               <Select value={shiftForm.status} onValueChange={(value) => setShiftForm({ ...shiftForm, status: value })}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="scheduled">Scheduled</SelectItem>
-                  <SelectItem value="started">Started</SelectItem>
-                  <SelectItem value="break">On Break</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                  <SelectItem value="scheduled">{tx.shiftStatus.scheduled}</SelectItem>
+                  <SelectItem value="started">{tx.shiftStatus.started}</SelectItem>
+                  <SelectItem value="break">{tx.shiftStatus.break}</SelectItem>
+                  <SelectItem value="completed">{tx.shiftStatus.completed}</SelectItem>
+                  <SelectItem value="cancelled">{tx.shiftStatus.cancelled}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -1177,12 +1371,12 @@ export default function StaffPage() {
             {shiftForm.start_time && shiftForm.end_time && (
               <div className="p-3 bg-blue-50 rounded-lg">
                 <p className="text-sm text-blue-800">
-                  <strong>Shift Duration:</strong>{" "}
+                  <strong>{tx.shiftDuration}:</strong>{" "}
                   {calculateShiftHours(shiftForm.start_time, shiftForm.end_time, Number(shiftForm.break_duration))}
                 </p>
                 {shiftForm.hourly_rate && (
                   <p className="text-sm text-blue-800">
-                    <strong>Estimated Cost:</strong> $
+                    <strong>{tx.estimatedCost}:</strong> $
                     {calculateShiftCost(
                       shiftForm.start_time,
                       shiftForm.end_time,
@@ -1196,9 +1390,9 @@ export default function StaffPage() {
 
             <div className="flex justify-end space-x-2">
               <Button variant="outline" onClick={() => setShiftDialogOpen(false)}>
-                Cancel
+                {tx.cancel}
               </Button>
-              <Button onClick={handleCreateShift}>Add Shift</Button>
+              <Button onClick={handleCreateShift}>{tx.addShift}</Button>
             </div>
           </div>
         </DialogContent>

@@ -14,6 +14,7 @@ import { Printer, Save, TestTube, Wifi, Monitor, FileText, Settings, AlertCircle
 import { supabase } from "@/lib/supabase"
 import { getCurrentUserRestaurant } from "@/lib/auth"
 import { Loading } from "@/components/ui/loading"
+import { useI18n } from "@/components/i18n/i18n-provider"
 
 interface PrinterConfig {
   enabled: boolean
@@ -29,6 +30,116 @@ interface PrinterConfig {
 }
 
 export default function PrinterSettingsPage() {
+  const { locale } = useI18n()
+  const tx =
+    locale === "es-ES"
+      ? {
+          restaurantNotFound: "Restaurante no encontrado",
+          saveSuccess: "Configuracion de impresora guardada",
+          saveError: "Error al guardar la configuracion",
+          testError: "Error al enviar prueba",
+          loading: "Cargando configuracion de impresora...",
+          title: "Ajustes de impresora",
+          subtitle: "Configura la impresion de tickets del restaurante",
+          printerConfig: "Configuracion de impresora",
+          enableReceipt: "Activar impresion de tickets",
+          enableReceiptDesc: "Imprimir tickets automaticamente en cada pedido",
+          printerType: "Tipo de impresora",
+          thermal: "Impresora termica",
+          network: "Impresora de red",
+          pdf: "PDF (impresion local)",
+          ip: "IP de impresora",
+          port: "Puerto de impresora",
+          paperWidth: "Ancho de papel (mm)",
+          autoCut: "Corte automatico",
+          autoCutDesc: "Cortar papel automaticamente al imprimir",
+          receiptCustomization: "Personalizacion del ticket",
+          printLogo: "Imprimir logo del restaurante",
+          printLogoDesc: "Incluir logo en los tickets",
+          headerText: "Texto de cabecera",
+          headerPh: "Bienvenido a nuestro restaurante",
+          headerDesc: "Texto personalizado en la parte superior",
+          footerText: "Texto de pie",
+          footerPh: "Gracias por tu pedido",
+          footerDesc: "Texto personalizado en la parte inferior",
+          testPrint: "Prueba de impresion",
+          testPrintDesc: "Enviar ticket de prueba para validar la configuracion",
+          sendingTest: "Enviando prueba...",
+          sendTest: "Enviar prueba",
+          saving: "Guardando...",
+          saveConfig: "Guardar configuracion",
+          status: "Estado de configuracion",
+          printerEnabled: "Impresora activada",
+          enabled: "Activada",
+          disabled: "Desactivada",
+          printerTypeLabel: "Tipo de impresora",
+          printerIpLabel: "IP de impresora",
+          paperWidthLabel: "Ancho de papel",
+          printReceipt: "Imprimir ticket",
+          instructions: "Instrucciones:",
+          printStep1: '1. Haz clic en "Imprimir ticket" o pulsa Ctrl+P',
+          printStep2: "2. Selecciona tu impresora USB",
+          printStep3: '3. Elige papel "80mm" si esta disponible',
+          printStep4: "4. Imprime el ticket",
+          pdfOpened: "PDF abierto en nueva ventana - imprime desde ahi",
+          popupBlocked: "Bloqueador de ventanas activo - permite ventanas emergentes",
+          testSent: "Prueba enviada correctamente",
+          escpos: "ESC/POS",
+        }
+      : {
+          restaurantNotFound: "Restaurant not found",
+          saveSuccess: "Printer configuration saved successfully",
+          saveError: "Error saving configuration",
+          testError: "Test print failed",
+          loading: "Loading printer configuration...",
+          title: "Printer Settings",
+          subtitle: "Configure receipt printing for your restaurant",
+          printerConfig: "Printer Configuration",
+          enableReceipt: "Enable Receipt Printing",
+          enableReceiptDesc: "Enable automatic receipt printing for orders",
+          printerType: "Printer Type",
+          thermal: "Thermal Printer",
+          network: "Network Printer",
+          pdf: "PDF (Local Print)",
+          ip: "Printer IP Address",
+          port: "Printer Port",
+          paperWidth: "Paper Width (mm)",
+          autoCut: "Auto Cut Paper",
+          autoCutDesc: "Automatically cut paper after printing",
+          receiptCustomization: "Receipt Customization",
+          printLogo: "Print Restaurant Logo",
+          printLogoDesc: "Include logo on receipts",
+          headerText: "Header Text",
+          headerPh: "Welcome to our restaurant!",
+          headerDesc: "Custom text to appear at the top of receipts",
+          footerText: "Footer Text",
+          footerPh: "Thank you for your order!",
+          footerDesc: "Custom text to appear at the bottom of receipts",
+          testPrint: "Test Print",
+          testPrintDesc: "Send a test receipt to verify configuration",
+          sendingTest: "Sending Test...",
+          sendTest: "Send Test Receipt",
+          saving: "Saving...",
+          saveConfig: "Save Configuration",
+          status: "Configuration Status",
+          printerEnabled: "Printer Enabled",
+          enabled: "Enabled",
+          disabled: "Disabled",
+          printerTypeLabel: "Printer Type",
+          printerIpLabel: "Printer IP",
+          paperWidthLabel: "Paper Width",
+          printReceipt: "Print Receipt",
+          instructions: "Instructions:",
+          printStep1: '1. Click "Print Receipt" button or press Ctrl+P',
+          printStep2: "2. Select your USB printer",
+          printStep3: '3. Choose "80mm" paper size if available',
+          printStep4: "4. Print the receipt",
+          pdfOpened: "PDF opened in new window - print from there",
+          popupBlocked: "Popup blocker active - allow popups",
+          testSent: "Test print sent successfully!",
+          escpos: "ESC/POS",
+        }
+
   const [config, setConfig] = useState<PrinterConfig>({
     enabled: false,
     printer_type: 'thermal',
@@ -39,7 +150,7 @@ export default function PrinterSettingsPage() {
     auto_cut: true,
     print_logo: true,
     header_text: '',
-    footer_text: 'Thank you for your order!'
+    footer_text: locale === "es-ES" ? "Gracias por tu pedido" : "Thank you for your order!"
   })
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -83,7 +194,7 @@ export default function PrinterSettingsPage() {
 
       const { restaurantId } = await getCurrentUserRestaurant()
       if (!restaurantId) {
-        setMessage({ type: 'error', text: 'Restaurant not found' })
+        setMessage({ type: 'error', text: tx.restaurantNotFound })
         return
       }
 
@@ -99,10 +210,10 @@ export default function PrinterSettingsPage() {
         throw error
       }
 
-      setMessage({ type: 'success', text: 'Printer configuration saved successfully!' })
+      setMessage({ type: 'success', text: tx.saveSuccess })
     } catch (error: any) {
       console.error('Error saving printer config:', error)
-      setMessage({ type: 'error', text: `Error saving configuration: ${error.message}` })
+      setMessage({ type: 'error', text: `${tx.saveError}: ${error.message}` })
     } finally {
       setSaving(false)
     }
@@ -115,7 +226,7 @@ export default function PrinterSettingsPage() {
 
       const { restaurantId } = await getCurrentUserRestaurant()
       if (!restaurantId) {
-        setMessage({ type: 'error', text: 'Restaurant not found' })
+        setMessage({ type: 'error', text: tx.restaurantNotFound })
         return
       }
 
@@ -146,7 +257,7 @@ export default function PrinterSettingsPage() {
               <!DOCTYPE html>
               <html>
               <head>
-                <title>Receipt - Test</title>
+                <title>${tx.printReceipt} - Test</title>
                 <style>
                   body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
                   .print-button {
@@ -175,40 +286,40 @@ export default function PrinterSettingsPage() {
               </head>
               <body>
                 <button class="print-button" onclick="window.print()">
-                  🖨️ Print Receipt
+                  🖨️ ${tx.printReceipt}
                 </button>
                 <div class="instructions">
-                  <strong>Instructions:</strong><br>
-                  1. Click "Print Receipt" button or press Ctrl+P<br>
-                  2. Select your USB printer<br>
-                  3. Choose "80mm" paper size if available<br>
-                  4. Print the receipt
+                  <strong>${tx.instructions}</strong><br>
+                  ${tx.printStep1}<br>
+                  ${tx.printStep2}<br>
+                  ${tx.printStep3}<br>
+                  ${tx.printStep4}
                 </div>
                 ${result.pdfUrl}
               </body>
               </html>
             `)
             newWindow.document.close()
-            setMessage({ type: 'success', text: 'PDF abierto en nueva ventana - imprimir desde ahí' })
+            setMessage({ type: 'success', text: tx.pdfOpened })
           } else {
-            setMessage({ type: 'error', text: 'Bloqueador de ventanas activado - permitir ventanas emergentes' })
+            setMessage({ type: 'error', text: tx.popupBlocked })
           }
         } else {
-          setMessage({ type: 'success', text: result.message || 'Test print sent successfully!' })
+          setMessage({ type: 'success', text: result.message || tx.testSent })
         }
       } else {
-        setMessage({ type: 'error', text: `Test print failed: ${result.error}` })
+          setMessage({ type: 'error', text: `${tx.testError}: ${result.error}` })
       }
     } catch (error: any) {
       console.error('Error testing printer:', error)
-      setMessage({ type: 'error', text: `Test print failed: ${error.message}` })
+      setMessage({ type: 'error', text: `${tx.testError}: ${error.message}` })
     } finally {
       setTesting(false)
     }
   }
 
   if (loading) {
-    return <Loading text="Loading printer configuration..." />
+    return <Loading text={tx.loading} />
   }
 
   return (
@@ -221,10 +332,10 @@ export default function PrinterSettingsPage() {
           </div>
           <div>
             <h1 className="text-2xl font-semibold text-gray-900">
-              Printer Settings
+              {tx.title}
             </h1>
             <p className="text-gray-500 text-sm">
-              Configure receipt printing for your restaurant
+              {tx.subtitle}
             </p>
           </div>
         </div>
@@ -245,16 +356,16 @@ export default function PrinterSettingsPage() {
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Settings className="h-5 w-5" />
-              <span>Printer Configuration</span>
+              <span>{tx.printerConfig}</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Enable Printer */}
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label>Enable Receipt Printing</Label>
+                <Label>{tx.enableReceipt}</Label>
                 <p className="text-sm text-gray-500">
-                  Enable automatic receipt printing for orders
+                  {tx.enableReceiptDesc}
                 </p>
               </div>
               <Switch
@@ -267,7 +378,7 @@ export default function PrinterSettingsPage() {
 
             {/* Printer Type */}
             <div className="space-y-2">
-              <Label>Printer Type</Label>
+              <Label>{tx.printerType}</Label>
               <Select
                 value={config.printer_type}
                 onValueChange={(value: any) => setConfig({ ...config, printer_type: value })}
@@ -279,25 +390,25 @@ export default function PrinterSettingsPage() {
                   <SelectItem value="thermal">
                     <div className="flex items-center space-x-2">
                       <Printer className="h-4 w-4" />
-                      <span>Thermal Printer</span>
+                      <span>{tx.thermal}</span>
                     </div>
                   </SelectItem>
                   <SelectItem value="network">
                     <div className="flex items-center space-x-2">
                       <Wifi className="h-4 w-4" />
-                      <span>Network Printer</span>
+                      <span>{tx.network}</span>
                     </div>
                   </SelectItem>
                   <SelectItem value="pdf">
                     <div className="flex items-center space-x-2">
                       <FileText className="h-4 w-4" />
-                      <span>PDF (Local Print)</span>
+                      <span>{tx.pdf}</span>
                     </div>
                   </SelectItem>
                   <SelectItem value="escpos">
                     <div className="flex items-center space-x-2">
                       <Monitor className="h-4 w-4" />
-                      <span>ESC/POS</span>
+                      <span>{tx.escpos}</span>
                     </div>
                   </SelectItem>
                 </SelectContent>
@@ -308,7 +419,7 @@ export default function PrinterSettingsPage() {
             {(config.printer_type === 'network' || config.printer_type === 'thermal') && (
               <>
                 <div className="space-y-2">
-                  <Label>Printer IP Address</Label>
+                  <Label>{tx.ip}</Label>
                   <Input
                     placeholder="192.168.1.100"
                     value={config.printer_ip || ''}
@@ -317,7 +428,7 @@ export default function PrinterSettingsPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Printer Port</Label>
+                  <Label>{tx.port}</Label>
                   <Input
                     type="number"
                     placeholder="9100"
@@ -330,7 +441,7 @@ export default function PrinterSettingsPage() {
 
             {/* Paper Configuration */}
             <div className="space-y-2">
-              <Label>Paper Width (mm)</Label>
+              <Label>{tx.paperWidth}</Label>
               <Input
                 type="number"
                 placeholder="80"
@@ -342,9 +453,9 @@ export default function PrinterSettingsPage() {
             {/* Auto Cut */}
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label>Auto Cut Paper</Label>
+                <Label>{tx.autoCut}</Label>
                 <p className="text-sm text-gray-500">
-                  Automatically cut paper after printing
+                  {tx.autoCutDesc}
                 </p>
               </div>
               <Switch
@@ -360,16 +471,16 @@ export default function PrinterSettingsPage() {
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <FileText className="h-5 w-5" />
-              <span>Receipt Customization</span>
+              <span>{tx.receiptCustomization}</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Print Logo */}
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label>Print Restaurant Logo</Label>
+                <Label>{tx.printLogo}</Label>
                 <p className="text-sm text-gray-500">
-                  Include logo on receipts
+                  {tx.printLogoDesc}
                 </p>
               </div>
               <Switch
@@ -382,27 +493,27 @@ export default function PrinterSettingsPage() {
 
             {/* Header Text */}
             <div className="space-y-2">
-              <Label>Header Text</Label>
+              <Label>{tx.headerText}</Label>
               <Input
-                placeholder="Welcome to our restaurant!"
+                placeholder={tx.headerPh}
                 value={config.header_text || ''}
                 onChange={(e) => setConfig({ ...config, header_text: e.target.value })}
               />
               <p className="text-sm text-gray-500">
-                Custom text to appear at the top of receipts
+                {tx.headerDesc}
               </p>
             </div>
 
             {/* Footer Text */}
             <div className="space-y-2">
-              <Label>Footer Text</Label>
+              <Label>{tx.footerText}</Label>
               <Input
-                placeholder="Thank you for your order!"
+                placeholder={tx.footerPh}
                 value={config.footer_text || ''}
                 onChange={(e) => setConfig({ ...config, footer_text: e.target.value })}
               />
               <p className="text-sm text-gray-500">
-                Custom text to appear at the bottom of receipts
+                {tx.footerDesc}
               </p>
             </div>
 
@@ -411,9 +522,9 @@ export default function PrinterSettingsPage() {
             {/* Test Print */}
             <div className="space-y-4">
               <div>
-                <Label>Test Print</Label>
+                <Label>{tx.testPrint}</Label>
                 <p className="text-sm text-gray-500">
-                  Send a test receipt to verify configuration
+                  {tx.testPrintDesc}
                 </p>
               </div>
               <Button
@@ -423,7 +534,7 @@ export default function PrinterSettingsPage() {
                 className="w-full"
               >
                 <TestTube className="h-4 w-4 mr-2" />
-                {testing ? 'Sending Test...' : 'Send Test Receipt'}
+                {testing ? tx.sendingTest : tx.sendTest}
               </Button>
             </div>
           </CardContent>
@@ -439,7 +550,7 @@ export default function PrinterSettingsPage() {
             className="w-full"
           >
             <Save className="h-4 w-4 mr-2" />
-            {saving ? 'Saving...' : 'Save Configuration'}
+            {saving ? tx.saving : tx.saveConfig}
           </Button>
         </CardContent>
       </Card>
@@ -447,28 +558,28 @@ export default function PrinterSettingsPage() {
       {/* Configuration Status */}
       <Card>
         <CardHeader>
-          <CardTitle>Configuration Status</CardTitle>
+          <CardTitle>{tx.status}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Printer Enabled</span>
+              <span className="text-sm font-medium">{tx.printerEnabled}</span>
               <Badge variant={config.enabled ? "default" : "secondary"}>
-                {config.enabled ? "Enabled" : "Disabled"}
+                {config.enabled ? tx.enabled : tx.disabled}
               </Badge>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Printer Type</span>
+              <span className="text-sm font-medium">{tx.printerTypeLabel}</span>
               <Badge variant="outline">{config.printer_type}</Badge>
             </div>
             {config.printer_ip && (
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Printer IP</span>
+                <span className="text-sm font-medium">{tx.printerIpLabel}</span>
                 <span className="text-sm text-gray-600">{config.printer_ip}</span>
               </div>
             )}
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Paper Width</span>
+              <span className="text-sm font-medium">{tx.paperWidthLabel}</span>
               <span className="text-sm text-gray-600">{config.paper_width}mm</span>
             </div>
           </div>

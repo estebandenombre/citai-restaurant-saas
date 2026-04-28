@@ -113,52 +113,30 @@ export default function PricingPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-        {/* Enhanced Header */}
-        <div className="relative overflow-hidden bg-white border-b border-gray-200">
-          {/* Background decoration */}
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-indigo-600/5"></div>
-          <div className="absolute top-0 left-0 w-72 h-72 bg-gradient-to-r from-blue-400/20 to-indigo-400/20 rounded-full blur-3xl"></div>
-          <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-full blur-3xl"></div>
-          
-          <div className="relative px-6 py-16 sm:px-8 sm:py-20">
-            <div className="max-w-4xl mx-auto text-center">
-              {/* Badge */}
-              <div className="inline-flex items-center px-4 py-2 rounded-full bg-blue-50 border border-blue-200 mb-6">
-                <Sparkles className="h-4 w-4 text-blue-600 mr-2" />
-                <span className="text-sm font-medium text-blue-700">Subscription Plans</span>
-              </div>
-              
-              {/* Main Title */}
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
-                Choose Your
-                <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
-                  {" "}Plan
-                </span>
-              </h1>
-              
-              {/* Description */}
-              <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
-                Select the perfect plan for your restaurant. Start with a free trial and upgrade as you grow.
-              </p>
-            </div>
+      <div className="min-h-screen bg-background">
+        <div className="border-b border-border bg-card">
+          <div className="mx-auto max-w-3xl px-6 py-16 text-center sm:px-8">
+            <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+              Plans
+            </p>
+            <div className="mx-auto h-10 max-w-sm animate-pulse rounded bg-muted" />
+            <div className="mx-auto mt-4 h-4 max-w-md animate-pulse rounded bg-muted" />
           </div>
         </div>
-        
         <div className="px-6 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+          <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
             {[...Array(4)].map((_, i) => (
-              <Card key={i} className="animate-pulse">
+              <Card key={i} className="animate-pulse border-border/80">
                 <CardHeader>
-                  <div className="h-6 bg-gray-200 rounded w-1/2 mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                  <div className="mb-2 h-6 w-1/2 rounded bg-muted" />
+                  <div className="h-4 w-3/4 rounded bg-muted" />
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    <div className="h-8 bg-gray-200 rounded w-full"></div>
+                    <div className="h-8 w-full rounded bg-muted" />
                     <div className="space-y-2">
                       {[...Array(6)].map((_, j) => (
-                        <div key={j} className="h-4 bg-gray-200 rounded w-3/4"></div>
+                        <div key={j} className="h-4 w-3/4 rounded bg-muted" />
                       ))}
                     </div>
                   </div>
@@ -172,63 +150,29 @@ export default function PricingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
-      {/* Enhanced Header */}
-      <div className="relative overflow-hidden bg-white/80 backdrop-blur-sm border-b border-gray-200/50">
-        {/* Background decoration */}
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-indigo-600/5"></div>
-        <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-r from-blue-400/20 to-indigo-400/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
-        <div className="absolute bottom-0 left-1/4 w-64 h-64 bg-gradient-to-r from-green-400/15 to-blue-400/15 rounded-full blur-2xl"></div>
-        
-        <div className="relative px-6 py-20 sm:px-8 sm:py-24">
-          <div className="max-w-5xl mx-auto text-center">
-            {/* Badge */}
-            <div className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200/50 shadow-sm mb-8">
-              <Sparkles className="h-5 w-5 text-blue-600 mr-3" />
-              <span className="text-sm font-semibold text-blue-700">Choose Your Perfect Plan</span>
-            </div>
-            
-            {/* Main Title */}
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 mb-8 leading-tight">
-              Pricing That
-              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
-                {" "}Grows With You
-              </span>
-            </h1>
-            
-            {/* Description */}
-            <p className="text-xl sm:text-2xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed font-medium">
-              Start free and scale as you grow. AI-powered insights that transform your restaurant operations.
-            </p>
-            
-            {/* Value Proposition */}
-            <div className="flex flex-wrap justify-center gap-6 mb-10">
-              <div className="flex items-center px-4 py-2 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200/50 rounded-full shadow-sm">
-                <Check className="h-5 w-5 text-green-600 mr-3" />
-                <span className="text-sm font-semibold text-green-700">14-day free trial</span>
-              </div>
-              <div className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200/50 rounded-full shadow-sm">
-                <Check className="h-5 w-5 text-blue-600 mr-3" />
-                <span className="text-sm font-semibold text-blue-700">0% commission</span>
-              </div>
-              <div className="flex items-center px-4 py-2 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200/50 rounded-full shadow-sm">
-                <Check className="h-5 w-5 text-purple-600 mr-3" />
-                <span className="text-sm font-semibold text-purple-700">Cancel anytime</span>
-              </div>
-            </div>
-            
-            {/* Current Plan Indicator */}
-            {subscriptionStatus && (
-              <div className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200/50 shadow-sm">
-                <Check className="h-5 w-5 text-green-600 mr-3" />
-                <span className="text-sm font-semibold text-green-700">
-                  Current Plan: {subscriptionStatus.plan_name}
-                  {subscriptionStatus.is_trial && ` (${subscriptionStatus.days_remaining} days left)`}
-                </span>
-              </div>
-            )}
+    <div className="min-h-screen bg-background">
+      <div className="border-b border-border bg-card">
+        <div className="mx-auto max-w-3xl px-6 py-16 text-center sm:px-8 sm:py-20">
+          <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+            Tariff
+          </p>
+          <h1 className="font-display text-4xl font-medium tracking-[-0.03em] text-foreground sm:text-5xl lg:text-6xl">
+            Honest <span className="italic">monthly</span> pricing
+          </h1>
+          <p className="mx-auto mt-5 max-w-xl text-lg text-muted-foreground">
+            No commission on orders. Change plan when your floor changes.
+          </p>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3 text-sm text-muted-foreground">
+            <span className="rounded-full border border-border bg-background px-3 py-1.5">14-day trial</span>
+            <span className="rounded-full border border-border bg-background px-3 py-1.5">0% on orders</span>
+            <span className="rounded-full border border-border bg-background px-3 py-1.5">Cancel anytime</span>
           </div>
+          {subscriptionStatus && (
+            <p className="mt-6 font-mono text-xs uppercase tracking-wider text-foreground">
+              Current: {subscriptionStatus.plan_name}
+              {subscriptionStatus.is_trial && ` · ${subscriptionStatus.days_remaining}d trial`}
+            </p>
+          )}
         </div>
       </div>
       
@@ -241,36 +185,36 @@ export default function PricingPage() {
             return (
               <Card 
                 key={plan.id} 
-                className={`relative group transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
-                  isPopular 
-                    ? 'ring-2 ring-blue-500 shadow-xl scale-105 bg-gradient-to-br from-blue-50/50 to-indigo-50/50' 
-                    : 'hover:ring-2 hover:ring-gray-200'
-                } ${isCurrentPlan ? 'border-green-500 shadow-lg' : 'border-gray-200/50'}`}
+                className={`group relative border transition-shadow hover:shadow-md ${
+                  isPopular
+                    ? "ring-1 ring-foreground/15 shadow-md"
+                    : "border-border/80"
+                } ${isCurrentPlan ? "border-foreground/30 shadow-sm" : ""}`}
               >
                 {isPopular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <Badge className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 shadow-lg">
-                      <Crown className="h-4 w-4 mr-2" />
-                      Most Popular
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 transform">
+                    <Badge className="border-border bg-foreground px-3 py-1.5 text-[10px] font-mono text-background">
+                      <Crown className="mr-1.5 h-3.5 w-3.5" />
+                      Popular
                     </Badge>
                   </div>
                 )}
-                
+
                 {isCurrentPlan && (
-                  <div className="absolute -top-4 right-4">
-                    <Badge className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 py-2 shadow-lg">
-                      <Check className="h-4 w-4 mr-2" />
-                      Current Plan
+                  <div className="absolute -top-3 right-3">
+                    <Badge variant="secondary" className="font-mono text-[10px] uppercase tracking-wider">
+                      <Check className="mr-1.5 h-3.5 w-3.5" />
+                      Current
                     </Badge>
                   </div>
                 )}
 
                 <CardHeader className="text-center pt-8">
                   <CardTitle className="flex items-center justify-center gap-2">
-                    {plan.name === 'free-trial-plan' && <Sparkles className="h-5 w-5 text-blue-500" />}
-                    {plan.name === 'starter-plan' && <Zap className="h-5 w-5 text-green-500" />}
-                    {plan.name === 'growth-plan' && <Crown className="h-5 w-5 text-yellow-500" />}
-                    {plan.name === 'multi-plan' && <Building2 className="h-5 w-5 text-purple-500" />}
+                    {plan.name === "free-trial-plan" && <Sparkles className="h-5 w-5 text-foreground/70" />}
+                    {plan.name === "starter-plan" && <Zap className="h-5 w-5 text-foreground/70" />}
+                    {plan.name === "growth-plan" && <Crown className="h-5 w-5 text-foreground/70" />}
+                    {plan.name === "multi-plan" && <Building2 className="h-5 w-5 text-foreground/70" />}
                     {plan.display_name}
                   </CardTitle>
                   <CardDescription>{plan.description}</CardDescription>
@@ -279,59 +223,55 @@ export default function PricingPage() {
                 <CardContent className="space-y-8">
                   {/* Price */}
                   <div className="text-center">
-                    <div className="text-4xl font-bold mb-2">
+                    <div className="mb-2 font-display text-4xl font-medium tabular-nums">
                       ${plan.price}
                       <span className="text-lg font-normal text-muted-foreground">
                         /{plan.billing_cycle === 'trial' ? 'trial' : 'month'}
                       </span>
                     </div>
                     {plan.trial_days > 0 && (
-                      <p className="text-sm text-blue-600 font-semibold mt-2">
-                        {plan.trial_days}-day free trial
+                      <p className="mt-2 font-mono text-xs text-muted-foreground">
+                        {plan.trial_days}-day trial
                       </p>
                     )}
-                    {plan.name === 'starter-plan' && (
-                      <div className="mt-3 p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200/50">
-                        <p className="text-sm text-green-700 font-semibold">
-                          Save $10 vs competitors • No setup fees
-                        </p>
-                      </div>
+                    {plan.name === "starter-plan" && (
+                      <p className="mt-3 rounded-lg border border-border/80 bg-muted/30 px-3 py-2 text-sm text-muted-foreground">
+                        No setup fees · simple pricing
+                      </p>
                     )}
-                    {plan.name === 'growth-plan' && (
-                      <div className="mt-3 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200/50">
-                        <p className="text-sm text-blue-700 font-semibold">
-                          Most popular • Save 5+ hours/week with AI
-                        </p>
-                      </div>
+                    {plan.name === "growth-plan" && (
+                      <p className="mt-3 rounded-lg border border-border/80 bg-muted/30 px-3 py-2 text-sm text-muted-foreground">
+                        Most teams land here
+                      </p>
                     )}
-                    {plan.name === 'multi-plan' && (
-                      <div className="mt-3 p-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200/50">
-                        <p className="text-sm text-purple-700 font-semibold">
-                          Unlimited for most businesses
-                        </p>
-                      </div>
+                    {plan.name === "multi-plan" && (
+                      <p className="mt-3 rounded-lg border border-border/80 bg-muted/30 px-3 py-2 text-sm text-muted-foreground">
+                        Chains & multi-kitchen
+                      </p>
                     )}
                   </div>
 
                   {/* Features */}
-                  <div className="space-y-4 p-4 bg-gray-50/50 rounded-lg">
+                  <div className="space-y-4 rounded-xl border border-border/70 bg-muted/25 p-4">
                     <div className="flex items-center gap-3 text-sm">
-                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                        <Users className="h-4 w-4 text-blue-600" />
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card">
+                        <Users className="h-4 w-4 text-foreground/70" />
                       </div>
-                      <span className="font-medium">Up to {plan.max_users} team member{plan.max_users > 1 ? 's' : ''}</span>
+                      <span className="font-medium">Up to {plan.max_users} team member{plan.max_users > 1 ? "s" : ""}</span>
                     </div>
                     <div className="flex items-center gap-3 text-sm">
-                      <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                        <Building2 className="h-4 w-4 text-green-600" />
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card">
+                        <Building2 className="h-4 w-4 text-foreground/70" />
                       </div>
-                      <span className="font-medium">Up to {plan.max_restaurants} location{plan.max_restaurants > 1 ? 's' : ''}</span>
+                      <span className="font-medium">Up to {plan.max_restaurants} location{plan.max_restaurants > 1 ? "s" : ""}</span>
                     </div>
                     <div className="flex items-center gap-3 text-sm">
-                      <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                        <BarChart3 className="h-4 w-4 text-purple-600" />
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card">
+                        <BarChart3 className="h-4 w-4 text-foreground/70" />
                       </div>
-                      <span className="font-medium">{plan.max_orders_per_month.toLocaleString()} orders/month</span>
+                      <span className="font-medium tabular-nums">
+                        {plan.max_orders_per_month.toLocaleString()} orders/mo
+                      </span>
                     </div>
                   </div>
 
@@ -339,21 +279,19 @@ export default function PricingPage() {
                   <div className="space-y-4">
                     {/* Enabled Features */}
                     <div className="space-y-3">
-                      <h4 className="text-sm font-semibold text-green-700 flex items-center gap-2">
+                      <h4 className="flex items-center gap-2 text-sm font-medium text-foreground">
                         <Check className="h-4 w-4" />
-                        Included Features
+                        Included
                       </h4>
                       <div className="space-y-2 pl-6">
                         {Object.entries(plan.features)
                           .filter(([_, enabled]) => enabled)
                           .map(([feature, _]) => (
                             <div key={feature} className="flex items-center gap-3 text-sm">
-                              <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
-                                <Check className="h-3 w-3 text-green-600" />
+                              <div className="flex h-5 w-5 items-center justify-center rounded-full border border-border bg-card">
+                                <Check className="h-3 w-3" />
                               </div>
-                              <span className="font-medium text-green-800">
-                                {getFeatureName(feature)}
-                              </span>
+                              <span className="font-medium text-foreground">{getFeatureName(feature)}</span>
                             </div>
                           ))}
                       </div>
@@ -362,23 +300,21 @@ export default function PricingPage() {
                     {/* Disabled Features */}
                     {Object.entries(plan.features).some(([_, enabled]) => !enabled) && (
                       <div className="space-y-3">
-                        <h4 className="text-sm font-semibold text-gray-500 flex items-center gap-2">
-                          <div className="w-4 h-4 bg-gray-200 rounded-full flex items-center justify-center">
-                            <div className="w-1.5 h-1.5 bg-gray-400 rounded-full" />
+                        <h4 className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                          <div className="flex h-4 w-4 items-center justify-center rounded-full border border-border">
+                            <div className="h-1 w-1 rounded-full bg-muted-foreground/50" />
                           </div>
-                          Not Included
+                          Not included
                         </h4>
                         <div className="space-y-2 pl-6">
                           {Object.entries(plan.features)
                             .filter(([_, enabled]) => !enabled)
                             .map(([feature, _]) => (
                               <div key={feature} className="flex items-center gap-3 text-sm">
-                                <div className="w-5 h-5 bg-gray-100 rounded-full flex items-center justify-center">
-                                  <div className="w-1.5 h-1.5 bg-gray-400 rounded-full" />
+                                <div className="flex h-5 w-5 items-center justify-center rounded-full border border-dashed border-border">
+                                  <div className="h-1 w-1 rounded-full bg-muted-foreground/40" />
                                 </div>
-                                <span className="text-muted-foreground">
-                                  {getFeatureName(feature)}
-                                </span>
+                                <span className="text-muted-foreground">{getFeatureName(feature)}</span>
                               </div>
                             ))}
                         </div>
@@ -388,31 +324,22 @@ export default function PricingPage() {
 
                   {/* Action Button */}
                   {isCurrentPlan ? (
-                    <Button
-                      className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold py-3"
-                      disabled
-                    >
-                      Current Plan
+                    <Button className="w-full" disabled variant="secondary">
+                      Current plan
                     </Button>
-                  ) : plan.name === 'free-trial-plan' ? (
-                    <Button
-                      className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3"
-                      disabled
-                    >
-                      Start Trial
+                  ) : plan.name === "free-trial-plan" ? (
+                    <Button className="w-full" disabled variant="secondary">
+                      Trial
                     </Button>
                   ) : (
                     <Button
-                      className={`w-full font-semibold py-3 transition-all duration-200 ${
-                        isPopular 
-                          ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl' 
-                          : 'bg-white hover:bg-gray-50 text-gray-700 border-2 border-gray-200 hover:border-gray-300'
-                      }`}
+                      variant={isPopular ? "default" : "outline"}
+                      className="w-full"
                       onClick={() => openContactModal(plan.name)}
                       disabled={loading}
                     >
-                      <Mail className="h-4 w-4 mr-2" />
-                      Contact to Upgrade
+                      <Mail className="mr-2 h-4 w-4" />
+                      Contact to upgrade
                     </Button>
                   )}
                 </CardContent>
@@ -423,42 +350,34 @@ export default function PricingPage() {
 
         {/* Benefits Section */}
         <div className="mt-16 max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl font-bold mb-2">Why Choose Tably?</h2>
-            <p className="text-muted-foreground">
-              Join thousands of restaurants that trust Tably to grow their business
-            </p>
+          <div className="mb-12 text-center">
+            <h2 className="font-display text-3xl font-medium tracking-[-0.02em]">Why Tably</h2>
+            <p className="mt-2 text-muted-foreground">Built for people on the floor, not for slide decks.</p>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+
+          <div className="mb-16 grid grid-cols-1 gap-8 md:grid-cols-3">
             <div className="text-center">
-              <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                <Zap className="h-8 w-8 text-blue-600" />
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-border bg-card">
+                <Zap className="h-7 w-7 text-foreground/75" strokeWidth={1.5} />
               </div>
-              <h3 className="text-lg font-semibold mb-2">Quick Setup</h3>
-              <p className="text-muted-foreground">
-                Get started in minutes, not days. No complex installations or training required.
-              </p>
+              <h3 className="mb-2 text-lg font-medium">Fast setup</h3>
+              <p className="text-sm text-muted-foreground">Live the same day — no consultants on site.</p>
             </div>
-            
+
             <div className="text-center">
-              <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                <BarChart3 className="h-8 w-8 text-green-600" />
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-border bg-card">
+                <BarChart3 className="h-7 w-7 text-foreground/75" strokeWidth={1.5} />
               </div>
-              <h3 className="text-lg font-semibold mb-2">Proven Results</h3>
-              <p className="text-muted-foreground">
-                Restaurants using Tably see an average 40% increase in online orders.
-              </p>
+              <h3 className="mb-2 text-lg font-medium">Clear numbers</h3>
+              <p className="text-sm text-muted-foreground">One place for covers, revenue and prep.</p>
             </div>
-            
+
             <div className="text-center">
-              <div className="mx-auto w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-4">
-                <MessageSquare className="h-8 w-8 text-purple-600" />
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-border bg-card">
+                <MessageSquare className="h-7 w-7 text-foreground/75" strokeWidth={1.5} />
               </div>
-              <h3 className="text-lg font-semibold mb-2">24/7 Support</h3>
-              <p className="text-muted-foreground">
-                Our team is here to help you succeed, whenever you need us.
-              </p>
+              <h3 className="mb-2 text-lg font-medium">Human support</h3>
+              <p className="text-sm text-muted-foreground">Real people when service is on the line.</p>
             </div>
           </div>
         </div>
@@ -473,7 +392,7 @@ export default function PricingPage() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card className="text-center group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-gray-200/50">
+            <Card className="text-center group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-border/80">
               <CardContent className="pt-8 pb-8">
                 <div className="text-amber-400 mb-6 text-xl">★★★★★</div>
                 <p className="text-base text-muted-foreground mb-6 leading-relaxed">
@@ -484,7 +403,7 @@ export default function PricingPage() {
               </CardContent>
             </Card>
 
-            <Card className="text-center group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-gray-200/50">
+            <Card className="text-center group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-border/80">
               <CardContent className="pt-8 pb-8">
                 <div className="text-amber-400 mb-6 text-xl">★★★★★</div>
                 <p className="text-base text-muted-foreground mb-6 leading-relaxed">
@@ -495,7 +414,7 @@ export default function PricingPage() {
               </CardContent>
             </Card>
 
-            <Card className="text-center group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-gray-200/50">
+            <Card className="text-center group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-border/80">
               <CardContent className="pt-8 pb-8">
                 <div className="text-amber-400 mb-6 text-xl">★★★★★</div>
                 <p className="text-base text-muted-foreground mb-6 leading-relaxed">
@@ -518,10 +437,10 @@ export default function PricingPage() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <Card className="text-center group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-gray-200/50">
+            <Card className="text-center group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-border/80">
               <CardHeader className="pb-4">
-                <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <Globe className="h-8 w-8 text-blue-600" />
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-border bg-card">
+                  <Globe className="h-7 w-7 text-foreground/75" strokeWidth={1.5} />
                 </div>
                 <CardTitle className="text-xl">Custom Domain</CardTitle>
                 <CardDescription className="text-base">Your own branded URL</CardDescription>
@@ -534,10 +453,10 @@ export default function PricingPage() {
               </CardContent>
             </Card>
 
-            <Card className="text-center group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-gray-200/50">
+            <Card className="text-center group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-border/80">
               <CardHeader className="pb-4">
-                <div className="mx-auto w-16 h-16 bg-gradient-to-br from-green-100 to-emerald-100 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <MessageSquare className="h-8 w-8 text-green-600" />
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-border bg-card">
+                  <MessageSquare className="h-7 w-7 text-foreground/75" strokeWidth={1.5} />
                 </div>
                 <CardTitle className="text-xl">VIP Support 24/7</CardTitle>
                 <CardDescription className="text-base">Priority phone & chat support</CardDescription>
@@ -550,10 +469,10 @@ export default function PricingPage() {
               </CardContent>
             </Card>
 
-            <Card className="text-center group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-gray-200/50">
+            <Card className="text-center group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-border/80">
               <CardHeader className="pb-4">
-                <div className="mx-auto w-16 h-16 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <ShoppingCart className="h-8 w-8 text-purple-600" />
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-border bg-card">
+                  <ShoppingCart className="h-7 w-7 text-foreground/75" strokeWidth={1.5} />
                 </div>
                 <CardTitle className="text-xl">Marketplace Integration</CardTitle>
                 <CardDescription className="text-base">Connect with delivery platforms</CardDescription>
@@ -566,10 +485,10 @@ export default function PricingPage() {
               </CardContent>
             </Card>
 
-            <Card className="text-center group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-gray-200/50">
+            <Card className="text-center group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-border/80">
               <CardHeader className="pb-4">
-                <div className="mx-auto w-16 h-16 bg-gradient-to-br from-orange-100 to-amber-100 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <Printer className="h-8 w-8 text-orange-600" />
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-border bg-card">
+                  <Printer className="h-7 w-7 text-foreground/75" strokeWidth={1.5} />
                 </div>
                 <CardTitle className="text-xl">Extra KDS/Printers</CardTitle>
                 <CardDescription className="text-base">Additional kitchen displays</CardDescription>
@@ -708,46 +627,36 @@ export default function PricingPage() {
           </div>
         </div>
 
-        {/* Final CTA Section */}
-        <div className="mt-20 max-w-5xl mx-auto text-center">
-          <Card className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white relative overflow-hidden">
-            {/* Background decoration */}
-            <div className="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-            <div className="absolute bottom-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-            
-            <CardContent className="pt-12 pb-12 relative">
-              <h2 className="text-4xl font-bold mb-6">Ready to Transform Your Restaurant?</h2>
-              <p className="text-blue-100 mb-8 max-w-3xl mx-auto text-lg leading-relaxed">
-                Join thousands of restaurants that have already increased their revenue and streamlined operations with Tably.
+        <div className="mx-auto mt-20 max-w-3xl text-center">
+          <Card className="border-border/90 bg-foreground text-background">
+            <CardContent className="px-8 py-12">
+              <h2 className="font-display text-3xl font-medium tracking-[-0.02em]">
+                Next step: talk to us
+              </h2>
+              <p className="mx-auto mt-3 max-w-lg text-sm text-background/80">
+                No pressure — we answer questions about your floor, your menu, and your team.
               </p>
-              <div className="flex flex-col sm:flex-row gap-6 justify-center mb-8">
-                <Button 
-                  size="lg" 
-                  className="bg-white text-blue-600 hover:bg-gray-100 font-semibold px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
-                  onClick={() => openContactModal('growth-plan')}
+              <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                <Button
+                  size="lg"
+                  variant="secondary"
+                  className="bg-background text-foreground hover:bg-background/90"
+                  onClick={() => openContactModal("growth-plan")}
                 >
-                  Start Free Trial
+                  Request upgrade
                 </Button>
-                <Button 
-                  size="lg" 
-                  variant="outline" 
-                  className="border-white text-white hover:bg-white hover:text-blue-600 font-semibold px-8 py-4 text-lg transition-all duration-300"
-                >
-                  Schedule Demo
+                <Button size="lg" variant="outline" className="border-background/30 text-background hover:bg-background/10">
+                  Book a call
                 </Button>
               </div>
-              <div className="flex flex-wrap justify-center gap-6 text-blue-200 text-sm">
-                <span className="flex items-center">
-                  <Check className="h-4 w-4 mr-2" />
-                  No credit card required
+              <div className="mt-8 flex flex-wrap justify-center gap-4 font-mono text-xs text-background/70">
+                <span className="flex items-center gap-1.5">
+                  <Check className="h-3.5 w-3.5" />
+                  14-day trial
                 </span>
-                <span className="flex items-center">
-                  <Check className="h-4 w-4 mr-2" />
-                  14-day free trial
-                </span>
-                <span className="flex items-center">
-                  <Check className="h-4 w-4 mr-2" />
-                  Cancel anytime
+                <span className="flex items-center gap-1.5">
+                  <Check className="h-3.5 w-3.5" />
+                  No card to start
                 </span>
               </div>
             </CardContent>

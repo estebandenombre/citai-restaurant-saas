@@ -10,22 +10,13 @@ import { supabase } from "@/lib/supabase"
 import { useTrialStatus } from "@/hooks/use-trial-status"
 import { 
   LayoutDashboard, 
-  ShoppingCart, 
   Utensils, 
   Calendar, 
-  Package, 
   Users, 
   BarChart3, 
   Settings, 
-  Printer,
-  Menu, 
-  X,
-  ChefHat,
-  Sparkles,
-  Zap,
   ChevronLeft,
   ChevronRight,
-  Bot,
   PackageCheck,
   Receipt,
   Globe,
@@ -33,16 +24,20 @@ import {
   Crown,
   Clock,
 } from "lucide-react"
+import { useI18n } from "@/components/i18n/i18n-provider"
+import { LocaleSwitcher } from "@/components/locale-switcher"
 
-const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, color: "from-blue-500 to-indigo-600" },
-  { name: "Orders", href: "/dashboard/orders", icon: Receipt, color: "from-green-500 to-emerald-600" },
-  { name: "Menu", href: "/dashboard/menu", icon: Utensils, color: "from-orange-500 to-red-600" },
-  { name: "Inventory", href: "/dashboard/inventory", icon: PackageCheck, color: "from-purple-500 to-pink-600" },
-  { name: "Reservations", href: "/dashboard/reservations", icon: Calendar, color: "from-indigo-500 to-purple-600" },
-  { name: "Staff", href: "/dashboard/staff", icon: Users, color: "from-teal-500 to-cyan-600" },
-  { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3, color: "from-yellow-500 to-orange-600" },
-  { name: "Website Preview", href: "/dashboard/website-preview", icon: Globe, color: "from-cyan-500 to-blue-600" },
+import type { LucideIcon } from "lucide-react"
+
+const navigation: { href: string; icon: LucideIcon; messageKey: string }[] = [
+  { messageKey: "dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { messageKey: "orders", href: "/dashboard/orders", icon: Receipt },
+  { messageKey: "menu", href: "/dashboard/menu", icon: Utensils },
+  { messageKey: "inventory", href: "/dashboard/inventory", icon: PackageCheck },
+  { messageKey: "reservations", href: "/dashboard/reservations", icon: Calendar },
+  { messageKey: "staff", href: "/dashboard/staff", icon: Users },
+  { messageKey: "analytics", href: "/dashboard/analytics", icon: BarChart3 },
+  { messageKey: "websitePreview", href: "/dashboard/website-preview", icon: Globe },
 ]
 
 interface SidebarProps {
@@ -51,6 +46,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ sidebarCollapsed, setSidebarCollapsed }: SidebarProps) {
+  const { t } = useI18n()
   const pathname = usePathname()
   const router = useRouter()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -147,9 +143,9 @@ export function Sidebar({ sidebarCollapsed, setSidebarCollapsed }: SidebarProps)
         sidebarCollapsed ? 'w-16' : 'w-64'
       }`}>
         {/* Sidebar Background */}
-        <div className="h-full bg-white border-r border-gray-100 shadow-sm">
+        <div className="h-full bg-card border-r border-border">
           {/* Sidebar Header */}
-          <div className="flex items-center justify-between p-3 border-b border-gray-100">
+          <div className="flex items-center justify-between p-3 border-b border-border">
             {!sidebarCollapsed && (
               <Link href="/dashboard" className="flex items-center">
                 <img 
@@ -163,7 +159,7 @@ export function Sidebar({ sidebarCollapsed, setSidebarCollapsed }: SidebarProps)
               variant="ghost"
               size="sm"
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className="text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-md h-8 w-8 p-0"
+              className="text-muted-foreground hover:text-foreground hover:bg-muted rounded-full h-8 w-8 p-0"
             >
               {sidebarCollapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
             </Button>
@@ -172,32 +168,35 @@ export function Sidebar({ sidebarCollapsed, setSidebarCollapsed }: SidebarProps)
           {/* Sidebar Navigation */}
           <div className="px-2.5 py-3 flex flex-col h-full">
             {/* Main Menu Section */}
+            <LocaleSwitcher collapsed={sidebarCollapsed} className="mb-3" />
+
             {!sidebarCollapsed && (
               <div className="mb-4">
-                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-2.5">
-                  Main Menu
+                <h3 className="mb-2 px-2.5 font-mono text-[11px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
+                  {t("nav.mainMenu")}
                 </h3>
               </div>
             )}
-            
-            <nav className="space-y-1 mb-4">
+
+            <nav className="mb-4 space-y-1">
               {navigation.map((item) => {
                 const isActive = pathname === item.href
                 const Icon = item.icon
+                const label = t(`nav.items.${item.messageKey}` as const)
                 return (
                   <Link
-                    key={item.name}
+                    key={item.href}
                     href={item.href}
-                    className={`flex items-center justify-center lg:justify-start space-x-3 px-3 py-2.5 rounded-md text-sm font-medium transition-all duration-200 ${
+                    className={`flex items-center justify-center lg:justify-start space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                       isActive 
-                        ? "bg-gradient-to-r text-white shadow-sm"
-                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                    } ${isActive ? item.color : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}
+                        ? "bg-muted text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                    } ${sidebarCollapsed ? 'justify-center' : ''}`}
                   >
                     <div className="flex items-center justify-center w-6 h-6">
                       <Icon className="h-5 w-5" />
                     </div>
-                    {!sidebarCollapsed && <span className="text-sm">{item.name}</span>}
+                    {!sidebarCollapsed && <span className="text-sm">{label}</span>}
                   </Link>
                 )
               })}
@@ -206,20 +205,20 @@ export function Sidebar({ sidebarCollapsed, setSidebarCollapsed }: SidebarProps)
             {/* General Section */}
             {!sidebarCollapsed && (
               <div className="mb-4">
-                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-2.5">
-                  General
+                <h3 className="mb-2 px-2.5 font-mono text-[11px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
+                  {t("nav.general")}
                 </h3>
               </div>
             )}
             <div className="space-y-1 mb-6">
               <Link
                 href="/dashboard/settings"
-                className="w-full justify-center lg:justify-start text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-md px-3 py-2.5 flex items-center"
+                className="w-full justify-center lg:justify-start text-muted-foreground hover:text-foreground hover:bg-muted/70 rounded-xl px-3 py-2.5 flex items-center"
               >
                 <div className="flex items-center justify-center w-6 h-6">
                   <Settings className="h-5 w-5" />
                 </div>
-                {!sidebarCollapsed && <span className="ml-3 text-sm">Settings</span>}
+                {!sidebarCollapsed && <span className="ml-3 text-sm">{t("nav.settings")}</span>}
               </Link>
               
               
@@ -227,12 +226,12 @@ export function Sidebar({ sidebarCollapsed, setSidebarCollapsed }: SidebarProps)
                 variant="ghost"
                 size="sm"
                 onClick={handleLogout}
-                className="w-full justify-center lg:justify-start text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-md px-3 py-2.5 flex items-center"
+                className="w-full justify-center lg:justify-start text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl px-3 py-2.5 flex items-center"
               >
                 <div className="flex items-center justify-center w-6 h-6">
                   <LogOut className="h-5 w-5" />
                 </div>
-                {!sidebarCollapsed && <span className="ml-3 text-sm">Logout</span>}
+                {!sidebarCollapsed && <span className="ml-3 text-sm">{t("nav.logout")}</span>}
               </Button>
             </div>
             
@@ -240,30 +239,30 @@ export function Sidebar({ sidebarCollapsed, setSidebarCollapsed }: SidebarProps)
             <div className="flex-1" />
             
             {/* User Info Section */}
-            <div className="p-4 border-t border-gray-100 bg-white">
+            <div className="p-4 border-t border-border bg-card">
               <div className="space-y-3">
                 {/* User Info */}
                 <div className="flex items-start space-x-3">
                   <Avatar className="h-8 w-8 flex-shrink-0">
                     <AvatarImage src="/placeholder-user.jpg" />
-                    <AvatarFallback className="bg-gray-900 text-white text-sm font-medium">
+                    <AvatarFallback className="bg-foreground text-background text-sm font-medium">
                       {userInfo?.name?.charAt(0).toUpperCase() || 'U'}
                     </AvatarFallback>
                   </Avatar>
                   {sidebarCollapsed && trialStatus && (
                     <div className="absolute -top-1 -right-1">
-                      <div className="w-3 h-3 bg-blue-500 rounded-full border-2 border-white" />
+                      <div className="w-3 h-3 rounded-full border-2 border-card bg-emerald-600" />
                     </div>
                   )}
                   {!sidebarCollapsed && (
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">{userInfo?.name || 'Usuario'}</p>
-                      <p className="text-xs text-gray-500 truncate mb-2">{userInfo?.email || 'info@tably.digital'}</p>
+                      <p className="text-sm font-medium text-foreground truncate">{userInfo?.name || 'Usuario'}</p>
+                      <p className="text-xs text-muted-foreground truncate mb-2">{userInfo?.email || 'info@tably.digital'}</p>
                       
                       {/* Trial Status Badge */}
                       <div className="mb-3">
                         {trialLoading ? (
-                          <div className="animate-pulse bg-gray-200 h-6 rounded-md w-20" />
+                          <div className="animate-pulse bg-muted h-6 rounded-md w-20" />
                         ) : trialStatus ? (
                           <div 
                             className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium cursor-pointer hover:bg-blue-50 transition-colors"
@@ -271,19 +270,19 @@ export function Sidebar({ sidebarCollapsed, setSidebarCollapsed }: SidebarProps)
                           >
                             {trialStatus.isExpired ? (
                               <Badge variant="destructive" className="text-xs">
-                                <Clock className="w-3 h-3 mr-1" />
-                                Trial Expired
+                                <Clock className="mr-1 h-3 w-3" />
+                                {t("nav.trialExpired")}
                               </Badge>
                             ) : (
-                              <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-800 hover:bg-blue-200">
-                                <Clock className="w-3 h-3 mr-1" />
-                                {trialStatus.daysRemaining} days left
+                              <Badge variant="secondary" className="text-xs">
+                                <Clock className="mr-1 h-3 w-3" />
+                                {t("nav.daysLeft", { n: trialStatus.daysRemaining })}
                               </Badge>
                             )}
                           </div>
                         ) : (
                           <Badge variant="outline" className="text-xs">
-                            Free Trial
+                            {t("nav.freeTrial")}
                           </Badge>
                         )}
                       </div>
@@ -295,10 +294,10 @@ export function Sidebar({ sidebarCollapsed, setSidebarCollapsed }: SidebarProps)
                 {!sidebarCollapsed && (
                   <Button
                     onClick={() => router.push('/pricing')}
-                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-medium py-2 px-3 rounded-md shadow-sm hover:shadow-md transition-all duration-200"
+                    className="w-full text-xs font-medium py-2 px-3 rounded-xl"
                   >
-                    <Crown className="h-3 w-3 mr-2" />
-                    Update Plan
+                    <Crown className="mr-2 h-3 w-3" />
+                    {t("nav.updatePlan")}
                   </Button>
                 )}
               </div>
@@ -307,10 +306,6 @@ export function Sidebar({ sidebarCollapsed, setSidebarCollapsed }: SidebarProps)
         </div>
       </div>
 
-      {/* Decorative Elements */}
-      <div className="fixed top-20 left-10 w-32 h-32 bg-gradient-to-r from-blue-400/20 to-indigo-400/20 rounded-full blur-3xl pointer-events-none z-30" />
-      <div className="fixed top-40 right-20 w-24 h-24 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-full blur-2xl pointer-events-none z-30" />
-      <div className="fixed bottom-20 left-1/4 w-40 h-40 bg-gradient-to-r from-green-400/20 to-teal-400/20 rounded-full blur-3xl pointer-events-none z-30" />
     </>
   )
 } 

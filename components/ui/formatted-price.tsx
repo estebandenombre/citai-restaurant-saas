@@ -1,6 +1,7 @@
 "use client"
 
 import { useRestaurantCurrency } from "@/hooks/use-restaurant-currency"
+import { useI18n } from "@/components/i18n/i18n-provider"
 
 interface FormattedPriceProps {
   amount: number
@@ -10,13 +11,16 @@ interface FormattedPriceProps {
 
 export function FormattedPrice({ amount, restaurantId, className = "" }: FormattedPriceProps) {
   const { currencyConfig, loading } = useRestaurantCurrency(restaurantId)
+  const { intlLocale } = useI18n()
 
   const formatPrice = (amount: number) => {
     if (loading || !currencyConfig) {
-      // Default formatting while loading
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
+      // Locale-aware default while config loads.
+      return new Intl.NumberFormat(intlLocale, {
+        style: "currency",
+        currency: "USD",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
       }).format(amount)
     }
 
@@ -41,13 +45,16 @@ export function FormattedPrice({ amount, restaurantId, className = "" }: Formatt
     // Format the number
     let formattedAmount: string
     
-    if (currency === 'JPY') {
-      // JPY doesn't use decimals
-      formattedAmount = Math.round(amount).toLocaleString('en-US')
+    if (currency === "JPY") {
+      // JPY usually doesn't use decimals.
+      formattedAmount = Math.round(amount).toLocaleString(intlLocale, {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      })
     } else {
-      formattedAmount = amount.toLocaleString('en-US', {
+      formattedAmount = amount.toLocaleString(intlLocale, {
         minimumFractionDigits: 2,
-        maximumFractionDigits: 2
+        maximumFractionDigits: 2,
       })
     }
     
@@ -60,7 +67,7 @@ export function FormattedPrice({ amount, restaurantId, className = "" }: Formatt
   }
 
   return (
-    <span className={className}>
+    <span data-slot="price" className={`tabular-nums ${className}`}>
       {formatPrice(amount)}
     </span>
   )

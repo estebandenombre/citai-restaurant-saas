@@ -32,6 +32,7 @@ import { Loading } from "@/components/ui/loading"
 import { PageHeader } from "@/components/ui/page-header"
 import { useToast } from "@/hooks/use-toast"
 import { useRestaurantCurrency } from "@/hooks/use-restaurant-currency"
+import { useI18n } from "@/components/i18n/i18n-provider"
 
 
 interface AnalyticsData {
@@ -77,6 +78,108 @@ interface AnalyticsData {
 }
 
 export default function AnalyticsPage() {
+  const { locale, intlLocale } = useI18n()
+  const tx =
+    locale === "es-ES"
+      ? {
+          loading: "Cargando analitica...",
+          errLoad: "Error al cargar los datos de analitica",
+          title: "Analitica",
+          subtitle: "Sigue el rendimiento e insights de tu restaurante",
+          timeRange: "Seleccionar rango",
+          today: "Hoy",
+          last7: "Ultimos 7 dias",
+          last30: "Ultimos 30 dias",
+          last90: "Ultimos 90 dias",
+          todayRevenue: "Ingresos de hoy",
+          totalRevenue: "Ingresos totales",
+          todayOrders: "Pedidos de hoy",
+          totalOrders: "Pedidos totales",
+          customers: "Clientes",
+          avgOrderValue: "Ticket medio",
+          fromYesterday: "vs ayer",
+          fromPrevWeek: "vs semana anterior",
+          fromPrevMonth: "vs mes anterior",
+          fromPrev90: "vs 90 dias anteriores",
+          fromPrevPeriod: "vs periodo anterior",
+          newThisMonth: "nuevos este mes",
+          perOrder: "por pedido",
+          tabs: {
+            revenue: "Tendencia de ingresos",
+            orders: "Tendencia de pedidos",
+            hourly: "Analisis por hora",
+            categories: "Rendimiento por categoria",
+          },
+          hourlyRevenueToday: "Ingresos por hora de hoy",
+          dailyRevenueLast7: "Ingresos diarios de los ultimos 7 dias",
+          hourlyOrdersToday: "Pedidos por hora de hoy",
+          dailyOrdersLast7: "Pedidos diarios de los ultimos 7 dias",
+          hourlySales: "Analisis de ventas por hora",
+          revenueByHour: "Ingresos por hora del dia",
+          categoryPerformance: "Rendimiento por categoria",
+          revenueByCategory: "Ingresos por categoria del menu",
+          topItems: "Productos top",
+          topItemsDesc: "Productos mas vendidos por ingresos",
+          ordersWord: "pedidos",
+          avgWord: "media",
+          dataSummary: "Resumen de datos",
+          metricsOverview: "Resumen de metricas clave",
+          exportSuccess: "Exportacion completada",
+          exportFailed: "La exportacion ha fallado",
+          quickExportCompleted: "Exportacion rapida completada",
+          quickExportFailed: "La exportacion rapida ha fallado",
+          pleaseTry: "Intentalo de nuevo.",
+        }
+      : {
+          loading: "Loading analytics...",
+          errLoad: "Error loading analytics data",
+          title: "Analytics",
+          subtitle: "Track your restaurant's performance and insights",
+          timeRange: "Select time range",
+          today: "Today",
+          last7: "Last 7 days",
+          last30: "Last 30 days",
+          last90: "Last 90 days",
+          todayRevenue: "Today's Revenue",
+          totalRevenue: "Total Revenue",
+          todayOrders: "Today's Orders",
+          totalOrders: "Total Orders",
+          customers: "Customers",
+          avgOrderValue: "Avg Order Value",
+          fromYesterday: "from yesterday",
+          fromPrevWeek: "from previous week",
+          fromPrevMonth: "from previous month",
+          fromPrev90: "from previous 90 days",
+          fromPrevPeriod: "from previous period",
+          newThisMonth: "new this month",
+          perOrder: "per order",
+          tabs: {
+            revenue: "Revenue Trends",
+            orders: "Order Trends",
+            hourly: "Hourly Analysis",
+            categories: "Category Performance",
+          },
+          hourlyRevenueToday: "Hourly revenue for today",
+          dailyRevenueLast7: "Daily revenue over the last 7 days",
+          hourlyOrdersToday: "Hourly orders for today",
+          dailyOrdersLast7: "Daily orders over the last 7 days",
+          hourlySales: "Hourly Sales Analysis",
+          revenueByHour: "Revenue by hour of the day",
+          categoryPerformance: "Category Performance",
+          revenueByCategory: "Revenue by menu category",
+          topItems: "Top Performing Items",
+          topItemsDesc: "Best selling menu items by revenue",
+          ordersWord: "orders",
+          avgWord: "avg",
+          dataSummary: "Data Summary",
+          metricsOverview: "Key metrics overview",
+          exportSuccess: "Export completed successfully",
+          exportFailed: "Export failed",
+          quickExportCompleted: "Quick export completed",
+          quickExportFailed: "Quick export failed",
+          pleaseTry: "Please try again.",
+        }
+
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null)
   const [loading, setLoading] = useState(true)
   const [timeRange, setTimeRange] = useState("7d")
@@ -91,7 +194,10 @@ export default function AnalyticsPage() {
       return `$${amount.toLocaleString()}`
     }
 
-    const formattedAmount = amount.toFixed(decimals)
+    const formattedAmount = amount.toLocaleString(intlLocale, {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    })
     const symbol = getCurrencySymbol(currencyConfig.currency)
     
     if (currencyConfig.position === 'after') {
@@ -162,15 +268,15 @@ export default function AnalyticsPage() {
       ExportService.downloadFile(blob, filename)
       
       toast({
-        title: "Export completed successfully",
+        title: tx.exportSuccess,
         description: `${format.toUpperCase()} report has been downloaded as "${filename}"`,
       })
       
     } catch (error) {
       console.error('Export error:', error)
       toast({
-        title: "Export failed",
-        description: error instanceof Error ? error.message : "Please try again.",
+        title: tx.exportFailed,
+        description: error instanceof Error ? error.message : tx.pleaseTry,
         variant: "destructive",
       })
     }
@@ -244,15 +350,15 @@ export default function AnalyticsPage() {
       ExportService.downloadFile(blob, filename)
       
       toast({
-        title: "Quick export completed",
+        title: tx.quickExportCompleted,
         description: `PDF report for ${period} has been downloaded as "${filename}"`,
       })
       
     } catch (error) {
       console.error('Quick export error:', error)
       toast({
-        title: "Quick export failed",
-        description: error instanceof Error ? error.message : "Please try again.",
+        title: tx.quickExportFailed,
+        description: error instanceof Error ? error.message : tx.pleaseTry,
         variant: "destructive",
       })
     }
@@ -678,7 +784,7 @@ export default function AnalyticsPage() {
   }
 
   if (loading) {
-    return <Loading text="Loading analytics..." />
+    return <Loading text={tx.loading} />
   }
 
   if (!analyticsData) {
@@ -687,7 +793,7 @@ export default function AnalyticsPage() {
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <AlertCircle className="h-12 w-12 text-red-600 mx-auto mb-4" />
-            <p className="text-gray-600">Error loading analytics data</p>
+            <p className="text-gray-600">{tx.errLoad}</p>
           </div>
         </div>
       </div>
@@ -705,23 +811,23 @@ export default function AnalyticsPage() {
             </div>
             <div>
               <h1 className="text-2xl font-semibold text-gray-900">
-                Analytics
+                {tx.title}
               </h1>
               <p className="text-gray-500 text-sm">
-                Track your restaurant's performance and insights
+                {tx.subtitle}
               </p>
             </div>
           </div>
           <div className="flex items-center space-x-3">
             <Select value={timeRange} onValueChange={setTimeRange}>
               <SelectTrigger className="w-32 border border-gray-200 rounded-lg">
-                <SelectValue placeholder="Select time range" />
+                <SelectValue placeholder={tx.timeRange} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="today">Today</SelectItem>
-                <SelectItem value="7d">Last 7 days</SelectItem>
-                <SelectItem value="30d">Last 30 days</SelectItem>
-                <SelectItem value="90d">Last 90 days</SelectItem>
+                <SelectItem value="today">{tx.today}</SelectItem>
+                <SelectItem value="7d">{tx.last7}</SelectItem>
+                <SelectItem value="30d">{tx.last30}</SelectItem>
+                <SelectItem value="90d">{tx.last90}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -733,7 +839,7 @@ export default function AnalyticsPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {timeRange === "today" ? "Today's Revenue" : "Total Revenue"}
+              {timeRange === "today" ? tx.todayRevenue : tx.totalRevenue}
             </CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -743,10 +849,10 @@ export default function AnalyticsPage() {
               <span className={analyticsData.revenue.growth >= 0 ? "text-green-600" : "text-red-600"}>
                 {analyticsData.revenue.growth >= 0 ? "+" : ""}{analyticsData.revenue.growth.toFixed(1)}%
               </span>{" "}
-              {timeRange === "today" ? "from yesterday" : 
-               timeRange === "7d" ? "from previous week" :
-               timeRange === "30d" ? "from previous month" :
-               timeRange === "90d" ? "from previous 90 days" : "from previous period"}
+              {timeRange === "today" ? tx.fromYesterday :
+               timeRange === "7d" ? tx.fromPrevWeek :
+               timeRange === "30d" ? tx.fromPrevMonth :
+               timeRange === "90d" ? tx.fromPrev90 : tx.fromPrevPeriod}
             </p>
           </CardContent>
         </Card>
@@ -754,7 +860,7 @@ export default function AnalyticsPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {timeRange === "today" ? "Today's Orders" : "Total Orders"}
+              {timeRange === "today" ? tx.todayOrders : tx.totalOrders}
             </CardTitle>
             <ShoppingCart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -764,30 +870,30 @@ export default function AnalyticsPage() {
               <span className={analyticsData.orders.growth >= 0 ? "text-green-600" : "text-red-600"}>
                 {analyticsData.orders.growth >= 0 ? "+" : ""}{analyticsData.orders.growth.toFixed(1)}%
               </span>{" "}
-              {timeRange === "today" ? "from yesterday" : 
-               timeRange === "7d" ? "from previous week" :
-               timeRange === "30d" ? "from previous month" :
-               timeRange === "90d" ? "from previous 90 days" : "from previous period"}
+              {timeRange === "today" ? tx.fromYesterday :
+               timeRange === "7d" ? tx.fromPrevWeek :
+               timeRange === "30d" ? tx.fromPrevMonth :
+               timeRange === "90d" ? tx.fromPrev90 : tx.fromPrevPeriod}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Customers</CardTitle>
+            <CardTitle className="text-sm font-medium">{tx.customers}</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{analyticsData.customers.total}</div>
             <p className="text-xs text-muted-foreground">
-              {analyticsData.customers.new} new this month
+              {analyticsData.customers.new} {tx.newThisMonth}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg Order Value</CardTitle>
+            <CardTitle className="text-sm font-medium">{tx.avgOrderValue}</CardTitle>
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -795,7 +901,7 @@ export default function AnalyticsPage() {
                                 {formatCurrency(analyticsData.orders.total > 0 ? (analyticsData.revenue.total / analyticsData.orders.total) : 0)}
             </div>
             <p className="text-xs text-muted-foreground">
-              per order
+              {tx.perOrder}
             </p>
           </CardContent>
         </Card>
@@ -804,18 +910,18 @@ export default function AnalyticsPage() {
       {/* Charts */}
       <Tabs defaultValue="revenue" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="revenue">Revenue Trends</TabsTrigger>
-          <TabsTrigger value="orders">Order Trends</TabsTrigger>
-          <TabsTrigger value="hourly">Hourly Analysis</TabsTrigger>
-          <TabsTrigger value="categories">Category Performance</TabsTrigger>
+          <TabsTrigger value="revenue">{tx.tabs.revenue}</TabsTrigger>
+          <TabsTrigger value="orders">{tx.tabs.orders}</TabsTrigger>
+          <TabsTrigger value="hourly">{tx.tabs.hourly}</TabsTrigger>
+          <TabsTrigger value="categories">{tx.tabs.categories}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="revenue" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Revenue Trends</CardTitle>
+              <CardTitle>{tx.tabs.revenue}</CardTitle>
               <CardDescription>
-                {timeRange === "today" ? "Hourly revenue for today" : "Daily revenue over the last 7 days"}
+                {timeRange === "today" ? tx.hourlyRevenueToday : tx.dailyRevenueLast7}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -835,9 +941,9 @@ export default function AnalyticsPage() {
         <TabsContent value="orders" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Order Trends</CardTitle>
+              <CardTitle>{tx.tabs.orders}</CardTitle>
               <CardDescription>
-                {timeRange === "today" ? "Hourly orders for today" : "Daily orders over the last 7 days"}
+                {timeRange === "today" ? tx.hourlyOrdersToday : tx.dailyOrdersLast7}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -857,8 +963,8 @@ export default function AnalyticsPage() {
         <TabsContent value="hourly" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Hourly Sales Analysis</CardTitle>
-              <CardDescription>Revenue by hour of the day</CardDescription>
+              <CardTitle>{tx.hourlySales}</CardTitle>
+              <CardDescription>{tx.revenueByHour}</CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
@@ -877,8 +983,8 @@ export default function AnalyticsPage() {
         <TabsContent value="categories" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Category Performance</CardTitle>
-              <CardDescription>Revenue by menu category</CardDescription>
+              <CardTitle>{tx.categoryPerformance}</CardTitle>
+              <CardDescription>{tx.revenueByCategory}</CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
@@ -908,8 +1014,8 @@ export default function AnalyticsPage() {
       {/* Top Items */}
       <Card>
         <CardHeader>
-          <CardTitle>Top Performing Items</CardTitle>
-          <CardDescription>Best selling menu items by revenue</CardDescription>
+          <CardTitle>{tx.topItems}</CardTitle>
+          <CardDescription>{tx.topItemsDesc}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -920,14 +1026,14 @@ export default function AnalyticsPage() {
                   <div>
                     <p className="font-medium">{item.name}</p>
                     <p className="text-sm text-muted-foreground">
-                      {item.quantity} orders
+                      {item.quantity} {tx.ordersWord}
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
                   <p className="font-medium">{formatCurrency(item.revenue)}</p>
                   <p className="text-sm text-muted-foreground">
-                    {formatCurrency(item.revenue / item.quantity)} avg
+                    {formatCurrency(item.revenue / item.quantity)} {tx.avgWord}
                   </p>
                 </div>
               </div>
@@ -946,32 +1052,34 @@ export default function AnalyticsPage() {
           <QuickExport onQuickExport={handleQuickExport} />
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Data Summary</CardTitle>
-            <CardDescription>Key metrics overview</CardDescription>
+            <CardTitle className="text-lg">{tx.dataSummary}</CardTitle>
+            <CardDescription>{tx.metricsOverview}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="grid grid-cols-2 gap-4">
               <div className="text-center p-3 bg-blue-50 rounded-lg">
                 <p className="text-2xl font-bold text-blue-600">{analyticsData.orders.total}</p>
                 <p className="text-sm text-gray-600">
-                  {timeRange === "today" ? "Today's Orders" : "Total Orders"}
+                  {timeRange === "today" ? tx.todayOrders : tx.totalOrders}
                 </p>
               </div>
               <div className="text-center p-3 bg-green-50 rounded-lg">
                 <p className="text-2xl font-bold text-green-600">{formatCurrency(analyticsData.revenue.total)}</p>
                 <p className="text-sm text-gray-600">
-                  {timeRange === "today" ? "Today's Revenue" : "Total Revenue"}
+                  {timeRange === "today" ? tx.todayRevenue : tx.totalRevenue}
                 </p>
               </div>
-              <div className="text-center p-3 bg-purple-50 rounded-lg">
-                <p className="text-2xl font-bold text-purple-600">{analyticsData.customers.total}</p>
-                <p className="text-sm text-gray-600">Customers</p>
+              <div className="rounded-lg bg-muted/50 p-3 text-center">
+                <p className="text-2xl font-bold font-mono tabular-nums text-foreground">
+                  {analyticsData.customers.total}
+                </p>
+                <p className="text-sm text-gray-600">{tx.customers}</p>
               </div>
               <div className="text-center p-3 bg-orange-50 rounded-lg">
                 <p className="text-2xl font-bold text-orange-600">
                   {formatCurrency(analyticsData.orders.total > 0 ? (analyticsData.revenue.total / analyticsData.orders.total) : 0)}
                 </p>
-                <p className="text-sm text-gray-600">Avg Order Value</p>
+                <p className="text-sm text-gray-600">{tx.avgOrderValue}</p>
               </div>
             </div>
           </CardContent>

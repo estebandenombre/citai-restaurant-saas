@@ -62,16 +62,14 @@ export function AuthGuard({ children }: AuthGuardProps) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 flex items-center justify-center">
-        <Card className="w-full max-w-md">
+      <div className="flex min-h-screen items-center justify-center bg-background p-4">
+        <Card className="w-full max-w-md border-border/90 shadow-sm">
           <CardHeader className="text-center">
-            <div className="mx-auto mb-4">
-              <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+            <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-xl border border-border">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
             </div>
-            <CardTitle>Verifying authentication...</CardTitle>
-            <CardDescription>
-              Please wait while we verify your session
-            </CardDescription>
+            <CardTitle className="font-display text-xl">Verifying session</CardTitle>
+            <CardDescription>One moment.</CardDescription>
           </CardHeader>
         </Card>
       </div>
@@ -80,21 +78,19 @@ export function AuthGuard({ children }: AuthGuardProps) {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 flex items-center justify-center">
-        <Card className="w-full max-w-md">
+      <div className="flex min-h-screen items-center justify-center bg-background p-4">
+        <Card className="w-full max-w-md border-border/90 shadow-sm">
           <CardHeader className="text-center">
-            <div className="mx-auto mb-4">
-              <Shield className="h-12 w-12 text-red-500" />
+            <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-2xl border border-border bg-muted/40">
+              <Shield className="h-6 w-6 text-foreground" />
             </div>
-            <CardTitle>Access Restricted</CardTitle>
-            <CardDescription>
-              You need to sign in to access the dashboard
-            </CardDescription>
+            <CardTitle className="font-display text-xl">Sign in required</CardTitle>
+            <CardDescription>This area is for restaurant staff only.</CardDescription>
           </CardHeader>
           <CardContent className="text-center">
             <Button onClick={handleLogin} className="w-full">
               <LogIn className="mr-2 h-4 w-4" />
-              Sign In
+              Sign in
             </Button>
           </CardContent>
         </Card>

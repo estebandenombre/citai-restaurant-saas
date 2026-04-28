@@ -209,7 +209,7 @@ export default function OnboardingTour({ isOpen, onClose, onComplete }: Onboardi
           <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <currentTourStep.icon className="w-6 h-6 text-purple-600" />
+                <currentTourStep.icon className="h-6 w-6 text-foreground" />
                 <CardTitle className="text-lg">{currentTourStep.title}</CardTitle>
               </div>
               <div className="flex items-center space-x-2">
@@ -234,9 +234,7 @@ export default function OnboardingTour({ isOpen, onClose, onComplete }: Onboardi
           </CardHeader>
           
           <CardContent className="space-y-4">
-            <p className="text-gray-600 leading-relaxed">
-              {currentTourStep.description}
-            </p>
+            <p className="leading-relaxed text-muted-foreground">{currentTourStep.description}</p>
 
             {/* Progress indicator */}
             <div className="flex items-center space-x-2">
@@ -246,10 +244,10 @@ export default function OnboardingTour({ isOpen, onClose, onComplete }: Onboardi
                   className={cn(
                     "w-2 h-2 rounded-full transition-colors",
                     index === currentStep
-                      ? "bg-purple-600"
+                      ? "bg-foreground"
                       : completedSteps.has(step.id)
-                      ? "bg-green-500"
-                      : "bg-gray-300"
+                        ? "bg-muted-foreground/50"
+                        : "bg-muted"
                   )}
                 />
               ))}

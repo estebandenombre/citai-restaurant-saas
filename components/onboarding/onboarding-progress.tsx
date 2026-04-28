@@ -96,23 +96,23 @@ export default function OnboardingProgress({ onStartTour }: OnboardingProgressPr
 
   if (progress === 100) {
     return (
-      <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
+      <Card className="border-border bg-card">
         <CardHeader className="pb-3">
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-              <Trophy className="w-4 h-4 text-green-600" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
+              <Trophy className="h-4 w-4 text-foreground" />
             </div>
             <div>
-              <CardTitle className="text-sm text-green-900">Completed!</CardTitle>
-              <p className="text-xs text-green-700">You now know all the features</p>
+              <CardTitle className="text-sm">Completed</CardTitle>
+              <p className="text-xs text-muted-foreground">You&rsquo;re set up and ready to go</p>
             </div>
           </div>
         </CardHeader>
         <CardContent>
           <div className="text-center">
-            <Sparkles className="w-8 h-8 text-green-600 mx-auto mb-2" />
-            <p className="text-xs text-green-700">
-              Congratulations! You are now an expert in Tably
+            <Sparkles className="mx-auto mb-2 h-8 w-8 text-foreground" />
+            <p className="text-xs text-muted-foreground">
+              You now have the full picture of the product
             </p>
           </div>
         </CardContent>
@@ -121,16 +121,16 @@ export default function OnboardingProgress({ onStartTour }: OnboardingProgressPr
   }
 
   return (
-    <Card className="bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200">
+    <Card className="border-border bg-card">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-              <Play className="w-4 h-4 text-purple-600" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
+              <Play className="h-4 w-4 text-foreground" />
             </div>
             <div>
-              <CardTitle className="text-sm text-purple-900">Onboarding</CardTitle>
-              <p className="text-xs text-purple-700">Complete to get started</p>
+              <CardTitle className="text-sm">Onboarding</CardTitle>
+              <p className="text-xs text-muted-foreground">Complete these to get started</p>
             </div>
           </div>
           <Badge variant="secondary" className="text-xs">
@@ -138,49 +138,39 @@ export default function OnboardingProgress({ onStartTour }: OnboardingProgressPr
           </Badge>
         </div>
       </CardHeader>
-      
+
       <CardContent className="space-y-3">
         <Progress value={progress} className="h-2" />
-        
+
         <div className="space-y-2">
           {tasks.map((task) => (
             <div
               key={task.id}
               className={cn(
-                "flex items-center justify-between p-2 rounded-lg transition-colors",
-                task.completed 
-                  ? "bg-green-100 border border-green-200" 
-                  : "bg-white border border-purple-100 hover:bg-purple-50"
+                "flex items-center justify-between rounded-lg p-2 transition-colors",
+                task.completed
+                  ? "border border-border bg-muted/50"
+                  : "border border-border bg-background hover:bg-muted/40"
               )}
             >
               <div className="flex items-center space-x-2">
                 {task.completed ? (
-                  <CheckCircle className="w-4 h-4 text-green-600" />
+                  <CheckCircle className="h-4 w-4 text-foreground" />
                 ) : (
-                  <Circle className="w-4 h-4 text-purple-400" />
+                  <Circle className="h-4 w-4 text-muted-foreground" />
                 )}
                 <div>
-                  <p className={cn(
-                    "text-xs font-medium",
-                    task.completed ? "text-green-800" : "text-purple-900"
-                  )}>
-                    {task.title}
-                  </p>
-                  <p className={cn(
-                    "text-xs",
-                    task.completed ? "text-green-600" : "text-purple-600"
-                  )}>
-                    {task.description}
-                  </p>
+                  <p className="text-xs font-medium text-foreground">{task.title}</p>
+                  <p className="text-xs text-muted-foreground">{task.description}</p>
                 </div>
               </div>
-              
+
               {!task.completed && task.action && (
                 <Button
                   size="sm"
                   variant="outline"
                   onClick={() => handleActionClick(task)}
-                  className="text-xs h-6 px-2 text-purple-600 border-purple-300 hover:bg-purple-50"
+                  className="h-6 px-2 text-xs"
                 >
                   {task.action.label}
                 </Button>

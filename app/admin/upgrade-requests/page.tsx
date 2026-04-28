@@ -30,6 +30,7 @@ import {
 import { UpgradeRequestService, UpgradeRequest } from '@/lib/upgrade-request-service'
 import { supabase } from '@/lib/supabase'
 import { useToast } from '@/hooks/use-toast'
+import { useI18n } from '@/components/i18n/i18n-provider'
 
 interface AdminUser {
   id: string
@@ -40,6 +41,120 @@ interface AdminUser {
 }
 
 export default function AdminUpgradeRequestsPage() {
+  const { locale } = useI18n()
+  const tx =
+    locale === 'es-ES'
+      ? {
+          accountLocked: 'Cuenta bloqueada',
+          tooManyAttempts: 'Demasiados intentos fallidos. Intentalo de nuevo mas tarde.',
+          loginFailed: 'Inicio de sesion fallido',
+          invalidCredentials: 'Credenciales invalidas. Intentalo de nuevo.',
+          accessDenied: 'Acceso denegado',
+          noPrivileges: 'No tienes permisos de administrador.',
+          loginSuccess: 'Inicio de sesion correcto',
+          welcomeAdmin: 'Bienvenido, admin',
+          loginError: 'Error de inicio de sesion',
+          unexpectedError: 'Ha ocurrido un error inesperado.',
+          loggedOut: 'Sesion cerrada',
+          loadError: 'No se han podido cargar las solicitudes.',
+          warning: 'Aviso',
+          planUpdateFailed: 'Solicitud aprobada, pero fallo la actualizacion del plan.',
+          success: 'Exito',
+          requestUpdated: 'Solicitud actualizada correctamente.',
+          updateFailed: 'No se pudo actualizar la solicitud.',
+          status: { pending: 'Pendiente', approved: 'Aprobada', rejected: 'Rechazada', completed: 'Completada', unknown: 'Desconocido' },
+          verifying: 'Verificando acceso de administrador...',
+          adminRequired: 'Acceso de administrador requerido',
+          enterCredentials: 'Introduce tus credenciales para gestionar solicitudes de upgrade',
+          adminEmail: 'Email de admin',
+          password: 'Contrasena',
+          enterPassword: 'Introduce la contrasena',
+          loginAdmin: 'Entrar como admin',
+          lockedTemp: 'Cuenta bloqueada temporalmente por multiples intentos fallidos.',
+          backDashboard: 'Volver al panel',
+          adminPanel: 'Panel de administracion',
+          management: 'Gestion de solicitudes de upgrade',
+          logout: 'Cerrar sesion',
+          total: 'Total',
+          pending: 'Pendiente',
+          approved: 'Aprobada',
+          rejected: 'Rechazada',
+          completed: 'Completada',
+          statusFilter: 'Estado',
+          dateRange: 'Rango de fechas',
+          search: 'Buscar',
+          allStatus: 'Todos los estados',
+          allTime: 'Todo el periodo',
+          today: 'Hoy',
+          week: 'Ultimos 7 dias',
+          month: 'Ultimos 30 dias',
+          searchPh: 'Buscar por email, plan o mensaje...',
+          refresh: 'Actualizar',
+          requestsTitle: 'Solicitudes de upgrade',
+          requestsDesc: 'Gestiona solicitudes y aprueba o rechaza cambios',
+          loadingRequests: 'Cargando solicitudes...',
+          noRequests: 'No hay solicitudes de upgrade.',
+          requestingUpgrade: 'Solicita upgrade a',
+          view: 'Ver',
+          approve: 'Aprobar',
+          reject: 'Rechazar',
+        }
+      : {
+          accountLocked: 'Account Locked',
+          tooManyAttempts: 'Too many failed attempts. Please try again later.',
+          loginFailed: 'Login Failed',
+          invalidCredentials: 'Invalid credentials. Please try again.',
+          accessDenied: 'Access Denied',
+          noPrivileges: "You don't have admin privileges.",
+          loginSuccess: 'Login Successful',
+          welcomeAdmin: 'Welcome, Admin!',
+          loginError: 'Login Error',
+          unexpectedError: 'An unexpected error occurred.',
+          loggedOut: 'Logged Out',
+          loadError: 'Failed to load upgrade requests.',
+          warning: 'Warning',
+          planUpdateFailed: 'Request approved but user plan update failed.',
+          success: 'Success',
+          requestUpdated: 'Request updated successfully.',
+          updateFailed: 'Failed to update request.',
+          status: { pending: 'Pending', approved: 'Approved', rejected: 'Rejected', completed: 'Completed', unknown: 'Unknown' },
+          verifying: 'Verifying admin access...',
+          adminRequired: 'Admin Access Required',
+          enterCredentials: 'Enter your admin credentials to manage upgrade requests',
+          adminEmail: 'Admin Email',
+          password: 'Password',
+          enterPassword: 'Enter password',
+          loginAdmin: 'Login as Admin',
+          lockedTemp: 'Account temporarily locked due to multiple failed attempts.',
+          backDashboard: 'Back to Dashboard',
+          adminPanel: 'Admin Panel',
+          management: 'Upgrade Requests Management',
+          logout: 'Logout',
+          total: 'Total',
+          pending: 'Pending',
+          approved: 'Approved',
+          rejected: 'Rejected',
+          completed: 'Completed',
+          statusFilter: 'Status',
+          dateRange: 'Date Range',
+          search: 'Search',
+          allStatus: 'All Status',
+          allTime: 'All Time',
+          today: 'Today',
+          week: 'Last 7 Days',
+          month: 'Last 30 Days',
+          searchPh: 'Search by email, plan, or message...',
+          refresh: 'Refresh',
+          requestsTitle: 'Upgrade Requests',
+          requestsDesc: 'Manage user upgrade requests and approve or reject them',
+          loadingRequests: 'Loading requests...',
+          noRequests: 'No upgrade requests found.',
+          requestingUpgrade: 'Requesting upgrade to',
+          view: 'View',
+          approve: 'Approve',
+          reject: 'Reject',
+        }
+
   const router = useRouter()
   const { toast } = useToast()
   
@@ -136,8 +251,8 @@ export default function AdminUpgradeRequestsPage() {
   const handleAdminLogin = async () => {
     if (isLocked) {
       toast({
-        title: "Account Locked",
-        description: "Too many failed attempts. Please try again later.",
+        title: tx.accountLocked,
+        description: tx.tooManyAttempts,
         variant: "destructive",
       })
       return
@@ -156,8 +271,8 @@ export default function AdminUpgradeRequestsPage() {
           setTimeout(() => setIsLocked(false), 300000) // 5 minutes lock
         }
         toast({
-          title: "Login Failed",
-          description: "Invalid credentials. Please try again.",
+          title: tx.loginFailed,
+          description: tx.invalidCredentials,
           variant: "destructive",
         })
         return
@@ -173,8 +288,8 @@ export default function AdminUpgradeRequestsPage() {
       if (userError || !userData || userData.role !== 'admin') {
         await supabase.auth.signOut()
         toast({
-          title: "Access Denied",
-          description: "You don't have admin privileges.",
+          title: tx.accessDenied,
+          description: tx.noPrivileges,
           variant: "destructive",
         })
         return
@@ -184,14 +299,14 @@ export default function AdminUpgradeRequestsPage() {
       setIsAuthenticated(true)
       setLoginAttempts(0)
       toast({
-        title: "Login Successful",
-        description: "Welcome, Admin!",
+        title: tx.loginSuccess,
+        description: tx.welcomeAdmin,
       })
     } catch (error) {
       console.error('Login error:', error)
       toast({
-        title: "Login Error",
-        description: "An unexpected error occurred.",
+        title: tx.loginError,
+        description: tx.unexpectedError,
         variant: "destructive",
       })
     }
@@ -211,7 +326,7 @@ export default function AdminUpgradeRequestsPage() {
     
     if (reason) {
       toast({
-        title: "Logged Out",
+        title: tx.loggedOut,
         description: reason,
       })
     }
@@ -236,8 +351,8 @@ export default function AdminUpgradeRequestsPage() {
     } catch (error) {
       console.error('Error loading requests:', error)
       toast({
-        title: "Error",
-        description: "Failed to load upgrade requests.",
+        title: tx.loginError,
+        description: tx.loadError,
         variant: "destructive",
       })
     } finally {
@@ -319,16 +434,16 @@ export default function AdminUpgradeRequestsPage() {
         if (userError) {
           console.error('Error updating user plan:', userError)
           toast({
-            title: "Warning",
-            description: "Request approved but user plan update failed.",
+            title: tx.warning,
+            description: tx.planUpdateFailed,
             variant: "destructive",
           })
         }
       }
 
       toast({
-        title: "Success",
-        description: `Request ${actionType}d successfully.`,
+        title: tx.success,
+        description: tx.requestUpdated,
       })
 
       setShowActionDialog(false)
@@ -339,8 +454,8 @@ export default function AdminUpgradeRequestsPage() {
     } catch (error) {
       console.error('Error updating request:', error)
       toast({
-        title: "Error",
-        description: "Failed to update request.",
+        title: tx.loginError,
+        description: tx.updateFailed,
         variant: "destructive",
       })
     }
@@ -364,20 +479,20 @@ export default function AdminUpgradeRequestsPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'pending':
-        return <Badge variant="secondary">Pending</Badge>
+        return <Badge variant="secondary">{tx.status.pending}</Badge>
       case 'approved':
-        return <Badge variant="default" className="bg-green-500">Approved</Badge>
+        return <Badge variant="default" className="bg-green-500">{tx.status.approved}</Badge>
       case 'rejected':
-        return <Badge variant="destructive">Rejected</Badge>
+        return <Badge variant="destructive">{tx.status.rejected}</Badge>
       case 'completed':
-        return <Badge variant="default" className="bg-blue-500">Completed</Badge>
+        return <Badge variant="default" className="bg-blue-500">{tx.status.completed}</Badge>
       default:
-        return <Badge variant="outline">Unknown</Badge>
+        return <Badge variant="outline">{tx.status.unknown}</Badge>
     }
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return new Date(dateString).toLocaleDateString(locale === 'es-ES' ? 'es-ES' : 'en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -401,7 +516,7 @@ export default function AdminUpgradeRequestsPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Verifying admin access...</p>
+          <p className="text-gray-600">{tx.verifying}</p>
         </div>
       </div>
     )
@@ -415,14 +530,14 @@ export default function AdminUpgradeRequestsPage() {
             <div className="mx-auto mb-4 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
               <Shield className="h-6 w-6 text-red-600" />
             </div>
-            <CardTitle className="text-xl">Admin Access Required</CardTitle>
+            <CardTitle className="text-xl">{tx.adminRequired}</CardTitle>
             <CardDescription>
-              Enter your admin credentials to manage upgrade requests
+              {tx.enterCredentials}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Admin Email</label>
+              <label className="text-sm font-medium">{tx.adminEmail}</label>
               <Input
                 type="email"
                 placeholder="admin@example.com"
@@ -432,11 +547,11 @@ export default function AdminUpgradeRequestsPage() {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Password</label>
+              <label className="text-sm font-medium">{tx.password}</label>
               <div className="relative">
                 <Input
                   type={showPassword ? "text" : "password"}
-                  placeholder="Enter password"
+                  placeholder={tx.enterPassword}
                   value={adminPassword}
                   onChange={(e) => setAdminPassword(e.target.value)}
                   disabled={isLocked}
@@ -459,13 +574,13 @@ export default function AdminUpgradeRequestsPage() {
               className="w-full"
             >
               <Lock className="h-4 w-4 mr-2" />
-              Login as Admin
+              {tx.loginAdmin}
             </Button>
             {isLocked && (
               <Alert>
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
-                  Account temporarily locked due to multiple failed attempts.
+                  {tx.lockedTemp}
                 </AlertDescription>
               </Alert>
             )}
@@ -489,11 +604,11 @@ export default function AdminUpgradeRequestsPage() {
               onClick={() => router.push('/dashboard')}
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Dashboard
+              {tx.backDashboard}
             </Button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Admin Panel</h1>
-              <p className="text-sm text-gray-600">Upgrade Requests Management</p>
+              <h1 className="text-2xl font-bold text-gray-900">{tx.adminPanel}</h1>
+              <p className="text-sm text-gray-600">{tx.management}</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -508,7 +623,7 @@ export default function AdminUpgradeRequestsPage() {
               size="sm"
               onClick={() => handleLogout()}
             >
-              Logout
+              {tx.logout}
             </Button>
           </div>
         </div>
@@ -521,7 +636,7 @@ export default function AdminUpgradeRequestsPage() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Total</p>
+                  <p className="text-sm font-medium text-gray-600">{tx.total}</p>
                   <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
                 </div>
                 <Mail className="h-8 w-8 text-gray-400" />
@@ -532,7 +647,7 @@ export default function AdminUpgradeRequestsPage() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Pending</p>
+                  <p className="text-sm font-medium text-gray-600">{tx.pending}</p>
                   <p className="text-2xl font-bold text-yellow-600">{stats.pending}</p>
                 </div>
                 <Clock className="h-8 w-8 text-yellow-400" />
@@ -543,7 +658,7 @@ export default function AdminUpgradeRequestsPage() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Approved</p>
+                  <p className="text-sm font-medium text-gray-600">{tx.approved}</p>
                   <p className="text-2xl font-bold text-green-600">{stats.approved}</p>
                 </div>
                 <CheckCircle className="h-8 w-8 text-green-400" />
@@ -554,7 +669,7 @@ export default function AdminUpgradeRequestsPage() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Rejected</p>
+                  <p className="text-sm font-medium text-gray-600">{tx.rejected}</p>
                   <p className="text-2xl font-bold text-red-600">{stats.rejected}</p>
                 </div>
                 <XCircle className="h-8 w-8 text-red-400" />
@@ -565,7 +680,7 @@ export default function AdminUpgradeRequestsPage() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Completed</p>
+                  <p className="text-sm font-medium text-gray-600">{tx.completed}</p>
                   <p className="text-2xl font-bold text-blue-600">{stats.completed}</p>
                 </div>
                 <CheckCircle className="h-8 w-8 text-blue-400" />
@@ -579,38 +694,38 @@ export default function AdminUpgradeRequestsPage() {
           <CardContent className="p-4">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-2 block">Status</label>
+                <label className="text-sm font-medium text-gray-700 mb-2 block">{tx.statusFilter}</label>
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="all">All Status</option>
-                  <option value="pending">Pending</option>
-                  <option value="approved">Approved</option>
-                  <option value="rejected">Rejected</option>
-                  <option value="completed">Completed</option>
+                  <option value="all">{tx.allStatus}</option>
+                  <option value="pending">{tx.pending}</option>
+                  <option value="approved">{tx.approved}</option>
+                  <option value="rejected">{tx.rejected}</option>
+                  <option value="completed">{tx.completed}</option>
                 </select>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-2 block">Date Range</label>
+                <label className="text-sm font-medium text-gray-700 mb-2 block">{tx.dateRange}</label>
                 <select
                   value={dateFilter}
                   onChange={(e) => setDateFilter(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="all">All Time</option>
-                  <option value="today">Today</option>
-                  <option value="week">Last 7 Days</option>
-                  <option value="month">Last 30 Days</option>
+                  <option value="all">{tx.allTime}</option>
+                  <option value="today">{tx.today}</option>
+                  <option value="week">{tx.week}</option>
+                  <option value="month">{tx.month}</option>
                 </select>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-2 block">Search</label>
+                <label className="text-sm font-medium text-gray-700 mb-2 block">{tx.search}</label>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <Input
-                    placeholder="Search by email, plan, or message..."
+                    placeholder={tx.searchPh}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10"
@@ -624,7 +739,7 @@ export default function AdminUpgradeRequestsPage() {
                   className="w-full"
                 >
                   <RefreshCw className={`h-4 w-4 mr-2 ${loadingRequests ? 'animate-spin' : ''}`} />
-                  Refresh
+                  {tx.refresh}
                 </Button>
               </div>
             </div>
@@ -634,21 +749,21 @@ export default function AdminUpgradeRequestsPage() {
         {/* Requests List */}
         <Card>
           <CardHeader>
-            <CardTitle>Upgrade Requests ({filteredRequests.length})</CardTitle>
+            <CardTitle>{tx.requestsTitle} ({filteredRequests.length})</CardTitle>
             <CardDescription>
-              Manage user upgrade requests and approve or reject them
+              {tx.requestsDesc}
             </CardDescription>
           </CardHeader>
           <CardContent>
             {loadingRequests ? (
               <div className="text-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                <p className="text-gray-600">Loading requests...</p>
+                <p className="text-gray-600">{tx.loadingRequests}</p>
               </div>
             ) : filteredRequests.length === 0 ? (
               <div className="text-center py-8">
                 <Mail className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600">No upgrade requests found.</p>
+                <p className="text-gray-600">{tx.noRequests}</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -664,7 +779,7 @@ export default function AdminUpgradeRequestsPage() {
                               {getStatusBadge(request.status)}
                             </div>
                             <p className="text-sm text-gray-600">
-                              Requesting upgrade to <span className="font-medium">{request.requested_plan}</span>
+                              {tx.requestingUpgrade} <span className="font-medium">{request.requested_plan}</span>
                             </p>
                             <p className="text-xs text-gray-500">
                               {formatDate(request.created_at)}
@@ -681,7 +796,7 @@ export default function AdminUpgradeRequestsPage() {
                             }}
                           >
                             <Eye className="h-4 w-4 mr-1" />
-                            View
+                            {tx.view}
                           </Button>
                           {request.status === 'pending' && (
                             <>
@@ -696,7 +811,7 @@ export default function AdminUpgradeRequestsPage() {
                                 className="bg-green-600 hover:bg-green-700"
                               >
                                 <CheckCircle className="h-4 w-4 mr-1" />
-                                Approve
+                                {tx.approve}
                               </Button>
                               <Button
                                 variant="destructive"
@@ -708,7 +823,7 @@ export default function AdminUpgradeRequestsPage() {
                                 }}
                               >
                                 <XCircle className="h-4 w-4 mr-1" />
-                                Reject
+                                {tx.reject}
                               </Button>
                             </>
                           )}

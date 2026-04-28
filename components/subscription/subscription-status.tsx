@@ -175,7 +175,7 @@ export function SubscriptionStatus() {
                 <span>Team Members: {planLimits.max_users}</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
-                <BarChart3 className="h-4 w-4 text-purple-500" />
+                <BarChart3 className="h-4 w-4 text-foreground" />
                 <span>Orders/Month: {planLimits.max_orders_per_month.toLocaleString()}</span>
               </div>
               <div className="flex items-center gap-2 text-sm">

@@ -463,7 +463,7 @@ export default function SimpleCart({ restaurantId }: SimpleCartProps) {
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end justify-end p-4 animate-in fade-in duration-200">
           <div className="w-full max-w-md h-[95vh] bg-white shadow-2xl rounded-t-3xl rounded-b-3xl animate-in slide-in-from-bottom duration-300 flex flex-col border border-slate-200">
             {/* Header */}
-            <CardHeader className="pb-4 flex-shrink-0 border-b bg-gradient-to-r from-slate-50 to-white rounded-t-3xl">
+            <CardHeader className="flex-shrink-0 rounded-t-3xl border-b border-border bg-muted/30 pb-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <div className="p-2 bg-slate-100 rounded-lg">
@@ -503,7 +503,7 @@ export default function SimpleCart({ restaurantId }: SimpleCartProps) {
                       <h3 className="text-2xl font-bold text-slate-900 mb-2">Order Placed!</h3>
                       <p className="text-slate-600">Thank you for your order</p>
                     </div>
-                    <div className="bg-gradient-to-r from-slate-50 to-slate-100 p-6 rounded-xl border">
+                    <div className="rounded-xl border border-border bg-muted/40 p-6">
                       <p className="text-sm text-slate-600 mb-1">Order Number</p>
                       <p className="text-xl font-bold text-slate-900">{orderNumber}</p>
                     </div>
@@ -543,19 +543,33 @@ export default function SimpleCart({ restaurantId }: SimpleCartProps) {
                   <div className="space-y-6">
                     {/* Progress Indicator */}
                     <div className="flex items-center justify-center space-x-4 mb-6">
-                      <div className={`flex items-center space-x-2 ${checkoutStep >= 1 ? 'text-blue-600' : 'text-slate-400'}`}>
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                          checkoutStep >= 1 ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-500'
-                        }`}>
+                      <div
+                        className={`flex items-center space-x-2 ${checkoutStep >= 1 ? "text-foreground" : "text-muted-foreground"}`}
+                      >
+                        <div
+                          className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
+                            checkoutStep >= 1
+                              ? "bg-foreground text-background"
+                              : "bg-muted text-muted-foreground"
+                          }`}
+                        >
                           1
                         </div>
-                        <span className="text-sm font-medium">Order Type</span>
+                        <span className="text-sm font-medium">Order type</span>
                       </div>
-                      <div className={`w-8 h-1 rounded-full ${checkoutStep >= 2 ? 'bg-blue-600' : 'bg-slate-200'}`}></div>
-                      <div className={`flex items-center space-x-2 ${checkoutStep >= 2 ? 'text-blue-600' : 'text-slate-400'}`}>
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                          checkoutStep >= 2 ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-500'
-                        }`}>
+                      <div
+                        className={`h-1 w-8 rounded-full ${checkoutStep >= 2 ? "bg-foreground" : "bg-muted"}`}
+                      ></div>
+                      <div
+                        className={`flex items-center space-x-2 ${checkoutStep >= 2 ? "text-foreground" : "text-muted-foreground"}`}
+                      >
+                        <div
+                          className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
+                            checkoutStep >= 2
+                              ? "bg-foreground text-background"
+                              : "bg-muted text-muted-foreground"
+                          }`}
+                        >
                           2
                         </div>
                         <span className="text-sm font-medium">Details</span>
@@ -581,8 +595,8 @@ export default function SimpleCart({ restaurantId }: SimpleCartProps) {
                               className="relative p-6 rounded-xl border-2 border-slate-200 bg-white hover:border-slate-300 hover:shadow-md transition-all duration-200 hover:scale-[1.02] group"
                             >
                               <div className="flex items-center space-x-4">
-                                <div className="p-3 bg-blue-100 rounded-xl group-hover:bg-blue-200 transition-colors">
-                                  <Package className="h-6 w-6 text-blue-600" />
+                                <div className="rounded-xl bg-muted p-3 transition-colors group-hover:bg-muted/80">
+                                  <Package className="h-6 w-6 text-foreground" />
                                 </div>
                                 <div className="flex-1 text-left">
                                   <div className="font-bold text-lg text-slate-900 mb-1">Pickup</div>
@@ -603,8 +617,8 @@ export default function SimpleCart({ restaurantId }: SimpleCartProps) {
                               className="relative p-6 rounded-xl border-2 border-slate-200 bg-white hover:border-slate-300 hover:shadow-md transition-all duration-200 hover:scale-[1.02] group"
                             >
                               <div className="flex items-center space-x-4">
-                                <div className="p-3 bg-green-100 rounded-xl group-hover:bg-green-200 transition-colors">
-                                  <Truck className="h-6 w-6 text-green-600" />
+                                <div className="rounded-xl bg-muted p-3 transition-colors group-hover:bg-muted/80">
+                                  <Truck className="h-6 w-6 text-foreground" />
                                 </div>
                                 <div className="flex-1 text-left">
                                   <div className="font-bold text-lg text-slate-900 mb-1">Delivery</div>
@@ -625,8 +639,8 @@ export default function SimpleCart({ restaurantId }: SimpleCartProps) {
                               className="relative p-6 rounded-xl border-2 border-slate-200 bg-white hover:border-slate-300 hover:shadow-md transition-all duration-200 hover:scale-[1.02] group"
                             >
                               <div className="flex items-center space-x-4">
-                                <div className="p-3 bg-purple-100 rounded-xl group-hover:bg-purple-200 transition-colors">
-                                  <Table className="h-6 w-6 text-purple-600" />
+                                <div className="rounded-xl bg-muted p-3 transition-colors group-hover:bg-muted/80">
+                                  <Table className="h-6 w-6 text-foreground" />
                                 </div>
                                 <div className="flex-1 text-left">
                                   <div className="font-bold text-lg text-slate-900 mb-1">Table Service</div>
@@ -762,10 +776,10 @@ export default function SimpleCart({ restaurantId }: SimpleCartProps) {
                               await handleRegularCheckout()
                             }}
                             disabled={isSubmitting || !validateCustomerInfo().isValid}
-                            className={`w-full h-14 text-base font-bold rounded-xl transition-all duration-200 hover:scale-[1.02] shadow-lg ${
+                            className={`h-14 w-full rounded-xl text-base font-bold shadow-sm transition-all duration-200 hover:scale-[1.02] ${
                               isSubmitting || !validateCustomerInfo().isValid
-                                ? 'bg-gray-400 cursor-not-allowed' 
-                                : 'bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700'
+                                ? "cursor-not-allowed bg-muted text-muted-foreground"
+                                : "bg-foreground text-background hover:bg-foreground/90"
                             }`}
                           >
                             {isSubmitting ? (
@@ -803,9 +817,9 @@ export default function SimpleCart({ restaurantId }: SimpleCartProps) {
                         </div>
                         <h3 className="text-xl font-semibold text-slate-900 mb-2">Your cart is empty</h3>
                         <p className="text-slate-600 mb-6">Add some delicious items to get started</p>
-                        <div className="bg-gradient-to-r from-amber-50 to-orange-50 p-4 rounded-xl border border-amber-200">
-                          <p className="text-sm text-amber-800">
-                            🎉 Free delivery on orders over <FormattedPrice amount={25} restaurantId={restaurantId} />!
+                        <div className="rounded-xl border border-border bg-muted/50 p-4">
+                          <p className="text-sm text-muted-foreground">
+                            Free delivery on orders over <FormattedPrice amount={25} restaurantId={restaurantId} />
                           </p>
                         </div>
                       </div>
@@ -813,7 +827,10 @@ export default function SimpleCart({ restaurantId }: SimpleCartProps) {
                       // Cart Items
                       <div className="space-y-4">
                         {cartItems.map((item) => (
-                          <div key={item.id} className="bg-gradient-to-r from-slate-50 to-white border border-slate-200 rounded-xl p-4 hover:shadow-md transition-shadow">
+                          <div
+                            key={item.id}
+                            className="rounded-xl border border-border bg-card p-4 transition-shadow hover:shadow-md"
+                          >
                             <div className="flex items-start justify-between">
                               <div className="flex-1">
                                 <div className="flex items-start space-x-3">
@@ -870,7 +887,7 @@ export default function SimpleCart({ restaurantId }: SimpleCartProps) {
                         ))}
 
                         {/* Order Summary */}
-                        <div className="bg-gradient-to-r from-slate-50 to-white border border-slate-200 rounded-xl p-6">
+                        <div className="rounded-xl border border-border bg-muted/30 p-6">
                           <h4 className="font-semibold text-slate-900 mb-4">Order Summary</h4>
                           <div className="space-y-2 text-sm">
                             <div className="flex justify-between">

@@ -5,25 +5,23 @@ import { ArrowLeft } from "lucide-react"
 
 export default function TermsPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="border-b border-gray-200 bg-white">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+    <div className="min-h-screen bg-background text-foreground">
+      <header className="border-b border-border bg-card">
+        <div className="container mx-auto flex items-center justify-between px-4 py-4">
           <Link href="/" className="flex items-center space-x-2">
-            <ArrowLeft className="w-5 h-5 text-gray-600" />
+            <ArrowLeft className="h-5 w-5 text-muted-foreground" />
             <Logo size="lg" />
           </Link>
           <Link href="/auth/register">
-            <Button className="bg-gradient-to-r from-[#7C3AED] to-[#D64DD2] hover:from-[#6B21A8] hover:to-[#C2185B] text-white">
-              Get Started Free
-            </Button>
+            <Button>Get started</Button>
           </Link>
         </div>
       </header>
 
       <div className="container mx-auto px-4 py-12">
-        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Terms and Conditions</h1>
-          <p className="text-gray-600 mb-8">
+        <div className="mx-auto max-w-4xl rounded-lg border border-border bg-card p-8 shadow-sm">
+          <h1 className="mb-4 text-3xl font-semibold">Terms and conditions</h1>
+          <p className="mb-8 text-muted-foreground">
             Last updated: {new Date().toLocaleDateString()}
           </p>
 

@@ -13,9 +13,50 @@ import Link from "next/link"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { Logo } from "@/components/ui/logo"
+import { useI18n } from "@/components/i18n/i18n-provider"
 
+function getPasswordStrength(
+  password: string,
+  t: (key: string) => string
+) {
+  let score = 0
+  const feedback: string[] = []
+
+  if (password.length >= 8) {
+    score += 1
+  } else {
+    feedback.push(t("register.valMin8"))
+  }
+
+  if (/[a-z]/.test(password)) {
+    score += 1
+  } else {
+    feedback.push(t("register.valLower"))
+  }
+
+  if (/[A-Z]/.test(password)) {
+    score += 1
+  } else {
+    feedback.push(t("register.valUpper"))
+  }
+
+  if (/[0-9]/.test(password)) {
+    score += 1
+  } else {
+    feedback.push(t("register.valNumber"))
+  }
+
+  if (/[^A-Za-z0-9]/.test(password)) {
+    score += 1
+  } else {
+    feedback.push(t("register.valSpecial"))
+  }
+
+  return { score, feedback }
+}
 
 export default function RegisterPage() {
+  const { t } = useI18n()
   const [formData, setFormData] = useState({
     restaurantName: "",
     firstName: "",
@@ -49,45 +90,7 @@ export default function RegisterPage() {
       .substring(0, 50)
   }
 
-  // Password strength checker
-  const getPasswordStrength = (password: string) => {
-    let score = 0
-    let feedback = []
-
-    if (password.length >= 8) {
-      score += 1
-    } else {
-      feedback.push("At least 8 characters")
-    }
-
-    if (/[a-z]/.test(password)) {
-      score += 1
-    } else {
-      feedback.push("Lowercase letter")
-    }
-
-    if (/[A-Z]/.test(password)) {
-      score += 1
-    } else {
-      feedback.push("Uppercase letter")
-    }
-
-    if (/[0-9]/.test(password)) {
-      score += 1
-    } else {
-      feedback.push("Number")
-    }
-
-    if (/[^A-Za-z0-9]/.test(password)) {
-      score += 1
-    } else {
-      feedback.push("Special character")
-    }
-
-    return { score, feedback }
-  }
-
-  const passwordStrength = getPasswordStrength(formData.password)
+  const passwordStrength = getPasswordStrength(formData.password, t)
   const isPasswordStrong = passwordStrength.score >= 4
   const isPasswordMatch = formData.password === formData.confirmPassword && formData.password !== ""
 
@@ -120,13 +123,13 @@ export default function RegisterPage() {
     setError("")
 
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match")
+      setError(t("register.errPasswordsMismatch"))
       setIsLoading(false)
       return
     }
 
     if (!isPasswordStrong) {
-      setError("Password is not strong enough")
+      setError(t("register.errPasswordWeak"))
       setIsLoading(false)
       return
     }
@@ -152,7 +155,7 @@ export default function RegisterPage() {
       }
 
       if (!authData.user) {
-        setError("Failed to create user account")
+        setError(t("register.errCreateUser"))
         setIsLoading(false)
         return
       }
@@ -190,7 +193,7 @@ export default function RegisterPage() {
           hint: restaurantError.hint,
           code: restaurantError.code
         })
-        setError("Failed to create restaurant: " + restaurantError.message)
+        setError(t("register.errCreateRestaurant", { message: restaurantError.message }))
         setIsLoading(false)
         return
       }
@@ -246,7 +249,7 @@ export default function RegisterPage() {
       setShowVerificationMessage(true)
     } catch (err) {
       console.error("Registration error:", err)
-      setError("An unexpected error occurred")
+      setError(t("register.errUnexpected"))
     } finally {
       setIsLoading(false)
     }
@@ -258,8 +261,8 @@ export default function RegisterPage() {
         <div key={step} className="flex items-center">
           <div className={`flex items-center justify-center w-8 h-8 rounded-full border-2 ${
             step <= currentStep 
-              ? "bg-[#7C3AED] border-[#7C3AED] text-white" 
-              : "bg-gray-100 border-gray-300 text-gray-400"
+              ? "bg-foreground border-foreground text-background" 
+              : "bg-muted border-border text-muted-foreground"
           }`}>
             {step < currentStep ? (
               <Check className="w-4 h-4" />
@@ -269,7 +272,7 @@ export default function RegisterPage() {
           </div>
           {step < 3 && (
             <div className={`w-12 h-0.5 mx-2 ${
-              step < currentStep ? "bg-[#7C3AED]" : "bg-gray-300"
+              step < currentStep ? "bg-foreground" : "bg-muted"
             }`} />
           )}
         </div>
@@ -278,42 +281,38 @@ export default function RegisterPage() {
   )
 
   const renderVerificationMessage = () => (
-    <div className="text-center space-y-6">
-      <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-        <Check className="w-8 h-8 text-green-600" />
-      </div>
-      
-      <div className="space-y-3">
-        <h3 className="text-xl font-bold text-gray-900">Account Created Successfully!</h3>
-        <p className="text-gray-600">
-          We've sent a verification link to your email address.
-        </p>
+    <div className="space-y-6 text-center">
+      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-border bg-card">
+        <Check className="h-8 w-8 text-foreground" />
       </div>
 
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-start space-x-3">
-          <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center mt-0.5">
-            <Mail className="w-3 h-3 text-white" />
+      <div className="space-y-2">
+        <h3 className="text-xl font-medium text-foreground">
+          {t("register.verifyCheckEmail")}
+        </h3>
+        <p className="text-sm text-muted-foreground">{t("register.verifySent")}</p>
+      </div>
+
+      <div className="rounded-xl border border-border/80 bg-muted/30 p-4 text-left">
+        <div className="flex gap-3">
+          <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-border bg-card">
+            <Mail className="h-4 w-4" />
           </div>
-          <div className="text-left">
-            <h4 className="text-sm font-medium text-blue-900">Verify your email address</h4>
-            <p className="text-xs text-blue-700 mt-1">
-              Check your inbox and click the verification link to activate your account.
+          <div>
+            <h4 className="text-sm font-medium">{t("register.verifyNext")}</h4>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {t("register.verifyNextDesc")}
             </p>
           </div>
         </div>
       </div>
 
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-        <div className="flex items-start space-x-3">
-          <div className="w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center mt-0.5">
-            <AlertCircle className="w-3 h-3 text-white" />
-          </div>
-          <div className="text-left">
-            <h4 className="text-sm font-medium text-yellow-900">Didn't receive the email?</h4>
-            <p className="text-xs text-yellow-700 mt-1">
-              Check your spam folder or request a new verification link.
-            </p>
+      <div className="rounded-xl border border-dashed border-border/90 bg-card p-4 text-left">
+        <div className="flex gap-3">
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+          <div>
+            <h4 className="text-sm font-medium">{t("register.noEmail")}</h4>
+            <p className="mt-1 text-xs text-muted-foreground">{t("register.noEmailDesc")}</p>
           </div>
         </div>
       </div>
@@ -321,11 +320,11 @@ export default function RegisterPage() {
       <div className="space-y-3">
         <Button
           onClick={() => router.push("/auth/login")}
-          className="w-full h-11 bg-gradient-to-r from-[#7C3AED] to-[#D64DD2] hover:from-[#6B21A8] hover:to-[#C2185B] text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300"
+          className="h-11 w-full"
         >
-          Go to Login
+          {t("register.goToLogin")}
         </Button>
-        
+
         <Button
           variant="outline"
           onClick={() => {
@@ -340,9 +339,9 @@ export default function RegisterPage() {
               confirmPassword: "",
             })
           }}
-          className="w-full h-11 border-gray-300 text-gray-700 hover:bg-gray-50"
+          className="h-11 w-full"
         >
-          Create Another Account
+          {t("register.createAnother")}
         </Button>
       </div>
     </div>
@@ -354,48 +353,54 @@ export default function RegisterPage() {
         return (
           <div className="space-y-4">
             <div className="flex items-center space-x-2 mb-4">
-              <Building2 className="w-5 h-5 text-[#7C3AED]" />
-              <h3 className="text-lg font-semibold text-gray-900">Restaurant Information</h3>
+              <Building2 className="w-5 h-5 text-foreground" />
+              <h3 className="text-lg font-semibold text-foreground">
+                {t("register.step1Title")}
+              </h3>
             </div>
             
             <div className="space-y-3">
-              <Label htmlFor="restaurantName" className="text-sm font-semibold text-gray-700">
-                Restaurant Name
+              <Label htmlFor="restaurantName" className="text-sm font-semibold text-foreground">
+                {t("register.restaurantName")}
               </Label>
               <Input
                 id="restaurantName"
                 name="restaurantName"
-                placeholder="Enter your restaurant name"
+                placeholder={t("register.restaurantNamePh")}
                 value={formData.restaurantName}
                 onChange={handleInputChange}
                 required
-                className="h-11 border-gray-200 focus:border-[#7C3AED] focus:ring-[#7C3AED] transition-colors"
+                className="h-11 transition-colors"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-3">
-                <Label htmlFor="firstName" className="text-sm font-semibold text-gray-700">First Name</Label>
+                <Label htmlFor="firstName" className="text-sm font-semibold text-foreground">
+                  {t("register.firstName")}
+                </Label>
                 <Input
                   id="firstName"
                   name="firstName"
-                  placeholder="First name"
+                  placeholder={t("register.firstNamePh")}
                   value={formData.firstName}
                   onChange={handleInputChange}
                   required
-                  className="h-11 border-gray-200 focus:border-[#7C3AED] focus:ring-[#7C3AED] transition-colors"
+                  className="h-11 transition-colors"
                 />
               </div>
               <div className="space-y-3">
-                <Label htmlFor="lastName" className="text-sm font-semibold text-gray-700">Last Name</Label>
+                <Label htmlFor="lastName" className="text-sm font-semibold text-foreground">
+                  {t("register.lastName")}
+                </Label>
                 <Input
                   id="lastName"
                   name="lastName"
-                  placeholder="Last name"
+                  placeholder={t("register.lastNamePh")}
                   value={formData.lastName}
                   onChange={handleInputChange}
                   required
-                  className="h-11 border-gray-200 focus:border-[#7C3AED] focus:ring-[#7C3AED] transition-colors"
+                  className="h-11 transition-colors"
                 />
               </div>
             </div>
@@ -406,42 +411,46 @@ export default function RegisterPage() {
         return (
           <div className="space-y-4">
             <div className="flex items-center space-x-2 mb-4">
-              <Mail className="w-5 h-5 text-[#7C3AED]" />
-              <h3 className="text-lg font-semibold text-gray-900">Account Details</h3>
+              <Mail className="w-5 h-5 text-foreground" />
+              <h3 className="text-lg font-semibold text-foreground">{t("register.step2Title")}</h3>
             </div>
             
             <div className="space-y-3">
-              <Label htmlFor="email" className="text-sm font-semibold text-gray-700">Email Address</Label>
+              <Label htmlFor="email" className="text-sm font-semibold text-foreground">
+                {t("register.email")}
+              </Label>
               <Input
                 id="email"
                 name="email"
                 type="email"
-                placeholder="Enter your email"
+                placeholder={t("register.emailPh")}
                 value={formData.email}
                 onChange={handleInputChange}
                 required
-                className="h-11 border-gray-200 focus:border-[#7C3AED] focus:ring-[#7C3AED] transition-colors"
+                className="h-11 transition-colors"
               />
             </div>
 
             <div className="space-y-3">
-              <Label htmlFor="password" className="text-sm font-semibold text-gray-700">Password</Label>
+              <Label htmlFor="password" className="text-sm font-semibold text-foreground">
+                {t("register.password")}
+              </Label>
               <div className="relative">
                 <Input
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Create a strong password"
+                  placeholder={t("register.passwordPh")}
                   value={formData.password}
                   onChange={handleInputChange}
                   required
-                  className="h-11 border-gray-200 focus:border-[#7C3AED] focus:ring-[#7C3AED] transition-colors pr-12"
+                  className="h-11 transition-colors pr-12"
                 />
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-gray-400 hover:text-gray-600"
+                  className="absolute right-0 top-0 h-full px-3 py-2 text-muted-foreground hover:bg-transparent hover:text-foreground"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -462,13 +471,15 @@ export default function RegisterPage() {
                               : passwordStrength.score >= 3
                               ? "bg-yellow-500"
                               : "bg-red-500"
-                            : "bg-gray-200"
+                            : "bg-muted"
                         }`}
                       />
                     ))}
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className="text-xs text-gray-600">Password strength:</span>
+                    <span className="text-xs text-muted-foreground">
+                      {t("register.passwordStrength")}
+                    </span>
                     <Badge 
                       variant="secondary" 
                       className={`text-xs ${
@@ -479,12 +490,18 @@ export default function RegisterPage() {
                           : "bg-red-100 text-red-700 border-red-200"
                       }`}
                     >
-                      {passwordStrength.score >= 4 ? "Strong" : passwordStrength.score >= 3 ? "Good" : "Weak"}
+                      {passwordStrength.score >= 4
+                        ? t("register.strong")
+                        : passwordStrength.score >= 3
+                          ? t("register.good")
+                          : t("register.weak")}
                     </Badge>
                   </div>
                   {passwordStrength.feedback.length > 0 && (
-                    <div className="text-xs text-gray-500 space-y-1">
-                      <p>Add: {passwordStrength.feedback.join(", ")}</p>
+                    <div className="space-y-1 text-xs text-muted-foreground">
+                      <p>
+                        {t("register.addPrefix")}: {passwordStrength.feedback.join(", ")}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -492,17 +509,19 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-3">
-              <Label htmlFor="confirmPassword" className="text-sm font-semibold text-gray-700">Confirm Password</Label>
+              <Label htmlFor="confirmPassword" className="text-sm font-semibold text-foreground">
+                {t("register.confirmPassword")}
+              </Label>
               <div className="relative">
                 <Input
                   id="confirmPassword"
                   name="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
-                  placeholder="Confirm your password"
+                  placeholder={t("register.confirmPasswordPh")}
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
                   required
-                  className={`h-11 border-gray-200 focus:border-[#7C3AED] focus:ring-[#7C3AED] transition-colors pr-12 ${
+                  className={`h-11 transition-colors pr-12 ${
                     formData.confirmPassword && !isPasswordMatch ? "border-red-300 focus:border-red-500" : ""
                   }`}
                 />
@@ -510,7 +529,7 @@ export default function RegisterPage() {
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-gray-400 hover:text-gray-600"
+                  className="absolute right-0 top-0 h-full px-3 py-2 text-muted-foreground hover:bg-transparent hover:text-foreground"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
                   {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -524,7 +543,7 @@ export default function RegisterPage() {
                     <AlertCircle className="w-4 h-4 text-red-500" />
                   )}
                   <span className={`text-xs ${isPasswordMatch ? "text-green-600" : "text-red-600"}`}>
-                    {isPasswordMatch ? "Passwords match" : "Passwords don't match"}
+                    {isPasswordMatch ? t("register.match") : t("register.noMatch")}
                   </span>
                 </div>
               )}
@@ -536,35 +555,35 @@ export default function RegisterPage() {
         return (
           <div className="space-y-4">
             <div className="flex items-center space-x-2 mb-4">
-              <Sparkles className="w-5 h-5 text-[#7C3AED]" />
-              <h3 className="text-lg font-semibold text-gray-900">Review & Create</h3>
+              <Sparkles className="w-5 h-5 text-foreground" />
+              <h3 className="text-lg font-semibold text-foreground">{t("register.step3Title")}</h3>
             </div>
             
-            <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+            <div className="rounded-xl bg-muted/40 p-4 space-y-3">
               <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Restaurant:</span>
-                <span className="text-sm font-medium text-gray-900">{formData.restaurantName}</span>
+                <span className="text-sm text-muted-foreground">Restaurant:</span>
+                <span className="text-sm font-medium text-foreground">{formData.restaurantName}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Owner:</span>
-                <span className="text-sm font-medium text-gray-900">{formData.firstName} {formData.lastName}</span>
+                <span className="text-sm text-muted-foreground">{t("register.reviewOwner")}:</span>
+                <span className="text-sm font-medium text-foreground">{formData.firstName} {formData.lastName}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Email:</span>
-                <span className="text-sm font-medium text-gray-900">{formData.email}</span>
+                <span className="text-sm text-muted-foreground">{t("register.reviewEmail")}:</span>
+                <span className="text-sm font-medium text-foreground">{formData.email}</span>
               </div>
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <div className="flex items-start space-x-3">
-                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center mt-0.5">
-                  <Check className="w-3 h-3 text-white" />
+            <div className="rounded-xl border border-border/80 bg-muted/25 p-4">
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-foreground">
+                  <Check className="h-3 w-3 text-background" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-medium text-blue-900">Ready to create your restaurant!</h4>
-                  <p className="text-xs text-blue-700 mt-1">
-                    Your account will be created with all the features you need to manage your restaurant efficiently.
-                  </p>
+                  <h4 className="text-sm font-medium text-foreground">
+                    {t("register.readyTitle")}
+                  </h4>
+                  <p className="mt-1 text-xs text-muted-foreground">{t("register.readyDesc")}</p>
                 </div>
               </div>
             </div>
@@ -577,25 +596,29 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-coral-50 flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
       {/* Background decoration */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-50/50 via-blue-50/30 to-coral-50/50"></div>
-      <div className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-r from-[#7C3AED]/20 to-[#D64DD2]/20 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-r from-[#FF6B6B]/20 to-[#7C3AED]/20 rounded-full blur-3xl"></div>
+      <div
+        className="absolute inset-0 opacity-[0.35]"
+        aria-hidden
+        style={{
+          backgroundImage: `radial-gradient(circle at 1px 1px, hsl(var(--foreground) / 0.06) 1px, transparent 0)`,
+          backgroundSize: "24px 24px",
+        }}
+      />
       
-      <Card className="w-full max-w-lg bg-white/90 backdrop-blur-sm border-0 shadow-2xl relative z-10">
+      <Card className="relative z-10 w-full max-w-lg border-border/90 bg-card shadow-sm">
         <CardHeader className="text-center pb-6">
           <div className="flex justify-center mb-4 mt-4">
             <Logo size="2xl" />
           </div>
-          <CardTitle className="text-2xl font-bold text-gray-900 mb-1">
-            {showVerificationMessage ? "Email Verification Required" : "Create Your Restaurant"}
+          <CardTitle className="text-2xl font-bold text-foreground mb-1">
+            {showVerificationMessage ? t("register.titleVerify") : t("register.title")}
           </CardTitle>
-          <CardDescription className="text-gray-600">
-            {showVerificationMessage 
-              ? "Complete your email verification to continue" 
-              : "Set up your restaurant management account in 3 simple steps"
-            }
+          <CardDescription className="text-muted-foreground">
+            {showVerificationMessage
+              ? t("register.descriptionVerify")
+              : t("register.description")}
           </CardDescription>
         </CardHeader>
         
@@ -617,25 +640,35 @@ export default function RegisterPage() {
                       id="terms"
                       checked={acceptedTerms}
                       onChange={(e) => setAcceptedTerms(e.target.checked)}
-                      className="mt-1 w-4 h-4 text-[#7C3AED] bg-gray-100 border-gray-300 rounded focus:ring-[#7C3AED] focus:ring-2"
+                      className="mt-1 h-4 w-4 rounded border border-input text-foreground focus-visible:ring-2 focus-visible:ring-ring"
                       required
                     />
-                    <label htmlFor="terms" className="text-sm text-gray-600">
-                      I agree to the{" "}
-                      <Link href="/legal/terms" target="_blank" className="text-[#7C3AED] hover:text-[#6B21A8] font-medium">
-                        Terms and Conditions
-                      </Link>
-                      {" "}and{" "}
-                      <Link href="/legal/privacy" target="_blank" className="text-[#7C3AED] hover:text-[#6B21A8] font-medium">
-                        Privacy Policy
+                    <label htmlFor="terms" className="text-sm text-muted-foreground">
+                      {t("register.agreeTerms")}{" "}
+                      <Link
+                        href="/legal/terms"
+                        target="_blank"
+                        className="font-medium text-foreground underline underline-offset-2"
+                      >
+                        {t("register.terms")}
+                      </Link>{" "}
+                      {t("register.and")}{" "}
+                      <Link
+                        href="/legal/privacy"
+                        target="_blank"
+                        className="font-medium text-foreground underline underline-offset-2"
+                      >
+                        {t("register.privacy")}
                       </Link>
                     </label>
                   </div>
                 )}
 
                 {error && (
-                  <div className="text-sm text-red-600 bg-red-50 border border-red-200 p-4 rounded-lg flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                  <div
+                    role="alert"
+                    className="flex items-start gap-2 rounded-xl border border-destructive/25 bg-destructive/5 p-4 text-sm text-destructive"
+                  >
                     <span>{error}</span>
                   </div>
                 )}
@@ -646,7 +679,7 @@ export default function RegisterPage() {
                       type="button"
                       variant="outline"
                       onClick={handlePreviousStep}
-                      className="flex-1 h-11 border-gray-300 text-gray-700 hover:bg-gray-50"
+                      className="h-11 flex-1"
                     >
                       Previous
                     </Button>
@@ -660,14 +693,14 @@ export default function RegisterPage() {
                         (currentStep === 1 && !canProceedToStep2) ||
                         (currentStep === 2 && !canProceedToStep3)
                       }
-                      className="flex-1 h-11 bg-gradient-to-r from-[#7C3AED] to-[#D64DD2] hover:from-[#6B21A8] hover:to-[#C2185B] text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="h-11 flex-1"
                     >
                       Next
                     </Button>
                   ) : (
                     <Button 
                       type="submit" 
-                      className="flex-1 h-11 bg-gradient-to-r from-[#7C3AED] to-[#D64DD2] hover:from-[#6B21A8] hover:to-[#C2185B] text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]" 
+                      className="h-11 flex-1" 
                       disabled={isLoading || !acceptedTerms}
                     >
                       {isLoading ? "Creating Account..." : "Create Account"}
@@ -679,10 +712,13 @@ export default function RegisterPage() {
           )}
 
           {!showVerificationMessage && (
-            <div className="mt-4 text-center text-sm text-gray-600">
-              Already have an account?{" "}
-              <Link href="/auth/login" className="text-[#7C3AED] hover:text-[#6B21A8] font-medium transition-colors">
-                Sign in
+            <div className="mt-4 text-center text-sm text-muted-foreground">
+              {t("register.hasAccount")}{" "}
+              <Link
+                href="/auth/login"
+                className="font-medium text-foreground underline underline-offset-4 decoration-border hover:decoration-foreground"
+              >
+                {t("register.signIn")}
               </Link>
             </div>
           )}

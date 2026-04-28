@@ -3,7 +3,6 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { 
   ChefHat, 
   Sparkles, 
@@ -29,7 +28,7 @@ export default function WelcomeCard({ restaurantName, onStartTour, onDismiss }: 
   if (!isVisible) return null
 
   return (
-    <Card className="relative bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200">
+    <Card className="relative border-border/90 bg-card shadow-sm">
       <Button
         variant="ghost"
         size="sm"
@@ -41,69 +40,59 @@ export default function WelcomeCard({ restaurantName, onStartTour, onDismiss }: 
       
       <CardHeader className="pb-4">
         <div className="flex items-center space-x-3">
-          <div className="flex items-center justify-center w-12 h-12 bg-purple-100 rounded-full">
-            <ChefHat className="w-6 h-6 text-purple-600" />
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-border bg-muted/50">
+            <ChefHat className="h-6 w-6 text-foreground/80" strokeWidth={1.5} />
           </div>
           <div>
-            <CardTitle className="text-xl text-purple-900">
-              Welcome to {restaurantName}! 🎉
+            <CardTitle className="font-display text-xl text-foreground">
+              Welcome, {restaurantName}
             </CardTitle>
-            <p className="text-purple-700 text-sm">
-              Your restaurant is set up and ready to use
-            </p>
+            <p className="text-sm text-muted-foreground">You&rsquo;re set up — take a quick tour or explore.</p>
           </div>
         </div>
       </CardHeader>
       
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="text-center p-3 bg-white rounded-lg border border-purple-100">
-            <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
-              <Sparkles className="w-4 h-4 text-green-600" />
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+          <div className="rounded-xl border border-border/80 bg-muted/20 p-3 text-center">
+            <div className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card">
+              <Sparkles className="h-4 w-4 text-foreground/70" />
             </div>
-            <h3 className="font-semibold text-sm text-gray-900">All Inclusive</h3>
-            <p className="text-xs text-gray-600">Complete restaurant management</p>
+            <h3 className="text-sm font-medium text-foreground">All-in-one</h3>
+            <p className="text-xs text-muted-foreground">Orders, menu, floor</p>
           </div>
-          
-          <div className="text-center p-3 bg-white rounded-lg border border-purple-100">
-            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
-              <BookOpen className="w-4 h-4 text-blue-600" />
+
+          <div className="rounded-xl border border-border/80 bg-muted/20 p-3 text-center">
+            <div className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card">
+              <BookOpen className="h-4 w-4 text-foreground/70" />
             </div>
-            <h3 className="font-semibold text-sm text-gray-900">Easy to Use</h3>
-            <p className="text-xs text-gray-600">Intuitive and modern interface</p>
+            <h3 className="text-sm font-medium text-foreground">Clear UI</h3>
+            <p className="text-xs text-muted-foreground">Built for busy shifts</p>
           </div>
-          
-          <div className="text-center p-3 bg-white rounded-lg border border-purple-100">
-            <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-2">
-              <ChefHat className="w-4 h-4 text-orange-600" />
+
+          <div className="rounded-xl border border-border/80 bg-muted/20 p-3 text-center">
+            <div className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card">
+              <ChefHat className="h-4 w-4 text-foreground/70" />
             </div>
-            <h3 className="font-semibold text-sm text-gray-900">Professional</h3>
-            <p className="text-xs text-gray-600">Enterprise-level tools</p>
+            <h3 className="text-sm font-medium text-foreground">Serious ops</h3>
+            <p className="text-xs text-muted-foreground">Inventory &amp; analytics</p>
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 pt-2">
-          <Button 
-            onClick={onStartTour}
-            className="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700"
-          >
-            <Play className="w-4 h-4" />
-            <span>Start Tutorial</span>
+        <div className="flex flex-col gap-3 pt-2 sm:flex-row">
+          <Button onClick={onStartTour} className="flex items-center gap-2">
+            <Play className="h-4 w-4" />
+            Start tour
           </Button>
-          
-          <Button 
-            variant="outline"
-            onClick={handleDismiss}
-          >
-            Explore on my own
+
+          <Button variant="outline" onClick={handleDismiss}>
+            Skip for now
           </Button>
         </div>
 
-        <div className="text-center pt-2">
-          <Badge variant="secondary" className="text-xs">
-            💡 Tip: Complete the tutorial to learn all the features
-          </Badge>
-        </div>
+        <p className="pt-1 text-center font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+          Tip: the tour takes under two minutes
+        </p>
       </CardContent>
     </Card>
   )

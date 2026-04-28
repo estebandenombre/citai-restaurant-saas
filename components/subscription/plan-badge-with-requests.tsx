@@ -91,20 +91,8 @@ export function PlanBadgeWithRequests({
     }
   }
 
-  const getPlanColor = () => {
-    switch (subscriptionStatus.plan_name) {
-      case 'Free Trial':
-        return 'bg-blue-100 text-blue-700 border-blue-200'
-      case 'Starter':
-        return 'bg-green-100 text-green-700 border-green-200'
-      case 'Pro':
-        return 'bg-purple-100 text-purple-700 border-purple-200'
-      case 'Multi':
-        return 'bg-orange-100 text-orange-700 border-orange-200'
-      default:
-        return 'bg-gray-100 text-gray-600 border-gray-200'
-    }
-  }
+  const getPlanColor = () =>
+    "border-border bg-muted/60 text-foreground ring-1 ring-border/60"
 
   const getStatusIndicator = () => {
     if (subscriptionStatus.is_trial) {
@@ -191,7 +179,7 @@ export function PlanBadgeWithRequests({
       {clickable && onClick ? (
         <button
           onClick={handlePlanClick}
-          className={`${getPlanColor()} text-xs font-medium flex items-center gap-1.5 w-fit border px-2 py-1 rounded-full cursor-pointer hover:scale-105 hover:shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+          className={`${getPlanColor()} flex w-fit cursor-pointer items-center gap-1.5 rounded-full border px-2 py-1 text-xs font-medium transition-all duration-200 hover:scale-105 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-foreground/20 focus:ring-offset-2`}
           title="Click to view subscription details"
         >
           {badgeContent}

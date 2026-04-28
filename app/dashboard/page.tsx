@@ -54,8 +54,28 @@ import { useOnboarding } from "@/hooks/use-onboarding"
 import Link from "next/link"
 import { Loading } from "@/components/ui/loading"
 import { FormattedPrice } from "@/components/ui/formatted-price"
+import { useI18n } from "@/components/i18n/i18n-provider"
+import type { LucideIcon } from "lucide-react"
+
+type DashboardActivity =
+  | {
+      kind: "order"
+      orderId: string
+      amount: number
+      status: string
+      at: string
+      icon: LucideIcon
+    }
+  | {
+      kind: "reservation"
+      customer: string
+      reservationDate: string
+      at: string
+      icon: LucideIcon
+    }
 
 export default function DashboardPage() {
+  const { t, intlLocale } = useI18n()
   const [user, setUser] = useState<any>(null)
   const { isOnboardingOpen, openOnboarding, closeOnboarding, completeOnboarding } = useOnboarding()
   const [restaurant, setRestaurant] = useState<any>(null)
@@ -83,17 +103,9 @@ export default function DashboardPage() {
     reservationChange: 0,
     staffChange: 0
   })
-  const [recentActivity, setRecentActivity] = useState<any[]>([])
+  const [recentActivity, setRecentActivity] = useState<DashboardActivity[]>([])
   const [menuItemsData, setMenuItemsData] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  const [greeting, setGreeting] = useState("")
-
-  useEffect(() => {
-    const hour = new Date().getHours()
-    if (hour < 12) setGreeting("Good morning")
-    else if (hour < 18) setGreeting("Good afternoon")
-    else setGreeting("Good evening")
-  }, [])
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -212,36 +224,36 @@ export default function DashboardPage() {
           staffChange: 0
         })
 
-        // Set up recent activity
-        const activity: any[] = []
-
-        // Add recent orders
+        const activity: DashboardActivity[] = []
         const recentOrders = todayOrdersData?.slice(0, 3) || []
         recentOrders.forEach((order) => {
+          const oid = (order as { order_number?: string | number; id: string }).order_number
           activity.push({
-            type: "order",
-            title: `Order #${order.id}`,
-            description: `$${order.total_amount || 0} - ${order.status}`,
-            color: "blue",
-            time: new Date(order.created_at).toLocaleTimeString(),
-            icon: Receipt
+            kind: "order",
+            orderId: String(oid ?? order.id),
+            amount: order.total_amount || 0,
+            status: String(order.status),
+            at: order.created_at,
+            icon: Receipt,
           })
         })
 
-        // Add recent reservations
         const recentReservations = reservationsData?.slice(0, 2) || []
         recentReservations.forEach((reservation) => {
           activity.push({
-            type: "reservation",
-            title: `Reservation`,
-            description: `${reservation.customer_name} - ${new Date(reservation.reservation_date).toLocaleDateString()}`,
-            color: "green",
-            time: new Date(reservation.created_at).toLocaleTimeString(),
-            icon: Calendar
+            kind: "reservation",
+            customer: reservation.customer_name,
+            reservationDate: reservation.reservation_date,
+            at: reservation.created_at,
+            icon: Calendar,
           })
         })
 
-        setRecentActivity(activity.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()).slice(0, 5))
+        setRecentActivity(
+          activity
+            .sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime())
+            .slice(0, 5)
+        )
 
       } catch (error) {
         console.error("Error fetching dashboard data:", error)
@@ -254,37 +266,39 @@ export default function DashboardPage() {
   }, [])
 
   if (loading) {
-    return <Loading text="Loading dashboard..." />
+    return <Loading text={t("common.loadingDashboard")} />
   }
 
     return (
     <div className="space-y-8">
       {/* Minimalist Header */}
-      <div className="bg-white rounded-lg border border-gray-100 p-6">
+      <div className="rounded-2xl border border-border/90 bg-card p-6 shadow-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <div className="flex items-center justify-center w-10 h-10 bg-blue-50 border border-blue-100 rounded-lg">
-              <LayoutDashboard className="h-5 w-5 text-blue-600" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-muted/50">
+              <LayoutDashboard className="h-5 w-5 text-foreground/80" strokeWidth={1.5} />
             </div>
             <div>
-              <h1 className="text-2xl font-semibold text-gray-900">
-                Dashboard
+              <h1 className="font-display text-2xl font-medium tracking-[-0.02em] text-foreground">
+                {t("dashboard.title")}
               </h1>
-              <p className="text-gray-500 text-sm">
-                Welcome back to {restaurant?.name}
+              <p className="text-sm text-muted-foreground">
+                {restaurant?.name}
               </p>
             </div>
           </div>
           <div className="flex items-center space-x-3">
-            <div className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600">
-              {new Date().toLocaleDateString('en-US', { 
-                month: 'short', 
-                day: 'numeric', 
-                year: 'numeric' 
-              })} - {new Date(new Date().setDate(new Date().getDate() + 30)).toLocaleDateString('en-US', { 
-                month: 'short', 
-                day: 'numeric', 
-                year: 'numeric' 
+            <div className="rounded-xl border border-border bg-muted/20 px-3 py-2 font-mono text-sm tabular-nums text-muted-foreground">
+              {new Date().toLocaleDateString(intlLocale, {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })}{" "}
+              —{" "}
+              {new Date(new Date().setDate(new Date().getDate() + 30)).toLocaleDateString(intlLocale, {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
               })}
             </div>
           </div>
@@ -294,96 +308,102 @@ export default function DashboardPage() {
       {/* Key Metrics Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Revenue Metric */}
-        <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+        <Card className="bg-card border border-border shadow-sm hover:shadow-md transition-shadow">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Today's Revenue</p>
-                <p className="text-2xl font-bold text-green-600">
+                <p className="text-sm font-medium text-muted-foreground">{t("dashboard.todaysRevenue")}</p>
+                <p className="text-2xl font-semibold tabular-nums tracking-tight text-foreground">
                   <FormattedPrice amount={stats.todayRevenue} restaurantId={restaurant?.id} />
                 </p>
                 <div className="flex items-center mt-2">
                   {stats.revenueChange >= 0 ? (
-                    <ArrowUp className="h-4 w-4 text-green-600" />
+                    <ArrowUp className="h-4 w-4 text-foreground" />
                   ) : (
-                    <ArrowDown className="h-4 w-4 text-red-600" />
+                    <ArrowDown className="h-4 w-4 text-destructive" />
                   )}
                   <span className={`text-sm font-medium ml-1 ${
-                    stats.revenueChange >= 0 ? 'text-green-600' : 'text-red-600'
+                    stats.revenueChange >= 0 ? 'text-foreground' : 'text-destructive'
                   }`}>
                     {Math.abs(stats.revenueChange).toFixed(1)}%
                   </span>
-                  <span className="text-sm text-gray-500 ml-1">vs yesterday</span>
+                  <span className="ml-1 text-sm text-muted-foreground">{t("common.vsYesterday")}</span>
                 </div>
               </div>
-              <div className="p-3 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg border border-green-200">
-                <DollarSign className="h-6 w-6 text-green-600" />
+              <div className="p-3 bg-card rounded-xl border border-border">
+                <DollarSign className="h-6 w-6 text-foreground" />
               </div>
             </div>
           </CardContent>
         </Card>
 
         {/* Orders Metric */}
-        <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+        <Card className="bg-card border border-border shadow-sm hover:shadow-md transition-shadow">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Today's Orders</p>
-                <p className="text-2xl font-bold text-blue-600">{stats.todayOrders}</p>
+                <p className="text-sm font-medium text-muted-foreground">{t("dashboard.metrics.orders")}</p>
+                <p className="text-2xl font-semibold tabular-nums tracking-tight text-foreground">{stats.todayOrders}</p>
                 <div className="flex items-center mt-2">
                   {stats.orderChange >= 0 ? (
-                    <ArrowUp className="h-4 w-4 text-green-600" />
+                    <ArrowUp className="h-4 w-4 text-foreground" />
                   ) : (
-                    <ArrowDown className="h-4 w-4 text-red-600" />
+                    <ArrowDown className="h-4 w-4 text-destructive" />
                   )}
                   <span className={`text-sm font-medium ml-1 ${
-                    stats.orderChange >= 0 ? 'text-green-600' : 'text-red-600'
+                    stats.orderChange >= 0 ? 'text-foreground' : 'text-destructive'
                   }`}>
                     {Math.abs(stats.orderChange).toFixed(1)}%
                   </span>
-                  <span className="text-sm text-gray-500 ml-1">vs yesterday</span>
+                  <span className="ml-1 text-sm text-muted-foreground">{t("common.vsYesterday")}</span>
                 </div>
               </div>
-              <div className="p-3 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
-                <ShoppingCart className="h-6 w-6 text-blue-600" />
+              <div className="p-3 bg-card rounded-xl border border-border">
+                <ShoppingCart className="h-6 w-6 text-foreground" />
               </div>
             </div>
           </CardContent>
         </Card>
 
         {/* Average Order Value */}
-        <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+        <Card className="bg-card border border-border shadow-sm hover:shadow-md transition-shadow">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Average Order Value</p>
-                <p className="text-2xl font-bold text-purple-600">
+                <p className="text-sm font-medium text-muted-foreground">
+                  {t("dashboard.averageOrderValue")}
+                </p>
+                <p className="text-2xl font-semibold tabular-nums tracking-tight text-foreground">
                   <FormattedPrice amount={stats.averageOrderValue} restaurantId={restaurant?.id} />
                 </p>
-                <p className="text-sm text-gray-500 mt-2">
-                  {stats.completedOrders} completed today
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {t("dashboard.completedToday", { n: stats.completedOrders })}
                 </p>
               </div>
-              <div className="p-3 bg-gradient-to-br from-purple-50 to-violet-50 rounded-lg border border-purple-200">
-                <BarChart3 className="h-6 w-6 text-purple-600" />
+              <div className="p-3 bg-card rounded-xl border border-border">
+                <BarChart3 className="h-6 w-6 text-foreground" />
               </div>
             </div>
           </CardContent>
         </Card>
 
         {/* Pending Orders */}
-        <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+        <Card className="bg-card border border-border shadow-sm hover:shadow-md transition-shadow">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Pending Orders</p>
-                <p className="text-2xl font-bold text-orange-600">{stats.pendingOrders}</p>
-                <p className="text-sm text-gray-500 mt-2">
-                  {stats.orderCompletionRate.toFixed(0)}% completion rate
+                <p className="text-sm font-medium text-muted-foreground">
+                  {t("dashboard.pendingOrders")}
+                </p>
+                <p className="text-2xl font-semibold tabular-nums tracking-tight text-foreground">{stats.pendingOrders}</p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {t("dashboard.completionRate", {
+                    n: Number(stats.orderCompletionRate.toFixed(0)),
+                  })}
                 </p>
               </div>
-              <div className="p-3 bg-gradient-to-br from-orange-50 to-amber-50 rounded-lg border border-orange-200">
-                <Clock className="h-6 w-6 text-orange-600" />
+              <div className="p-3 bg-card rounded-xl border border-border">
+                <Clock className="h-6 w-6 text-foreground" />
               </div>
             </div>
           </CardContent>
@@ -394,12 +414,14 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Revenue Analytics */}
-        <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+        <Card className="bg-card border border-border shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-lg font-semibold text-gray-900">Revenue Analytics</CardTitle>
-                <CardDescription>Weekly and monthly performance</CardDescription>
+                <CardTitle className="text-lg font-semibold text-foreground">
+                  {t("dashboard.revenueAnalytics")}
+                </CardTitle>
+                <CardDescription>{t("dashboard.revenueAnalyticsDesc")}</CardDescription>
               </div>
               <Link href="/dashboard/analytics">
                 <Button variant="ghost" size="sm">
@@ -411,23 +433,23 @@ export default function DashboardPage() {
           <CardContent className="space-y-6">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">This Week</span>
-                <span className="text-lg font-semibold text-green-600">
+                <span className="text-sm text-muted-foreground">{t("dashboard.thisWeek")}</span>
+                <span className="text-lg font-semibold text-foreground">
                   <FormattedPrice amount={stats.weeklyRevenue} restaurantId={restaurant?.id} />
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">This Month</span>
-                <span className="text-lg font-semibold text-green-600">
+                <span className="text-sm text-muted-foreground">{t("dashboard.thisMonth")}</span>
+                <span className="text-lg font-semibold text-foreground">
                   <FormattedPrice amount={stats.monthlyRevenue} restaurantId={restaurant?.id} />
                 </span>
               </div>
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">Revenue Growth</span>
+                <span className="text-muted-foreground">{t("dashboard.revenueGrowth")}</span>
                 <span className={`font-medium ${
-                  stats.revenueChange >= 0 ? 'text-green-600' : 'text-red-600'
+                  stats.revenueChange >= 0 ? 'text-foreground' : 'text-destructive'
                 }`}>
                   {stats.revenueChange >= 0 ? '+' : ''}{stats.revenueChange.toFixed(1)}%
                 </span>
@@ -441,12 +463,14 @@ export default function DashboardPage() {
         </Card>
 
         {/* Operations Overview */}
-        <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+        <Card className="bg-card border border-border shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-lg font-semibold text-gray-900">Menu Overview</CardTitle>
-                <CardDescription>Current menu items and categories</CardDescription>
+                <CardTitle className="text-lg font-semibold text-foreground">
+                  {t("dashboard.menuOverview")}
+                </CardTitle>
+                <CardDescription>{t("dashboard.menuOverviewDesc")}</CardDescription>
               </div>
               <Link href="/dashboard/menu">
                 <Button variant="ghost" size="sm">
@@ -459,15 +483,15 @@ export default function DashboardPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Total Items</span>
-                  <span className="text-lg font-semibold text-blue-600">{stats.totalMenuItems}</span>
+                  <span className="text-sm text-muted-foreground">{t("dashboard.totalItems")}</span>
+                  <span className="text-lg font-semibold text-foreground">{stats.totalMenuItems}</span>
                 </div>
                 <Progress value={Math.min((stats.totalMenuItems / 100) * 100, 100)} className="h-2" />
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Categories</span>
-                  <span className="text-lg font-semibold text-purple-600">{stats.totalCategories}</span>
+                  <span className="text-sm text-muted-foreground">{t("dashboard.categories")}</span>
+                  <span className="text-lg font-semibold text-foreground">{stats.totalCategories}</span>
                 </div>
                 <Progress value={Math.min((stats.totalCategories / 10) * 100, 100)} className="h-2" />
               </div>
@@ -476,29 +500,31 @@ export default function DashboardPage() {
             {/* Menu Items List */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-700">Recent Items</span>
-                <span className="text-xs text-gray-500">{stats.totalMenuItems} total</span>
+                <span className="text-sm font-medium text-foreground">{t("dashboard.recentItems")}</span>
+                <span className="text-xs text-muted-foreground">
+                  {t("dashboard.itemsTotal", { n: stats.totalMenuItems })}
+                </span>
               </div>
               <div className="space-y-2 max-h-32 overflow-y-auto">
                 {menuItemsData?.slice(0, 5).map((item, index) => (
-                  <div key={index} className="flex items-center justify-between p-2 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100">
+                  <div key={index} className="flex items-center justify-between p-2 bg-muted/50 rounded-xl border border-border/60">
                     <div className="flex items-center space-x-3">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <div className="h-2 w-2 rounded-full bg-emerald-600/80" />
                       <div>
-                        <p className="text-sm font-medium text-gray-900 truncate">{item.name}</p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-sm font-medium text-foreground truncate">{item.name}</p>
+                        <p className="text-xs text-muted-foreground">
                           <FormattedPrice amount={item.price} restaurantId={restaurant?.id} />
                         </p>
                       </div>
                     </div>
-                    <Badge variant="outline" className="text-xs border-blue-200 text-blue-700">
-                      {item.category || 'General'}
+                    <Badge variant="outline" className="text-xs font-mono normal-case tracking-normal">
+                      {item.category || t("dashboard.generalCategory")}
                     </Badge>
                     </div>
                 ))}
                 {(!menuItemsData || menuItemsData.length === 0) && (
                   <div className="text-center py-4">
-                    <p className="text-sm text-gray-500">No menu items yet</p>
+                    <p className="text-sm text-muted-foreground">{t("dashboard.noMenuItems")}</p>
                   </div>
               )}
               </div>
@@ -507,12 +533,14 @@ export default function DashboardPage() {
         </Card>
 
         {/* Recent Activity */}
-        <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+        <Card className="bg-card border border-border shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-lg font-semibold text-gray-900">Recent Activity</CardTitle>
-                <CardDescription>Latest orders and reservations</CardDescription>
+                <CardTitle className="text-lg font-semibold text-foreground">
+                  {t("dashboard.recentActivity")}
+                </CardTitle>
+                <CardDescription>{t("dashboard.recentActivityDesc")}</CardDescription>
               </div>
               <Link href="/dashboard/orders">
                 <Button variant="ghost" size="sm">
@@ -524,34 +552,53 @@ export default function DashboardPage() {
           <CardContent>
             <div className="space-y-4">
               {recentActivity.length > 0 ? (
-                recentActivity.map((activity, index) => {
-                  const Icon = activity.icon
+                recentActivity.map((row, index) => {
+                  const Icon = row.icon
+                  const title =
+                    row.kind === "order"
+                      ? t("dashboard.orderTitle", { id: row.orderId })
+                      : t("dashboard.reservationTitle")
+                  const timeLabel = new Date(row.at).toLocaleTimeString(intlLocale)
                   return (
-                    <div key={index} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
-                      <div className={`p-2 rounded-lg ${
-                        activity.color === 'blue' ? 'bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200' : 'bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200'
-                      }`}>
-                        <Icon className={`h-4 w-4 ${
-                          activity.color === 'blue' ? 'text-blue-600' : 'text-green-600'
-                        }`} />
+                    <div
+                      key={index}
+                      className="flex items-center space-x-3 rounded-lg p-2 transition-colors hover:bg-muted/50"
+                    >
+                      <div
+                        className={`rounded-lg p-2 ${
+                          row.kind === "order"
+                            ? "border border-border bg-card"
+                            : "border border-border/70 bg-muted/50"
+                        }`}
+                      >
+                        <Icon className="h-4 w-4 text-foreground" />
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">
-                          {activity.title}
-                        </p>
-                        <p className="text-xs text-gray-500 truncate">
-                          {activity.description}
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium text-foreground">{title}</p>
+                        <p className="truncate text-xs text-muted-foreground">
+                          {row.kind === "order" ? (
+                            <>
+                              <FormattedPrice
+                                amount={row.amount}
+                                restaurantId={restaurant?.id}
+                              />{" "}
+                              — {row.status}
+                            </>
+                          ) : (
+                            <>
+                              {row.customer} —{" "}
+                              {new Date(row.reservationDate).toLocaleDateString(intlLocale)}
+                            </>
+                          )}
                         </p>
                       </div>
-                      <span className="text-xs text-gray-400">
-                        {activity.time}
-                      </span>
+                      <span className="text-xs text-muted-foreground/80">{timeLabel}</span>
                     </div>
                   )
                 })
               ) : (
-                <div className="text-center py-4">
-                  <p className="text-sm text-gray-500">No recent activity</p>
+                <div className="py-4 text-center">
+                  <p className="text-sm text-muted-foreground">{t("dashboard.noRecentActivity")}</p>
                 </div>
               )}
             </div>
@@ -564,12 +611,14 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         
         {/* Reservations */}
-        <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+        <Card className="bg-card border border-border shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-lg font-semibold text-gray-900">Reservations</CardTitle>
-                <CardDescription>Today's bookings</CardDescription>
+                <CardTitle className="text-lg font-semibold text-foreground">
+                  {t("dashboard.reservationsCard")}
+                </CardTitle>
+                <CardDescription>{t("dashboard.reservationsDesc")}</CardDescription>
               </div>
               <Link href="/dashboard/reservations">
                 <Button variant="ghost" size="sm">
@@ -581,24 +630,26 @@ export default function DashboardPage() {
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Today</span>
-                <span className="text-2xl font-bold text-teal-600">{stats.todayReservations}</span>
+                <span className="text-sm text-muted-foreground">{t("common.today")}</span>
+                <span className="text-2xl font-bold text-foreground">{stats.todayReservations}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Total</span>
-                <span className="text-lg font-semibold text-teal-600">{stats.totalReservations}</span>
+                <span className="text-sm text-muted-foreground">{t("common.total")}</span>
+                <span className="text-lg font-semibold text-foreground">{stats.totalReservations}</span>
               </div>
             </div>
           </CardContent>
         </Card>
 
         {/* Staff */}
-        <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+        <Card className="bg-card border border-border shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-lg font-semibold text-gray-900">Staff</CardTitle>
-                <CardDescription>Team overview</CardDescription>
+                <CardTitle className="text-lg font-semibold text-foreground">
+                  {t("dashboard.staff")}
+                </CardTitle>
+                <CardDescription>{t("dashboard.teamOverview")}</CardDescription>
               </div>
               <Link href="/dashboard/staff">
                 <Button variant="ghost" size="sm">
@@ -610,20 +661,20 @@ export default function DashboardPage() {
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Active Staff</span>
-                <span className="text-2xl font-bold text-indigo-600">{stats.totalStaff}</span>
+                <span className="text-sm text-muted-foreground">{t("dashboard.activeStaff")}</span>
+                <span className="text-2xl font-bold text-foreground">{stats.totalStaff}</span>
               </div>
               <div className="flex items-center space-x-2">
                 {Array.from({ length: Math.min(stats.totalStaff, 4) }, (_, i) => (
-                  <Avatar key={i} className="h-8 w-8 border-2 border-indigo-200">
-                    <AvatarFallback className="text-xs bg-gradient-to-br from-indigo-50 to-purple-50 text-indigo-700">
+                  <Avatar key={i} className="h-8 w-8 border-2 border-border">
+                    <AvatarFallback className="text-xs bg-muted text-foreground">
                       {String.fromCharCode(65 + i)}
                     </AvatarFallback>
                   </Avatar>
                 ))}
                 {stats.totalStaff > 4 && (
-                  <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-full border border-indigo-200">
-                    <span className="text-xs font-medium text-indigo-700">+{stats.totalStaff - 4}</span>
+                  <div className="flex items-center justify-center w-8 h-8 bg-muted rounded-full border border-border">
+                    <span className="text-xs font-medium text-foreground">+{stats.totalStaff - 4}</span>
                   </div>
                 )}
               </div>
@@ -632,29 +683,31 @@ export default function DashboardPage() {
         </Card>
 
         {/* Quick Actions */}
-        <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+        <Card className="bg-card border border-border shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-semibold text-gray-900">Quick Actions</CardTitle>
-            <CardDescription>Common tasks</CardDescription>
+            <CardTitle className="text-lg font-semibold text-foreground">
+              {t("dashboard.quickActions")}
+            </CardTitle>
+            <CardDescription>{t("dashboard.quickActionsDesc")}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
               <Link href="/dashboard/orders">
-                <Button variant="outline" className="w-full justify-start hover:bg-blue-50 hover:border-blue-200 transition-colors">
-                  <Receipt className="h-4 w-4 mr-2 text-blue-600" />
-                  View Orders
+                <Button variant="outline" className="w-full justify-start hover:bg-muted/60 transition-colors">
+                  <Receipt className="h-4 w-4 mr-2 text-foreground" />
+                  {t("dashboard.viewOrders")}
                 </Button>
               </Link>
               <Link href="/dashboard/menu">
-                <Button variant="outline" className="w-full justify-start hover:bg-purple-50 hover:border-purple-200 transition-colors">
-                  <MenuIcon className="h-4 w-4 mr-2 text-purple-600" />
-                  Manage Menu
+                <Button variant="outline" className="w-full justify-start hover:bg-muted/60 transition-colors">
+                  <MenuIcon className="h-4 w-4 mr-2 text-foreground" />
+                  {t("dashboard.manageMenu")}
                 </Button>
               </Link>
               <Link href="/dashboard/inventory">
-                <Button variant="outline" className="w-full justify-start hover:bg-orange-50 hover:border-orange-200 transition-colors">
-                  <Package className="h-4 w-4 mr-2 text-orange-600" />
-                  Check Inventory
+                <Button variant="outline" className="w-full justify-start hover:bg-muted/60 transition-colors">
+                  <Package className="h-4 w-4 mr-2 text-foreground" />
+                  {t("dashboard.checkInventory")}
                 </Button>
               </Link>
 

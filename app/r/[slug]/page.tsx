@@ -95,10 +95,10 @@ export default function RestaurantPage({ params }: { params: Promise<{ slug: str
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-900 mx-auto mb-4"></div>
-          <p className="text-slate-600 font-medium">Loading restaurant...</p>
+          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-2 border-muted border-t-foreground" />
+          <p className="font-medium text-muted-foreground">Loading restaurant…</p>
         </div>
       </div>
     )

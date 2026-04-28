@@ -3,6 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { useI18n } from "@/components/i18n/i18n-provider"
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -34,6 +35,37 @@ interface PerformanceInsightsProps {
 }
 
 export function PerformanceInsights({ analyticsData, currencyConfig }: PerformanceInsightsProps) {
+  const { locale, intlLocale } = useI18n()
+  const tx =
+    locale === "es-ES"
+      ? {
+          title: "Insights de rendimiento",
+          subtitle: "Insights y recomendaciones con IA basados en tus datos",
+          lowAvgOrderValue: "Valor medio del pedido bajo",
+          warning: "Advertencia",
+          belowTarget: "Por debajo del objetivo",
+          reviewMenuPricing: "Revisa precios del menu y promociones",
+          peakBusinessHours: "Horas pico de negocio",
+          info: "Info",
+          considerStaffing: "Considera optimizar el personal",
+          avgOrderValueDesc: "El valor medio del pedido es {value}, considera estrategias de upselling",
+          peakRevenueDesc: "Ingresos mas altos a las {hour} con {value}",
+          noInsights: "Aun no hay insights. Sigue recopilando datos para recomendaciones personalizadas.",
+        }
+      : {
+          title: "Performance Insights",
+          subtitle: "AI-powered insights and recommendations based on your data",
+          lowAvgOrderValue: "Low Average Order Value",
+          warning: "Warning",
+          belowTarget: "Below target",
+          reviewMenuPricing: "Review menu pricing and promotions",
+          peakBusinessHours: "Peak Business Hours",
+          info: "Info",
+          considerStaffing: "Consider staffing optimization",
+          avgOrderValueDesc: "Average order value is {value}, consider upselling strategies",
+          peakRevenueDesc: "Highest revenue at {hour} with {value}",
+          noInsights: "No insights available yet. Continue collecting data for personalized recommendations.",
+        }
   const getCurrencySymbol = (currency: string): string => {
     const symbols: { [key: string]: string } = {
       'USD': '$',
@@ -55,7 +87,10 @@ export function PerformanceInsights({ analyticsData, currencyConfig }: Performan
       return `$${amount.toLocaleString()}`
     }
     const symbol = getCurrencySymbol(currencyConfig.currency)
-    const formattedAmount = amount.toLocaleString()
+    const formattedAmount = amount.toLocaleString(intlLocale, {
+      minimumFractionDigits: currencyConfig.currency === "JPY" ? 0 : 2,
+      maximumFractionDigits: currencyConfig.currency === "JPY" ? 0 : 2,
+    })
     if (currencyConfig.position === 'after') {
       return `${formattedAmount}${symbol}`
     } else {
@@ -121,10 +156,10 @@ export function PerformanceInsights({ analyticsData, currencyConfig }: Performan
      } else if (avgOrderValue < 15) {
        insights.push({
          type: "warning",
-         title: "Low Average Order Value",
-         description: `Average order value is ${formatCurrency(avgOrderValue)}, consider upselling strategies`,
-         metric: "Below target",
-         action: "Review menu pricing and promotions",
+         title: tx.lowAvgOrderValue,
+         description: tx.avgOrderValueDesc.replace("{value}", formatCurrency(avgOrderValue)),
+         metric: tx.belowTarget,
+         action: tx.reviewMenuPricing,
          icon: <AlertTriangle className="h-5 w-5 text-yellow-600" />
        })
      }
@@ -136,9 +171,9 @@ export function PerformanceInsights({ analyticsData, currencyConfig }: Performan
          if (peakHour.revenue > 0) {
        insights.push({
          type: "neutral",
-         title: "Peak Business Hours",
-         description: `Highest revenue at ${peakHour.hour} with ${formatCurrency(peakHour.revenue)}`,
-         metric: "Consider staffing optimization",
+         title: tx.peakBusinessHours,
+         description: tx.peakRevenueDesc.replace("{hour}", peakHour.hour).replace("{value}", formatCurrency(peakHour.revenue)),
+         metric: tx.considerStaffing,
          icon: <Clock className="h-5 w-5 text-blue-600" />
        })
      }
@@ -183,17 +218,17 @@ export function PerformanceInsights({ analyticsData, currencyConfig }: Performan
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
           <Lightbulb className="h-5 w-5 text-yellow-600" />
-          <span>Performance Insights</span>
+          <span>{tx.title}</span>
         </CardTitle>
         <CardDescription>
-          AI-powered insights and recommendations based on your data
+          {tx.subtitle}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {insights.length === 0 ? (
           <div className="text-center py-8">
             <Info className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600">No insights available yet. Continue collecting data for personalized recommendations.</p>
+            <p className="text-gray-600">{tx.noInsights}</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -212,8 +247,8 @@ export function PerformanceInsights({ analyticsData, currencyConfig }: Performan
                       <Badge variant={getBadgeVariant(insight.type)} className="text-xs">
                         {insight.type === "positive" && "Good"}
                         {insight.type === "negative" && "Attention"}
-                        {insight.type === "warning" && "Warning"}
-                        {insight.type === "neutral" && "Info"}
+                        {insight.type === "warning" && tx.warning}
+                        {insight.type === "neutral" && tx.info}
                       </Badge>
                     </div>
                     <p className="text-sm text-gray-600 mb-2">{insight.description}</p>

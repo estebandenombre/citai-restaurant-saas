@@ -24,6 +24,7 @@ import {
 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { MenuItemImageUpload } from "./menu-item-image-upload"
+import { useI18n } from "@/components/i18n/i18n-provider"
 
 interface Category {
   id: string
@@ -72,17 +73,112 @@ interface AddMenuItemFormProps {
   editingItem?: MenuItem | null
 }
 
-const COMMON_ALLERGENS = [
-  'Gluten', 'Dairy', 'Eggs', 'Fish', 'Shellfish', 'Tree Nuts', 
-  'Peanuts', 'Soy', 'Wheat', 'Sesame', 'Sulfites', 'Mustard'
-]
-
-const DIETARY_OPTIONS = [
-  'Vegetarian', 'Vegan', 'Gluten-Free', 'Dairy-Free', 'Low-Carb',
-  'Keto', 'Paleo', 'Halal', 'Kosher', 'Organic', 'Local'
-]
-
 export default function AddMenuItemForm({ restaurantId, onSuccess, onCancel, editingItem }: AddMenuItemFormProps) {
+  const { locale } = useI18n()
+  const tx =
+    locale === "es-ES"
+      ? {
+          requiredName: "El nombre es obligatorio",
+          requiredPrice: "El precio es obligatorio",
+          positivePrice: "El precio debe ser mayor que cero",
+          requiredCategory: "La categoria es obligatoria",
+          prepPositive: "El tiempo de preparacion debe ser un numero positivo",
+          failedSave: "No se pudo guardar el item de menu",
+          editTitle: "Editar item de menu",
+          addTitle: "Anadir nuevo item de menu",
+          editDesc: "Actualiza los detalles del item",
+          addDesc: "Crea un nuevo item para tu restaurante",
+          cancel: "Cancelar",
+          name: "Nombre *",
+          price: "Precio *",
+          description: "Descripcion",
+          category: "Categoria *",
+          selectCategory: "Selecciona una categoria",
+          prepTime: "Tiempo de preparacion (minutos)",
+          commonAllergens: "Alergenos comunes",
+          customAllergen: "Alergeno personalizado",
+          selectedAllergens: "Alergenos seleccionados",
+          dietaryOptions: "Opciones de dieta",
+          customDietary: "Opcion de dieta personalizada",
+          selectedDietary: "Opciones de dieta seleccionadas",
+          addIngredient: "Anadir ingrediente",
+          ingredientsList: "Lista de ingredientes",
+          settings: "Ajustes",
+          availableForOrder: "Disponible para pedir",
+          featuredItem: "Item destacado",
+          updateItem: "Actualizar item",
+          addItem: "Anadir item",
+          dishExample: "ej. Pizza margarita",
+          describeDish: "Describe el plato...",
+          addCustomAllergen: "Anadir alergeno personalizado...",
+          addCustomDietary: "Anadir opcion de dieta...",
+          addIngredientPlaceholder: "Anadir ingrediente...",
+          allergensTitle: "Alergenos",
+          allergensDesc: "Selecciona los alergenos que contiene este plato",
+          dietaryTitle: "Informacion dietetica",
+          dietaryDesc: "Selecciona las opciones dieteticas que aplican a este plato",
+          ingredientsTitle: "Ingredientes",
+          ingredientsDesc: "Lista los ingredientes principales de este plato",
+          availableDesc: "Haz que este item este disponible para pedir",
+          featuredDesc: "Destaca este item como especial o popular",
+          saving: "Guardando...",
+        }
+      : {
+          requiredName: "Name is required",
+          requiredPrice: "Price is required",
+          positivePrice: "Price must be a positive number",
+          requiredCategory: "Category is required",
+          prepPositive: "Preparation time must be a positive number",
+          failedSave: "Failed to save menu item",
+          editTitle: "Edit Menu Item",
+          addTitle: "Add New Menu Item",
+          editDesc: "Update the details of your menu item",
+          addDesc: "Create a new menu item for your restaurant",
+          cancel: "Cancel",
+          name: "Name *",
+          price: "Price *",
+          description: "Description",
+          category: "Category *",
+          selectCategory: "Select a category",
+          prepTime: "Preparation Time (minutes)",
+          commonAllergens: "Common Allergens",
+          customAllergen: "Custom Allergen",
+          selectedAllergens: "Selected Allergens",
+          dietaryOptions: "Dietary Options",
+          customDietary: "Custom Dietary Option",
+          selectedDietary: "Selected Dietary Options",
+          addIngredient: "Add Ingredient",
+          ingredientsList: "Ingredients List",
+          settings: "Settings",
+          availableForOrder: "Available for Order",
+          featuredItem: "Featured Item",
+          updateItem: "Update Item",
+          addItem: "Add Item",
+          dishExample: "e.g., Margherita Pizza",
+          describeDish: "Describe your dish...",
+          addCustomAllergen: "Add custom allergen...",
+          addCustomDietary: "Add custom dietary option...",
+          addIngredientPlaceholder: "Add ingredient...",
+          allergensTitle: "Allergens",
+          allergensDesc: "Select allergens that this dish contains",
+          dietaryTitle: "Dietary Information",
+          dietaryDesc: "Select dietary options that apply to this dish",
+          ingredientsTitle: "Ingredients",
+          ingredientsDesc: "List the main ingredients in this dish",
+          availableDesc: "Make this item available for customers to order",
+          featuredDesc: "Highlight this item as a special or popular dish",
+          saving: "Saving...",
+        }
+
+  const COMMON_ALLERGENS =
+    locale === "es-ES"
+      ? ["Gluten", "Lacteos", "Huevos", "Pescado", "Marisco", "Frutos secos", "Cacahuetes", "Soja", "Trigo", "Sesamo", "Sulfitos", "Mostaza"]
+      : ["Gluten", "Dairy", "Eggs", "Fish", "Shellfish", "Tree Nuts", "Peanuts", "Soy", "Wheat", "Sesame", "Sulfites", "Mustard"]
+
+  const DIETARY_OPTIONS =
+    locale === "es-ES"
+      ? ["Vegetariano", "Vegano", "Sin gluten", "Sin lacteos", "Bajo en carbohidratos", "Keto", "Paleo", "Halal", "Kosher", "Organico", "Local"]
+      : ["Vegetarian", "Vegan", "Gluten-Free", "Dairy-Free", "Low-Carb", "Keto", "Paleo", "Halal", "Kosher", "Organic", "Local"]
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -152,21 +248,21 @@ export default function AddMenuItemForm({ restaurantId, onSuccess, onCancel, edi
     const newErrors: Record<string, string> = {}
 
     if (!form.name.trim()) {
-      newErrors.name = 'Name is required'
+      newErrors.name = tx.requiredName
     }
 
     if (!form.price.trim()) {
-      newErrors.price = 'Price is required'
+      newErrors.price = tx.requiredPrice
     } else if (isNaN(Number(form.price)) || Number(form.price) <= 0) {
-      newErrors.price = 'Price must be a positive number'
+      newErrors.price = tx.positivePrice
     }
 
     if (!form.category_id) {
-      newErrors.category_id = 'Category is required'
+      newErrors.category_id = tx.requiredCategory
     }
 
     if (form.preparation_time && (isNaN(Number(form.preparation_time)) || Number(form.preparation_time) < 0)) {
-      newErrors.preparation_time = 'Preparation time must be a positive number'
+      newErrors.preparation_time = tx.prepPositive
     }
 
     setErrors(newErrors)
@@ -231,7 +327,7 @@ export default function AddMenuItemForm({ restaurantId, onSuccess, onCancel, edi
       onSuccess()
     } catch (error: any) {
       console.error('Error saving menu item:', error)
-      setErrors({ submit: error.message || 'Failed to save menu item' })
+      setErrors({ submit: error.message || tx.failedSave })
     } finally {
       setSaving(false)
     }
@@ -337,14 +433,14 @@ export default function AddMenuItemForm({ restaurantId, onSuccess, onCancel, edi
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">
-            {editingItem ? 'Edit Menu Item' : 'Add New Menu Item'}
+            {editingItem ? tx.editTitle : tx.addTitle}
           </h2>
           <p className="text-gray-600 mt-2">
-            {editingItem ? 'Update the details of your menu item' : 'Create a new menu item for your restaurant'}
+            {editingItem ? tx.editDesc : tx.addDesc}
           </p>
         </div>
         <Button variant="outline" onClick={onCancel}>
-          Cancel
+          {tx.cancel}
         </Button>
       </div>
 
@@ -360,19 +456,19 @@ export default function AddMenuItemForm({ restaurantId, onSuccess, onCancel, edi
           <CardContent className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-sm font-medium">Name *</Label>
+                <Label htmlFor="name" className="text-sm font-medium">{tx.name}</Label>
                 <Input
                   id="name"
                   value={form.name}
                   onChange={(e) => setForm(prev => ({ ...prev, name: e.target.value }))}
-                  placeholder="e.g., Margherita Pizza"
+                  placeholder={tx.dishExample}
                   className={`h-11 ${errors.name ? 'border-red-500' : ''}`}
                 />
                 {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="price" className="text-sm font-medium">Price *</Label>
+                <Label htmlFor="price" className="text-sm font-medium">{tx.price}</Label>
                 <div className="relative">
                   <DollarSign className="absolute left-3 top-3.5 h-4 w-4 text-gray-400" />
                   <Input
@@ -391,12 +487,12 @@ export default function AddMenuItemForm({ restaurantId, onSuccess, onCancel, edi
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description" className="text-sm font-medium">Description</Label>
+              <Label htmlFor="description" className="text-sm font-medium">{tx.description}</Label>
               <Textarea
                 id="description"
                 value={form.description}
                 onChange={(e) => setForm(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Describe your dish..."
+                placeholder={tx.describeDish}
                 rows={3}
                 className="min-h-[80px]"
               />
@@ -414,13 +510,13 @@ export default function AddMenuItemForm({ restaurantId, onSuccess, onCancel, edi
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label htmlFor="category" className="text-sm font-medium">Category *</Label>
+                <Label htmlFor="category" className="text-sm font-medium">{tx.category}</Label>
                 <Select
                   value={form.category_id}
                   onValueChange={(value) => setForm(prev => ({ ...prev, category_id: value }))}
                 >
                   <SelectTrigger className={`h-11 ${errors.category_id ? 'border-red-500' : ''}`}>
-                    <SelectValue placeholder="Select a category" />
+                    <SelectValue placeholder={tx.selectCategory} />
                   </SelectTrigger>
                   <SelectContent>
                     {categories.map((category) => (
@@ -434,7 +530,7 @@ export default function AddMenuItemForm({ restaurantId, onSuccess, onCancel, edi
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="preparation_time" className="text-sm font-medium">Preparation Time (minutes)</Label>
+                <Label htmlFor="preparation_time" className="text-sm font-medium">{tx.prepTime}</Label>
                 <div className="relative">
                   <Clock className="absolute left-3 top-3.5 h-4 w-4 text-gray-400" />
                   <Input
@@ -458,13 +554,13 @@ export default function AddMenuItemForm({ restaurantId, onSuccess, onCancel, edi
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5" />
-              Allergens
+              {tx.allergensTitle}
             </CardTitle>
-            <p className="text-sm text-gray-600">Select allergens that this dish contains</p>
+            <p className="text-sm text-gray-600">{tx.allergensDesc}</p>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-3">
-              <Label className="text-sm font-medium">Common Allergens</Label>
+              <Label className="text-sm font-medium">{tx.commonAllergens}</Label>
               <div className="flex flex-wrap gap-3">
                 {COMMON_ALLERGENS.map((allergen) => (
                   <Badge
@@ -484,12 +580,12 @@ export default function AddMenuItemForm({ restaurantId, onSuccess, onCancel, edi
             </div>
 
             <div className="space-y-3">
-              <Label className="text-sm font-medium">Custom Allergen</Label>
+              <Label className="text-sm font-medium">{tx.customAllergen}</Label>
               <div className="flex gap-3">
                 <Input
                   value={newAllergen}
                   onChange={(e) => setNewAllergen(e.target.value)}
-                  placeholder="Add custom allergen..."
+                  placeholder={tx.addCustomAllergen}
                   onKeyPress={(e) => e.key === 'Enter' && addAllergen()}
                   className="h-11"
                 />
@@ -501,7 +597,7 @@ export default function AddMenuItemForm({ restaurantId, onSuccess, onCancel, edi
 
             {form.allergens.length > 0 && (
               <div className="space-y-3">
-                <Label className="text-sm font-medium">Selected Allergens</Label>
+                <Label className="text-sm font-medium">{tx.selectedAllergens}</Label>
                 <div className="flex flex-wrap gap-3">
                   {form.allergens.map((allergen) => (
                     <Badge key={allergen} variant="secondary" className="bg-red-50 text-red-700 px-3 py-1.5 text-sm">
@@ -526,13 +622,13 @@ export default function AddMenuItemForm({ restaurantId, onSuccess, onCancel, edi
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CheckCircle className="h-5 w-5" />
-              Dietary Information
+              {tx.dietaryTitle}
             </CardTitle>
-            <p className="text-sm text-gray-600">Select dietary options that apply to this dish</p>
+            <p className="text-sm text-gray-600">{tx.dietaryDesc}</p>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-3">
-              <Label className="text-sm font-medium">Dietary Options</Label>
+              <Label className="text-sm font-medium">{tx.dietaryOptions}</Label>
               <div className="flex flex-wrap gap-3">
                 {DIETARY_OPTIONS.map((dietary) => (
                   <Badge
@@ -552,12 +648,12 @@ export default function AddMenuItemForm({ restaurantId, onSuccess, onCancel, edi
             </div>
 
             <div className="space-y-3">
-              <Label className="text-sm font-medium">Custom Dietary Option</Label>
+              <Label className="text-sm font-medium">{tx.customDietary}</Label>
               <div className="flex gap-3">
                 <Input
                   value={newDietary}
                   onChange={(e) => setNewDietary(e.target.value)}
-                  placeholder="Add custom dietary option..."
+                  placeholder={tx.addCustomDietary}
                   onKeyPress={(e) => e.key === 'Enter' && addDietary()}
                   className="h-11"
                 />
@@ -569,7 +665,7 @@ export default function AddMenuItemForm({ restaurantId, onSuccess, onCancel, edi
 
             {form.dietary_info.length > 0 && (
               <div className="space-y-3">
-                <Label className="text-sm font-medium">Selected Dietary Options</Label>
+                <Label className="text-sm font-medium">{tx.selectedDietary}</Label>
                 <div className="flex flex-wrap gap-3">
                   {form.dietary_info.map((dietary) => (
                     <Badge key={dietary} variant="secondary" className="bg-green-50 text-green-700 px-3 py-1.5 text-sm">
@@ -594,18 +690,18 @@ export default function AddMenuItemForm({ restaurantId, onSuccess, onCancel, edi
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <ChefHat className="h-5 w-5" />
-              Ingredients
+              {tx.ingredientsTitle}
             </CardTitle>
-            <p className="text-sm text-gray-600">List the main ingredients in this dish</p>
+            <p className="text-sm text-gray-600">{tx.ingredientsDesc}</p>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-3">
-              <Label className="text-sm font-medium">Add Ingredient</Label>
+              <Label className="text-sm font-medium">{tx.addIngredient}</Label>
               <div className="flex gap-3">
                 <Input
                   value={newIngredient}
                   onChange={(e) => setNewIngredient(e.target.value)}
-                  placeholder="Add ingredient..."
+                  placeholder={tx.addIngredientPlaceholder}
                   onKeyPress={(e) => e.key === 'Enter' && addIngredient()}
                   className="h-11"
                 />
@@ -617,7 +713,7 @@ export default function AddMenuItemForm({ restaurantId, onSuccess, onCancel, edi
 
             {form.ingredients.length > 0 && (
               <div className="space-y-3">
-                <Label className="text-sm font-medium">Ingredients List</Label>
+                <Label className="text-sm font-medium">{tx.ingredientsList}</Label>
                 <div className="flex flex-wrap gap-3">
                   {form.ingredients.map((ingredient) => (
                     <Badge key={ingredient} variant="outline" className="px-3 py-1.5 text-sm">
@@ -640,13 +736,13 @@ export default function AddMenuItemForm({ restaurantId, onSuccess, onCancel, edi
         {/* Settings */}
         <Card>
           <CardHeader>
-            <CardTitle>Settings</CardTitle>
+            <CardTitle>{tx.settings}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
               <div className="space-y-1">
-                <Label htmlFor="is_available" className="text-sm font-medium">Available for Order</Label>
-                <p className="text-sm text-gray-600">Make this item available for customers to order</p>
+                <Label htmlFor="is_available" className="text-sm font-medium">{tx.availableForOrder}</Label>
+                <p className="text-sm text-gray-600">{tx.availableDesc}</p>
               </div>
               <Switch
                 id="is_available"
@@ -659,8 +755,8 @@ export default function AddMenuItemForm({ restaurantId, onSuccess, onCancel, edi
 
             <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
               <div className="space-y-1">
-                <Label htmlFor="is_featured" className="text-sm font-medium">Featured Item</Label>
-                <p className="text-sm text-gray-600">Highlight this item as a special or popular dish</p>
+                <Label htmlFor="is_featured" className="text-sm font-medium">{tx.featuredItem}</Label>
+                <p className="text-sm text-gray-600">{tx.featuredDesc}</p>
               </div>
               <Switch
                 id="is_featured"
@@ -681,18 +777,18 @@ export default function AddMenuItemForm({ restaurantId, onSuccess, onCancel, edi
         {/* Submit Button */}
         <div className="flex justify-end gap-4 pt-6 border-t border-gray-200">
           <Button variant="outline" onClick={onCancel} className="h-11 px-6">
-            Cancel
+            {tx.cancel}
           </Button>
           <Button onClick={handleSubmit} disabled={saving} className="h-11 px-6">
             {saving ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Saving...
+                {tx.saving}
               </>
             ) : (
               <>
                 <Save className="h-4 w-4 mr-2" />
-                {editingItem ? 'Update Item' : 'Add Item'}
+                {editingItem ? tx.updateItem : tx.addItem}
               </>
             )}
           </Button>

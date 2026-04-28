@@ -22,6 +22,7 @@ import {
   Trash2
 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
+import { useI18n } from "@/components/i18n/i18n-provider"
 
 interface Category {
   id: string
@@ -53,6 +54,69 @@ Caesar Salad,Fresh romaine lettuce with Caesar dressing,12.99,Appetizers,10,true
 Tiramisu,Italian dessert with coffee and mascarpone,9.99,Desserts,5,true,true`
 
 export default function BulkAddMenuItems({ restaurantId, onSuccess, onCancel }: BulkAddMenuItemsProps) {
+  const { locale } = useI18n()
+  const tx =
+    locale === "es-ES"
+      ? {
+          requiredName: "El nombre es obligatorio",
+          requiredPrice: "El precio es obligatorio",
+          pricePositive: "El precio debe ser mayor que cero",
+          requiredCategory: "La categoria es obligatoria",
+          header: "Anadir items en bloque",
+          subtitle: "Anade varios platos al menu rapidamente",
+          cancel: "Cancelar",
+          importExport: "Opciones de importar/exportar",
+          loadSample: "Cargar ejemplo",
+          exportCsv: "Exportar CSV",
+          importCsv: "Importar CSV",
+          csvData: "Datos CSV (pega aqui tu CSV)",
+          csvPlaceholder: "Pega aqui los datos CSV...",
+          successCreated: "Se han creado {count} items del menu",
+          item: "Item",
+          available: "Disponible",
+          featured: "Destacado",
+          name: "Nombre *",
+          dishName: "Nombre del plato",
+          price: "Precio *",
+          category: "Categoria *",
+          selectCategory: "Seleccionar categoria",
+          prepTime: "Tiempo de preparacion (minutos)",
+          description: "Descripcion",
+          describeDish: "Describe el plato...",
+          addAnother: "Anadir otro item",
+          creating: "Creando items...",
+          createN: "Crear {count} items",
+        }
+      : {
+          requiredName: "Name is required",
+          requiredPrice: "Price is required",
+          pricePositive: "Price must be a positive number",
+          requiredCategory: "Category is required",
+          header: "Bulk Add Menu Items",
+          subtitle: "Add multiple dishes to your menu quickly",
+          cancel: "Cancel",
+          importExport: "Import/Export Options",
+          loadSample: "Load Sample",
+          exportCsv: "Export CSV",
+          importCsv: "Import CSV",
+          csvData: "CSV Data (Paste your CSV here)",
+          csvPlaceholder: "Paste CSV data here...",
+          successCreated: "Successfully created {count} menu items!",
+          item: "Item",
+          available: "Available",
+          featured: "Featured",
+          name: "Name *",
+          dishName: "Dish name",
+          price: "Price *",
+          category: "Category *",
+          selectCategory: "Select category",
+          prepTime: "Preparation Time (minutes)",
+          description: "Description",
+          describeDish: "Describe the dish...",
+          addAnother: "Add Another Item",
+          creating: "Creating Items...",
+          createN: "Create {count} Items",
+        }
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -121,15 +185,15 @@ export default function BulkAddMenuItems({ restaurantId, onSuccess, onCancel }: 
     
     items.forEach((item, index) => {
       if (!item.name.trim()) {
-        newErrors[`${index}-name`] = 'Name is required'
+        newErrors[`${index}-name`] = tx.requiredName
       }
       if (!item.price.trim()) {
-        newErrors[`${index}-price`] = 'Price is required'
+        newErrors[`${index}-price`] = tx.requiredPrice
       } else if (isNaN(Number(item.price)) || Number(item.price) <= 0) {
-        newErrors[`${index}-price`] = 'Price must be a positive number'
+        newErrors[`${index}-price`] = tx.pricePositive
       }
       if (!item.category_id) {
-        newErrors[`${index}-category`] = 'Category is required'
+        newErrors[`${index}-category`] = tx.requiredCategory
       }
     })
 
@@ -236,13 +300,13 @@ export default function BulkAddMenuItems({ restaurantId, onSuccess, onCancel }: 
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Bulk Add Menu Items</h2>
-          <p className="text-gray-600 mt-1">Add multiple dishes to your menu quickly</p>
+          <h2 className="text-2xl font-bold text-gray-900">{tx.header}</h2>
+          <p className="text-gray-600 mt-1">{tx.subtitle}</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={onCancel}>
             <X className="h-4 w-4 mr-2" />
-            Cancel
+            {tx.cancel}
           </Button>
         </div>
       </div>
@@ -250,30 +314,30 @@ export default function BulkAddMenuItems({ restaurantId, onSuccess, onCancel }: 
       {/* CSV Import/Export */}
       <Card>
         <CardHeader>
-          <CardTitle>Import/Export Options</CardTitle>
+          <CardTitle>{tx.importExport}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Button variant="outline" onClick={() => setCsvData(SAMPLE_CSV)}>
               <Copy className="h-4 w-4 mr-2" />
-              Load Sample
+              {tx.loadSample}
             </Button>
             <Button variant="outline" onClick={exportToCSV}>
               <Download className="h-4 w-4 mr-2" />
-              Export CSV
+              {tx.exportCsv}
             </Button>
             <Button variant="outline" onClick={() => parseCSV(csvData)}>
               <Upload className="h-4 w-4 mr-2" />
-              Import CSV
+              {tx.importCsv}
             </Button>
           </div>
           
           <div>
-            <Label>CSV Data (Paste your CSV here)</Label>
+            <Label>{tx.csvData}</Label>
             <Textarea
               value={csvData}
               onChange={(e) => setCsvData(e.target.value)}
-              placeholder="Paste CSV data here..."
+              placeholder={tx.csvPlaceholder}
               rows={6}
             />
           </div>
@@ -295,7 +359,7 @@ export default function BulkAddMenuItems({ restaurantId, onSuccess, onCancel }: 
         <div className="bg-green-50 border border-green-200 rounded-lg p-4">
           <div className="flex items-center">
             <CheckCircle className="h-5 w-5 text-green-400 mr-2" />
-            <span className="text-green-700">Successfully created {successCount} menu items!</span>
+            <span className="text-green-700">{tx.successCreated.replace("{count}", String(successCount))}</span>
           </div>
         </div>
       )}
@@ -306,18 +370,18 @@ export default function BulkAddMenuItems({ restaurantId, onSuccess, onCancel }: 
           <Card key={index}>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">Item {index + 1}</CardTitle>
+                <CardTitle className="text-lg">{tx.item} {index + 1}</CardTitle>
                 <div className="flex items-center gap-2">
                   <Switch
                     checked={item.is_available}
                     onCheckedChange={(checked) => updateItem(index, 'is_available', checked)}
                   />
-                  <span className="text-sm text-gray-600">Available</span>
+                  <span className="text-sm text-gray-600">{tx.available}</span>
                   <Switch
                     checked={item.is_featured}
                     onCheckedChange={(checked) => updateItem(index, 'is_featured', checked)}
                   />
-                  <span className="text-sm text-gray-600">Featured</span>
+                  <span className="text-sm text-gray-600">{tx.featured}</span>
                   {items.length > 1 && (
                     <Button
                       variant="ghost"
@@ -334,11 +398,11 @@ export default function BulkAddMenuItems({ restaurantId, onSuccess, onCancel }: 
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
-                  <Label>Name *</Label>
+                  <Label>{tx.name}</Label>
                   <Input
                     value={item.name}
                     onChange={(e) => updateItem(index, 'name', e.target.value)}
-                    placeholder="Dish name"
+                    placeholder={tx.dishName}
                     className={errors[`${index}-name`] ? 'border-red-500' : ''}
                   />
                   {errors[`${index}-name`] && (
@@ -347,7 +411,7 @@ export default function BulkAddMenuItems({ restaurantId, onSuccess, onCancel }: 
                 </div>
 
                 <div>
-                  <Label>Price *</Label>
+                  <Label>{tx.price}</Label>
                   <Input
                     value={item.price}
                     onChange={(e) => updateItem(index, 'price', e.target.value)}
@@ -360,10 +424,10 @@ export default function BulkAddMenuItems({ restaurantId, onSuccess, onCancel }: 
                 </div>
 
                 <div>
-                  <Label>Category *</Label>
+                  <Label>{tx.category}</Label>
                   <Select value={item.category_id} onValueChange={(value) => updateItem(index, 'category_id', value)}>
                     <SelectTrigger className={errors[`${index}-category`] ? 'border-red-500' : ''}>
-                      <SelectValue placeholder="Select category" />
+                      <SelectValue placeholder={tx.selectCategory} />
                     </SelectTrigger>
                     <SelectContent>
                       {categories.map((category) => (
@@ -379,7 +443,7 @@ export default function BulkAddMenuItems({ restaurantId, onSuccess, onCancel }: 
                 </div>
 
                 <div>
-                  <Label>Preparation Time (minutes)</Label>
+                  <Label>{tx.prepTime}</Label>
                   <Input
                     value={item.preparation_time}
                     onChange={(e) => updateItem(index, 'preparation_time', e.target.value)}
@@ -388,11 +452,11 @@ export default function BulkAddMenuItems({ restaurantId, onSuccess, onCancel }: 
                 </div>
 
                 <div className="md:col-span-2 lg:col-span-3">
-                  <Label>Description</Label>
+                  <Label>{tx.description}</Label>
                   <Textarea
                     value={item.description}
                     onChange={(e) => updateItem(index, 'description', e.target.value)}
-                    placeholder="Describe the dish..."
+                    placeholder={tx.describeDish}
                     rows={2}
                   />
                 </div>
@@ -406,25 +470,25 @@ export default function BulkAddMenuItems({ restaurantId, onSuccess, onCancel }: 
       <div className="flex justify-center">
         <Button variant="outline" onClick={addItem}>
           <Plus className="h-4 w-4 mr-2" />
-          Add Another Item
+          {tx.addAnother}
         </Button>
       </div>
 
       {/* Action Buttons */}
       <div className="flex justify-end gap-3 pt-6 border-t">
         <Button variant="outline" onClick={onCancel}>
-          Cancel
+          {tx.cancel}
         </Button>
         <Button onClick={handleSubmit} disabled={saving}>
           {saving ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Creating Items...
+              {tx.creating}
             </>
           ) : (
             <>
               <Save className="h-4 w-4 mr-2" />
-              Create {items.length} Items
+              {tx.createN.replace("{count}", String(items.length))}
             </>
           )}
         </Button>
