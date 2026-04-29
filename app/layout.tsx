@@ -4,6 +4,7 @@ import { GeistSans } from "geist/font/sans"
 import { GeistMono } from "geist/font/mono"
 import "./globals.css"
 import { AppProviders } from "@/components/app-providers"
+import { getSiteUrl } from "@/lib/site"
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -14,6 +15,7 @@ const fraunces = Fraunces({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(getSiteUrl()),
   title: "Tably - Restaurant Management",
   description: "Modern restaurant management platform",
   icons: {

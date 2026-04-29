@@ -926,6 +926,16 @@ export default function HomePage() {
                   </Link>
                 </li>
                 <li>
+                  <Link href="/software-gestion-restaurantes" className="hover:text-white transition-colors">
+                    {isEs ? "Gestión restaurante" : "Restaurant OS"}
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/pedidos-online-restaurante" className="hover:text-white transition-colors">
+                    {isEs ? "Pedidos online" : "Online orders"}
+                  </Link>
+                </li>
+                <li>
                   <Link href="/auth/login" className="hover:text-white transition-colors">
                     {isEs ? "Iniciar sesión" : "Sign in"}
                   </Link>
@@ -937,7 +947,7 @@ export default function HomePage() {
               <div className="font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-500 mb-4">{isEs ? "Estudio" : "Studio"}</div>
               <ul className="space-y-2 text-sm text-zinc-300">
                 <li>
-                  <Link href="#" className="hover:text-white transition-colors">
+                  <Link href="/sobre-tably" className="hover:text-white transition-colors">
                     {isEs ? "Nosotros" : "About"}
                   </Link>
                 </li>
