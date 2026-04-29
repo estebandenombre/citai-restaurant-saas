@@ -101,7 +101,7 @@ export default function SoftwareGestionRestaurantesPage() {
         </ul>
 
         <h2 className="font-display mt-14 text-2xl font-normal tracking-tight text-zinc-950 md:text-3xl">
-          Por qué equipos en España eligen modelos sin comisión
+          Por qué equipos en Valencia y en España eligen modelos sin comisión
         </h2>
         <p className="mt-6 leading-relaxed text-zinc-700">
           Las plataformas que cobran un porcentaje por pedido pueden ser útiles para darse a conocer, pero cuando ya tienes

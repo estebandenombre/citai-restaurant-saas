@@ -8,9 +8,9 @@ import { ArrowRight } from "lucide-react"
 const path = "/sobre-tably"
 
 export const metadata: Metadata = {
-  title: "Sobre Tably · Software para restaurantes desde Barcelona | Tably",
+  title: "Sobre Tably · Software para restaurantes desde Valencia | Tably",
   description:
-    "Tably es un estudio de producto para hostelería: pedidos, reservas, KDS e inventario sin comisión por venta. Datos en la UE, soporte humano.",
+    "Tably es un estudio de producto para hostelería en Valencia: pedidos, reservas, KDS e inventario sin comisión por venta. Datos en la UE, soporte humano.",
   alternates: { canonical: `${getSiteUrl()}${path}` },
   openGraph: {
     title: "Sobre Tably",
@@ -36,8 +36,14 @@ export default function SobreTablyPage() {
       name: "Tably Studio S.L.",
       url: site,
       email: "hello@tably.digital",
-      areaServed: "ES",
-      description: "Software de gestión para restaurantes.",
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: "Valencia",
+        addressRegion: "Comunitat Valenciana",
+        addressCountry: "ES",
+      },
+      areaServed: { "@type": "Country", name: "España" },
+      description: "Software de gestión para restaurantes, con base en Valencia.",
     },
   }
 
@@ -55,7 +61,7 @@ export default function SobreTablyPage() {
           ticket a un intermediario eterno.
         </p>
         <p className="mt-4 text-lg leading-relaxed text-zinc-700">
-          Somos un equipo con base en Barcelona y foco en Europa. Priorizamos privacidad (alojamiento en la UE), exportación de
+          Somos un equipo con base en Valencia y foco en Europa. Priorizamos privacidad (alojamiento en la UE), exportación de
           datos y respuestas de personas reales cuando algo falla en pleno sábado.
         </p>
 

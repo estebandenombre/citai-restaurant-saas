@@ -371,7 +371,7 @@ export default function HomePage() {
           {/* Top meta bar */}
           <div className="flex flex-wrap items-center justify-between gap-4 font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-500 mb-16 md:mb-20">
             <span className="font-mono">— Index, Vol. 03</span>
-            <span className="hidden md:inline">{isEs ? "Creado en Barcelona, usado en todo el mundo" : "Made in Barcelona, served worldwide"}</span>
+            <span className="hidden md:inline">{isEs ? "Creado en Valencia, usado en todo el mundo" : "Made in Valencia, served worldwide"}</span>
             <span className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
               <span className="font-mono">v3.2 — {isEs ? "Ya disponible" : "Now shipping"}</span>
@@ -406,7 +406,7 @@ export default function HomePage() {
                 {isEs ? "Un estudio de software para restaurantes" : "A studio for restaurant software"}
               </div>
               <div className={`${display.className} mt-3 italic text-zinc-700 text-lg leading-snug`}>
-                {isEs ? "Desde 2024 — Barcelona y Madrid." : "est. 2024 — Barcelona & Madrid."}
+                {isEs ? "Desde 2024 — Valencia." : "est. 2024 — Valencia."}
               </div>
             </div>
             <div className="md:col-span-6 md:col-start-7">
@@ -587,7 +587,7 @@ export default function HomePage() {
                     ))}
                   </nav>
                   <div className="mt-auto pt-10 text-xs text-zinc-500 leading-relaxed">
-                    <div className="font-medium text-zinc-700">Bella Vista — Madrid</div>
+                    <div className="font-medium text-zinc-700">Bella Vista — Valencia</div>
                     <div className="mt-1 font-mono tabular-nums">{isEs ? "Sab · 21:14 · 47/52 servicios" : "Sat · 21:14 · 47/52 covers"}</div>
                   </div>
                 </aside>
@@ -665,7 +665,7 @@ export default function HomePage() {
             <figcaption className="mt-5 font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-500 flex items-center gap-3">
               <span>Fig. 01</span>
               <span className="h-px flex-1 bg-zinc-900/15"></span>
-              <span className="text-right">{isEs ? "Panel de servicio en hora punta — Bella Vista, Madrid" : "Service dashboard, dinner rush — Bella Vista, Madrid"}</span>
+              <span className="text-right">{isEs ? "Panel de servicio en hora punta — Bella Vista, Valencia" : "Service dashboard, dinner rush — Bella Vista, Valencia"}</span>
             </figcaption>
           </figure>
         </div>
@@ -677,7 +677,7 @@ export default function HomePage() {
           <div className="md:col-span-7">
             <div className="font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-500 mb-8 flex items-center gap-3">
               <span className="h-px w-8 bg-zinc-900/30"></span>
-              <span>{isEs ? "Nota de campo 03 — Bella Vista, Madrid" : "Field note 03 — Bella Vista, Madrid"}</span>
+              <span>{isEs ? "Nota de campo 03 — Bella Vista, Valencia" : "Field note 03 — Bella Vista, Valencia"}</span>
             </div>
             <blockquote
               className={`${display.className} text-3xl md:text-4xl lg:text-5xl leading-[1.12] tracking-[-0.01em] font-light text-zinc-950`}
@@ -696,7 +696,7 @@ export default function HomePage() {
               </div>
               <div className="text-sm">
                 <div className="font-medium">Esteban Ortiz</div>
-                <div className="text-zinc-600">{isEs ? "Propietario — Bella Vista, Madrid" : "Owner — Bella Vista, Madrid"}</div>
+                <div className="text-zinc-600">{isEs ? "Propietario — Bella Vista, Valencia" : "Owner — Bella Vista, Valencia"}</div>
               </div>
             </div>
           </div>
@@ -896,7 +896,7 @@ export default function HomePage() {
                 {isEs ? "Tably — Un estudio de software para restaurantes." : "Tably — A studio for restaurant software."}
               </div>
               <p className="mt-4 text-sm text-zinc-400 max-w-sm leading-relaxed">
-                {isEs ? "Creado en Barcelona por gente que estuvo en cocina antes que en codigo." : "Built in Barcelona by people who washed dishes before they wrote code."}
+                {isEs ? "Creado en Valencia por gente que estuvo en cocina antes que en codigo." : "Built in Valencia by people who washed dishes before they wrote code."}
               </p>
               <a
                 href="mailto:hello@tably.digital"
@@ -1008,7 +1008,7 @@ export default function HomePage() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-zinc-500 pt-6 border-t border-white/10">
             <div className="font-mono">© 2026 Tably Studio S.L. — {isEs ? "Un sistema operativo para restaurantes." : "A restaurant operating system."}</div>
             <div className="flex items-center gap-6">
-              <span className="hidden md:inline font-mono">Barcelona · 41.3851° N, 2.1734° E</span>
+              <span className="hidden md:inline font-mono">Valencia · 39.4699° N, 0.3774° W</span>
               <Link href="#" className="hover:text-white transition-colors">
                 Twitter
               </Link>
