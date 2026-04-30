@@ -36,6 +36,13 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${GeistSans.variable} ${GeistMono.variable} ${fraunces.variable}`}
     >
+      <head>
+        <script
+          src="https://analytics.ahrefs.com/analytics.js"
+          data-key="tol2ZTFF5YglM7V0jPkMrg"
+          async
+        />
+      </head>
       <body className="min-h-screen font-sans antialiased bg-background text-foreground">
         <AppProviders>
           <div className="min-h-screen bg-background">{children}</div>
