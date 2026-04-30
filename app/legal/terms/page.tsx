@@ -1,7 +1,20 @@
 import Link from "next/link"
+import type { Metadata } from "next"
 import { Button } from "@/components/ui/button"
 import { Logo } from "@/components/ui/logo"
+import { getSiteUrl } from "@/lib/site"
 import { ArrowLeft } from "lucide-react"
+
+const path = "/legal/terms"
+
+export const metadata: Metadata = {
+  title: "Terms and Conditions | Tably",
+  description:
+    "Review Tably's service terms, trial details, user responsibilities, and data ownership commitments.",
+  alternates: {
+    canonical: `${getSiteUrl()}${path}`,
+  },
+}
 
 export default function TermsPage() {
   return (

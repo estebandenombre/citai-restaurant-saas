@@ -20,6 +20,11 @@ export const metadata: Metadata = {
     locale: "es_ES",
     type: "article",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Inventario y menú en vivo | Tably",
+    description: "Gestiona mermas y disponibilidad ligada a la carta y a los pedidos.",
+  },
 }
 
 export default function InventarioRestaurantePage() {

@@ -1,7 +1,20 @@
 import Link from "next/link"
+import type { Metadata } from "next"
 import { Button } from "@/components/ui/button"
 import { Logo } from "@/components/ui/logo"
+import { getSiteUrl } from "@/lib/site"
 import { ArrowLeft } from "lucide-react"
+
+const path = "/legal/privacy"
+
+export const metadata: Metadata = {
+  title: "Privacy Policy | Tably",
+  description:
+    "Read how Tably collects, processes, and protects personal data for restaurant teams using our platform.",
+  alternates: {
+    canonical: `${getSiteUrl()}${path}`,
+  },
+}
 
 export default function PrivacyPage() {
   return (

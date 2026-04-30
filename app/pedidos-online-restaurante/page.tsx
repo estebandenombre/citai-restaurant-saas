@@ -20,6 +20,11 @@ export const metadata: Metadata = {
     locale: "es_ES",
     type: "article",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Pedidos online para restaurantes sin comisión | Tably",
+    description: "Canal directo de ventas para tu restaurante. Sin comisiones por pedido.",
+  },
 }
 
 export default function PedidosOnlineRestaurantePage() {

@@ -20,6 +20,11 @@ export const metadata: Metadata = {
     locale: "es_ES",
     type: "article",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Software de reservas para restaurantes | Tably",
+    description: "Plano de sala, waitlist y protección ante ausencias. Prueba gratuita.",
+  },
 }
 
 export default function ReservasRestaurantesPage() {

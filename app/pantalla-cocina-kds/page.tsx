@@ -20,6 +20,11 @@ export const metadata: Metadata = {
     locale: "es_ES",
     type: "article",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "KDS · Pantalla de cocina para restaurantes | Tably",
+    description: "Organiza comandas por estación y mantén el pase bajo control.",
+  },
 }
 
 export default function PantallaCocinaKdsPage() {

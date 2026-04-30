@@ -20,6 +20,11 @@ export const metadata: Metadata = {
     locale: "es_ES",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Sobre Tably",
+    description: "Equipo y enfoque: herramientas para quien trabaja en sala y cocina.",
+  },
 }
 
 export default function SobreTablyPage() {

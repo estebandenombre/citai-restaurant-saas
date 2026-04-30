@@ -21,6 +21,12 @@ export const metadata: Metadata = {
     locale: "es_ES",
     type: "article",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Software de gestión para restaurantes | Tably",
+    description:
+      "ERP ligero para hostelería: sala, cocina y oficina conectadas. Prueba gratuita.",
+  },
 }
 
 export default function SoftwareGestionRestaurantesPage() {

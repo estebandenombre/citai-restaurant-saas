@@ -19,6 +19,10 @@ const productLinks = [
   { href: "/reservas-restaurantes", label: "Reservas" },
   { href: "/pantalla-cocina-kds", label: "KDS" },
   { href: "/inventario-restaurante", label: "Inventario" },
+  { href: "/restaurant-reservation-system", label: "Reservation system" },
+  { href: "/digital-menu-software", label: "Digital menu" },
+  { href: "/restaurant-inventory-management", label: "Inventory management" },
+  { href: "/restaurant-pos", label: "Restaurant POS" },
 ]
 
 export function JsonLd({ data }: { data: Record<string, unknown> }) {
